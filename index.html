@@ -1,1 +1,426 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <title>Babeh Barbershop - Premium Barber Services</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E✂️%3C/text%3E%3C/svg%3E">
+  
+  <!-- TailwindCSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
+      background: linear-gradient(145deg, #f8fafc 0%, #f1f5f9 100%);
+      min-height: 100vh;
+    }
+    
+    /* Menu Button Styles */
+    .menu-btn {
+      padding: 10px 20px;
+      border-radius: 50px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+      border: none;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .menu-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
+    
+    .menu-btn.active {
+      background: white;
+      color: #7e22ce;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* Content Container */
+    .content-container {
+      min-height: calc(100vh - 80px);
+      padding: 24px;
+      animation: fadeIn 0.5s ease;
+    }
+    
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    /* Card Styles */
+    .service-card, .barberman-card, .job-card {
+      transition: all 0.3s ease;
+    }
+    
+    .service-card:hover, .barberman-card:hover, .job-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+    }
+    
+    /* Gallery Item */
+    .gallery-item {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+    }
+    
+    .gallery-item:active {
+      transform: scale(0.98);
+    }
+    
+    /* Fullscreen Overlay */
+    .fullscreen-overlay {
+      background-color: rgba(0, 0, 0, 0.95);
+      backdrop-filter: blur(12px);
+    }
+    
+    /* Scrollbar */
+    .gallery-scroll {
+      scrollbar-width: thin;
+      scrollbar-color: #cbd5e1 #f1f5f9;
+    }
+    
+    .gallery-scroll::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+    
+    .gallery-scroll::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 10px;
+    }
+    
+    .gallery-scroll::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 10px;
+    }
+    
+    body.no-scroll {
+      overflow: hidden;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .menu-btn {
+        padding: 8px 16px;
+        font-size: 12px;
+      }
+      .content-container {
+        padding: 16px;
+      }
+    }
+    
+    /* Mobile Menu */
+    .mobile-menu {
+      position: fixed;
+      top: 0;
+      left: -280px;
+      width: 280px;
+      height: 100%;
+      background: linear-gradient(135deg, #4c1d95, #7e22ce);
+      z-index: 1000;
+      transition: left 0.3s ease;
+      padding: 20px;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .mobile-menu.open {
+      left: 0;
+    }
+    
+    .mobile-menu .mobile-menu-btn {
+      display: block;
+      width: 100%;
+      padding: 12px 16px;
+      margin-bottom: 8px;
+      border-radius: 12px;
+      text-align: left;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    
+    .mobile-menu .mobile-menu-btn:hover,
+    .mobile-menu .mobile-menu-btn.active {
+      background: white;
+      color: #7e22ce;
+    }
+    
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      display: none;
+    }
+    
+    .overlay.show {
+      display: block;
+    }
+  </style>
+</head>
+<body>
 
+  <div id="app">
+    <!-- Header / Navbar -->
+    <header class="shadow-md sticky top-0 z-50" style="background: linear-gradient(135deg, #4c1d95, #7e22ce, #a855f7);">
+      <nav class="container mx-auto px-4 py-3">
+        <div class="flex items-center justify-between">
+          <!-- Logo -->
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-full shadow-md overflow-hidden bg-white flex items-center justify-center">
+              <img src="images/logo.jpg" alt="Babeh Logo" class="w-full h-full object-cover" 
+                   onerror="this.onerror=null; this.parentElement.innerHTML = '<i class=\'fas fa-cut text-purple-600 text-2xl\'></i>';">
+            </div>
+            <div>
+              <h1 class="text-xl font-bold text-white">Babeh Barbershop</h1>
+              <p class="text-xs text-purple-200">Premium Barber Services</p>
+            </div>
+          </div>
+          
+          <!-- Mobile Menu Button -->
+          <button id="mobileMenuBtn" class="text-white text-2xl md:hidden">
+            <i class="fas fa-bars"></i>
+          </button>
+          
+          <!-- Desktop Menu -->
+          <div class="hidden md:flex space-x-2" id="desktopMenu">
+            <button class="menu-btn active" data-menu="background">
+              <i class="fas fa-home mr-1"></i> Background
+            </button>
+            <button class="menu-btn" data-menu="price-services">
+              <i class="fas fa-tags mr-1"></i> Price & Services
+            </button>
+            <button class="menu-btn" data-menu="barberman">
+              <i class="fas fa-users mr-1"></i> Barberman
+            </button>
+            <button class="menu-btn" data-menu="reservation">
+              <i class="fas fa-calendar-alt mr-1"></i> Reservasi
+            </button>
+            <button class="menu-btn" data-menu="katalog">
+              <i class="fas fa-cut mr-1"></i> Katalog
+            </button>
+            <button class="menu-btn" data-menu="lowongan">
+              <i class="fas fa-briefcase mr-1"></i> Lowongan
+            </button>
+            <button class="menu-btn" data-menu="chat">
+              <i class="fab fa-whatsapp mr-1"></i> Chat Admin
+            </button>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Mobile Menu Sidebar -->
+    <div class="mobile-menu" id="mobileMenu">
+      <div class="flex justify-between items-center mb-6 pb-4 border-b border-white/20">
+        <span class="text-white font-bold text-lg">Menu</span>
+        <button id="closeMobileMenu" class="text-white text-2xl">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <button class="mobile-menu-btn active" data-menu="background">
+        <i class="fas fa-home mr-2"></i> Background
+      </button>
+      <button class="mobile-menu-btn" data-menu="price-services">
+        <i class="fas fa-tags mr-2"></i> Price & Services
+      </button>
+      <button class="mobile-menu-btn" data-menu="barberman">
+        <i class="fas fa-users mr-2"></i> Barberman
+      </button>
+      <button class="mobile-menu-btn" data-menu="reservation">
+        <i class="fas fa-calendar-alt mr-2"></i> Reservasi
+      </button>
+      <button class="mobile-menu-btn" data-menu="katalog">
+        <i class="fas fa-cut mr-2"></i> Katalog
+      </button>
+      <button class="mobile-menu-btn" data-menu="lowongan">
+        <i class="fas fa-briefcase mr-2"></i> Lowongan
+      </button>
+      <button class="mobile-menu-btn" data-menu="chat">
+        <i class="fab fa-whatsapp mr-2"></i> Chat Admin
+      </button>
+    </div>
+    
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Main Content -->
+    <main id="mainContent" class="content-container">
+      <!-- Content akan diisi oleh JS -->
+      <div class="flex justify-center items-center h-64">
+        <div class="text-center">
+          <i class="fas fa-spinner fa-spin text-4xl text-purple-600"></i>
+          <p class="mt-4 text-gray-500">Memuat...</p>
+        </div>
+      </div>
+    </main>
+
+    <!-- Fullscreen Modal untuk Katalog -->
+    <div id="fullscreenModal" class="fixed inset-0 z-50 hidden fullscreen-overlay">
+      <div class="absolute top-5 left-5 z-50">
+        <button id="closeFullscreenBtn" class="bg-black/50 text-white p-3 rounded-full backdrop-blur-sm hover:bg-black/70 active:scale-95 transition">
+          <i class="fas fa-arrow-left text-xl"></i>
+        </button>
+      </div>
+      <div class="absolute top-5 right-5 z-50">
+        <button id="closeFullscreenXBtn" class="bg-black/50 text-white p-3 rounded-full backdrop-blur-sm hover:bg-black/70 active:scale-95 transition">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+      
+      <div class="w-full h-full flex flex-col items-center justify-center relative">
+        <img id="fullscreenImg" class="max-w-[90%] max-h-[75vh] object-contain rounded-xl shadow-2xl" src="" alt="Fullscreen">
+        <div id="fullscreenName" class="mt-4 text-white text-xl font-bold bg-black/50 px-6 py-2 rounded-full backdrop-blur-sm">-</div>
+        <button id="prevImageBtn" class="absolute left-3 md:left-6 bg-black/50 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg hover:bg-black/70">
+          <i class="fas fa-chevron-left text-2xl"></i>
+        </button>
+        <button id="nextImageBtn" class="absolute right-3 md:right-6 bg-black/50 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg hover:bg-black/70">
+          <i class="fas fa-chevron-right text-2xl"></i>
+        </button>
+      </div>
+      <div class="absolute bottom-5 left-0 right-0 text-center text-white/80 text-sm">
+        <span id="imageCounter">0 / 0</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load JavaScript Modules -->
+  <script src="js/background.js"></script>
+  <script src="js/price-services.js"></script>
+  <script src="js/barberman.js"></script>
+  <script src="js/reservation.js"></script>
+  <script src="js/katalog.js"></script>
+  <script src="js/lowongan.js"></script>
+  <script src="js/chat-admin.js"></script>
+  
+  <script>
+    // Main Controller
+    (function() {
+      // State
+      let currentMenu = 'background';
+      
+      // DOM Elements
+      const mainContent = document.getElementById('mainContent');
+      const desktopMenuBtns = document.querySelectorAll('#desktopMenu .menu-btn');
+      const mobileMenuBtns = document.querySelectorAll('.mobile-menu-btn');
+      const mobileMenu = document.getElementById('mobileMenu');
+      const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+      const closeMobileMenu = document.getElementById('closeMobileMenu');
+      const overlay = document.getElementById('overlay');
+      
+      // Fungsi untuk load konten dari module yang sudah di-load
+      function loadContent(menu) {
+        currentMenu = menu;
+        
+        // Update active class di desktop menu
+        desktopMenuBtns.forEach(btn => {
+          if (btn.getAttribute('data-menu') === menu) {
+            btn.classList.add('active');
+          } else {
+            btn.classList.remove('active');
+          }
+        });
+        
+        // Update active class di mobile menu
+        mobileMenuBtns.forEach(btn => {
+          if (btn.getAttribute('data-menu') === menu) {
+            btn.classList.add('active');
+          } else {
+            btn.classList.remove('active');
+          }
+        });
+        
+        // Panggil fungsi render dari module yang sesuai
+        if (menu === 'background' && typeof renderBackground === 'function') {
+          renderBackground(mainContent);
+        } else if (menu === 'price-services' && typeof renderPriceServices === 'function') {
+          renderPriceServices(mainContent);
+        } else if (menu === 'barberman' && typeof renderBarberman === 'function') {
+          renderBarberman(mainContent);
+        } else if (menu === 'reservation' && typeof renderReservation === 'function') {
+          renderReservation(mainContent);
+        } else if (menu === 'katalog' && typeof renderKatalog === 'function') {
+          renderKatalog(mainContent);
+        } else if (menu === 'lowongan' && typeof renderLowongan === 'function') {
+          renderLowongan(mainContent);
+        } else if (menu === 'chat' && typeof renderChat === 'function') {
+          renderChat(mainContent);
+        } else {
+          mainContent.innerHTML = '<div class="text-center py-20"><p class="text-gray-500">Konten sedang dimuat...</p></div>';
+        }
+        
+        // Tutup mobile menu jika terbuka
+        closeMobileMenuPanel();
+      }
+      
+      function closeMobileMenuPanel() {
+        mobileMenu.classList.remove('open');
+        overlay.classList.remove('show');
+      }
+      
+      function openMobileMenuPanel() {
+        mobileMenu.classList.add('open');
+        overlay.classList.add('show');
+      }
+      
+      // Event Listeners
+      desktopMenuBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const menu = btn.getAttribute('data-menu');
+          if (menu) loadContent(menu);
+        });
+      });
+      
+      mobileMenuBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const menu = btn.getAttribute('data-menu');
+          if (menu) {
+            loadContent(menu);
+            closeMobileMenuPanel();
+          }
+        });
+      });
+      
+      mobileMenuBtn.addEventListener('click', openMobileMenuPanel);
+      closeMobileMenu.addEventListener('click', closeMobileMenuPanel);
+      overlay.addEventListener('click', closeMobileMenuPanel);
+      
+      // Load default menu
+      loadContent('background');
+      
+      console.log('🚀 Babeh Barbershop App Ready!');
+    })();
+  </script>
+</body>
+</html>
