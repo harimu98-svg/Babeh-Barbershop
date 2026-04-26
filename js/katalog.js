@@ -1,13 +1,32 @@
 // Katalog Model Rambut - Babeh Barbershop
 // Modifikasi dari file index.html yang ada
 
+// ============================================
+// DEKLARASI VARIABEL GLOBAL (DILAKUKAN PERTAMA)
+// ============================================
+
 let currentKatalogImages = [];
 let currentKatalogIndex = 0;
 let currentKatalogCategory = 'Best Haircut';
 
-const SUPABASE_URL = 'https://intzwjmlypmopzauxeqt.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImludHp3am1seXBtb3B6YXV4ZXF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3MTc5MTIsImV4cCI6MjA3MDI5MzkxMn0.VwwVEDdHtYP5gui4epTcNfLXhPkmfFbRVb5y8mrXJiM';
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Konfigurasi Supabase
+const KATALOG_SUPABASE_URL = 'https://intzwjmlypmopzauxeqt.supabase.co';
+const KATALOG_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImludHp3am1seXBtb3B6YXV4ZXF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3MTc5MTIsImV4cCI6MjA3MDI5MzkxMn0.VwwVEDdHtYP5gui4epTcNfLXhPkmfFbRVb5y8mrXJiM';
+
+// Inisialisasi Supabase Client (dilakukan SEKARANG, bukan di dalam fungsi)
+let katalogSupabaseClient = null;
+
+// Inisialisasi Supabase dengan aman
+try {
+  if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
+    katalogSupabaseClient = window.supabase.createClient(KATALOG_SUPABASE_URL, KATALOG_SUPABASE_ANON_KEY);
+    console.log('✅ Supabase client untuk katalog berhasil diinisialisasi');
+  } else {
+    console.error('❌ Supabase library belum dimuat! Pastikan script supabase sudah dipanggil.');
+  }
+} catch (err) {
+  console.error('❌ Gagal inisialisasi Supabase:', err);
+}
 
 const KATALOG_TABLE = 'model_rambut';
 
@@ -20,6 +39,10 @@ const katalogCategoryMapping = {
   'Football Players Haircut': 'Football Players Haircut',
   'Other Service': 'Other Service'
 };
+
+// ============================================
+// FUNGSI UTAMA
+// ============================================
 
 // Fungsi untuk render halaman katalog
 function renderKatalog(container) {
@@ -66,41 +89,51 @@ function renderKatalog(container) {
     </div>
   `;
   
-  // Tambahkan style untuk tombol kategori
-  const style = document.createElement('style');
-  style.textContent = `
-    .katalog-cat-btn {
-      padding: 10px 20px;
-      border-radius: 9999px;
-      font-weight: 600;
-      transition: all 0.3s ease;
-      cursor: pointer;
-      background-color: #e5e7eb;
-      color: #4b5563;
-      border: none;
-      font-size: 14px;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .katalog-cat-btn:hover {
-      background-color: #d1d5db;
-      transform: translateY(-2px);
-    }
-    .katalog-cat-btn.active-cat {
-      background: linear-gradient(135deg, #7e22ce, #a855f7);
-      color: white;
-      box-shadow: 0 4px 10px rgba(126, 34, 206, 0.3);
-    }
-    .katalog-gallery-item {
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      cursor: pointer;
-    }
-    .katalog-gallery-item:active {
-      transform: scale(0.98);
-    }
-  `;
-  document.head.appendChild(style);
+  // Tambahkan style untuk tombol kategori jika belum ada
+  if (!document.querySelector('#katalogStyle')) {
+    const style = document.createElement('style');
+    style.id = 'katalogStyle';
+    style.textContent = `
+      .katalog-cat-btn {
+        padding: 10px 20px;
+        border-radius: 9999px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        background-color: #e5e7eb;
+        color: #4b5563;
+        border: none;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .katalog-cat-btn:hover {
+        background-color: #d1d5db;
+        transform: translateY(-2px);
+      }
+      .katalog-cat-btn.active-cat {
+        background: linear-gradient(135deg, #7e22ce, #a855f7);
+        color: white;
+        box-shadow: 0 4px 10px rgba(126, 34, 206, 0.3);
+      }
+      .katalog-gallery-item {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        cursor: pointer;
+      }
+      .katalog-gallery-item:active {
+        transform: scale(0.98);
+      }
+      .fullscreen-overlay {
+        background-color: rgba(0, 0, 0, 0.95);
+        backdrop-filter: blur(12px);
+      }
+      body.no-scroll {
+        overflow: hidden;
+      }
+    `;
+    document.head.appendChild(style);
+  }
   
   // Load default kategori
   loadKatalogCategory('Best Haircut');
@@ -121,12 +154,33 @@ function renderKatalog(container) {
   });
 }
 
+// ============================================
+// FUNGSI DATABASE
+// ============================================
+
 // Fungsi untuk mengambil data dari database
 async function fetchKatalogModelsByCategory(kategori) {
+  // Cek apakah Supabase client sudah siap
+  if (!katalogSupabaseClient) {
+    console.error('❌ Supabase client belum siap. Mencoba inisialisasi ulang...');
+    try {
+      if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
+        katalogSupabaseClient = window.supabase.createClient(KATALOG_SUPABASE_URL, KATALOG_SUPABASE_ANON_KEY);
+        console.log('✅ Supabase client berhasil diinisialisasi ulang');
+      } else {
+        console.error('❌ Supabase library tidak tersedia');
+        return [];
+      }
+    } catch (err) {
+      console.error('❌ Gagal inisialisasi ulang Supabase:', err);
+      return [];
+    }
+  }
+  
   try {
     console.log(`📋 Mengambil data katalog untuk kategori: ${kategori}`);
     
-    const { data, error } = await supabaseClient
+    const { data, error } = await katalogSupabaseClient
       .from(KATALOG_TABLE)
       .select('*')
       .eq('kategori', kategori);
@@ -174,6 +228,10 @@ function sortKatalogByNomor(data) {
   });
 }
 
+// ============================================
+// FUNGSI LOAD DAN RENDER
+// ============================================
+
 // Fungsi untuk load kategori
 async function loadKatalogCategory(category) {
   const loading = document.getElementById('katalogLoading');
@@ -199,9 +257,11 @@ async function loadKatalogCategory(category) {
       currentKatalogImages = models.map(model => {
         let imageUrl = model.link_url_bucket;
         if (!imageUrl.startsWith('http')) {
-          imageUrl = supabaseClient.storage
-            .from('model_rambut')
-            .getPublicUrl(imageUrl).data.publicUrl;
+          if (katalogSupabaseClient) {
+            imageUrl = katalogSupabaseClient.storage
+              .from('model_rambut')
+              .getPublicUrl(imageUrl).data.publicUrl;
+          }
         }
         
         return {
@@ -240,6 +300,7 @@ async function loadKatalogCategory(category) {
       <div class="text-center py-12">
         <i class="fas fa-exclamation-triangle text-4xl text-red-500 mb-2"></i>
         <p class="text-gray-500">Gagal memuat data. Silakan coba lagi.</p>
+        <p class="text-gray-400 text-sm mt-2">Error: ${err.message}</p>
       </div>
     `;
   }
@@ -252,6 +313,10 @@ function escapeKatalogHtml(text) {
   div.textContent = text;
   return div.innerHTML;
 }
+
+// ============================================
+// FUNGSI FULLSCREEN
+// ============================================
 
 // Fullscreen functions
 function openKatalogFullscreen(index) {
@@ -280,6 +345,9 @@ function openKatalogFullscreen(index) {
 }
 
 function createKatalogFullscreenModal() {
+  // Cek apakah modal sudah ada
+  if (document.getElementById('katalogFullscreenModal')) return;
+  
   const modalHTML = `
     <div id="katalogFullscreenModal" class="fixed inset-0 z-50 hidden fullscreen-overlay">
       <div class="absolute top-5 left-5 z-50">
@@ -373,22 +441,6 @@ function katalogPrevImage() {
   if (img) img.src = item.url;
   if (name) name.innerText = `${item.nomor} - ${item.nama}`;
   if (counter) counter.innerText = `${currentKatalogIndex + 1} / ${currentKatalogImages.length}`;
-}
-
-// Tambahkan style fullscreen jika belum ada
-if (!document.querySelector('#katalogFullscreenStyle')) {
-  const fullscreenStyle = document.createElement('style');
-  fullscreenStyle.id = 'katalogFullscreenStyle';
-  fullscreenStyle.textContent = `
-    .fullscreen-overlay {
-      background-color: rgba(0, 0, 0, 0.95);
-      backdrop-filter: blur(12px);
-    }
-    body.no-scroll {
-      overflow: hidden;
-    }
-  `;
-  document.head.appendChild(fullscreenStyle);
 }
 
 console.log('📁 Modul Katalog Model Rambut siap digunakan!');
