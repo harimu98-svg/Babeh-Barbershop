@@ -46,7 +46,7 @@ async function fetchOutlets() {
     if (data && data.length > 0) {
       console.log(`✅ Ditemukan ${data.length} outlet`);
       data.forEach((outlet, idx) => {
-        console.log(`   ${idx + 1}. ${outlet.outlet} - ${outlet.alamat}`);
+        console.log(`   ${idx + 1}. ${outlet.outlet} - reservasi: ${outlet.reservasi}`);
       });
       return data;
     }
@@ -67,21 +67,24 @@ function getDummyOutlets() {
       alamat: 'Jl. Raya No. 123, Jakarta Selatan',
       jam_buka: '09:00',
       jam_tutup: '21:00',
-      reservasi: 'Ya'
+      reservasi: 'true',
+      map: 'https://maps.google.com/?q=Jl.+Raya+No.+123+Jakarta+Selatan'
     },
     {
       outlet: 'Babeh Barbershop Cabang',
       alamat: 'Jl. Boulevard No. 45, Jakarta Utara',
       jam_buka: '10:00',
       jam_tutup: '22:00',
-      reservasi: 'Ya'
+      reservasi: 'true',
+      map: 'https://maps.google.com/?q=Jl.+Boulevard+No.+45+Jakarta+Utara'
     },
     {
       outlet: 'Babeh Barbershop Express',
       alamat: 'Mall Grand Indonesia Lt. 3, Jakarta Pusat',
       jam_buka: '10:00',
       jam_tutup: '20:00',
-      reservasi: 'Tidak'
+      reservasi: 'false',
+      map: 'https://maps.google.com/?q=Mall+Grand+Indonesia+Jakarta+Pusat'
     }
   ];
 }
@@ -157,7 +160,7 @@ async function renderTentangKami(container) {
         </div>
       </div>
       
-      <!-- Outlet & Jam Operasional (dari database) -->
+      <!-- Outlet & Jam Operasional -->
       <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8">
         <h3 class="text-2xl font-bold text-purple-800 mb-4 flex items-center gap-2">
           <i class="fas fa-store text-purple-600"></i> Outlet & Jam Operasional
@@ -165,7 +168,11 @@ async function renderTentangKami(container) {
         <p class="text-gray-500 mb-6">Kunjungi outlet terdekat Anda</p>
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          ${outletsData.map(outlet => `
+          ${outletsData.map(outlet => {
+            // Cek nilai reservasi (true/false sebagai string atau boolean)
+            const reservasiStatus = outlet.reservasi === 'true' || outlet.reservasi === true;
+            
+            return `
             <div class="border border-gray-200 rounded-xl p-5 hover:shadow-lg transition">
               <div class="flex items-start gap-3 mb-3">
                 <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
@@ -174,6 +181,11 @@ async function renderTentangKami(container) {
                 <div>
                   <h4 class="font-bold text-slate-800 text-lg">${escapeHtml(outlet.outlet)}</h4>
                   <p class="text-gray-500 text-sm mt-1">${escapeHtml(outlet.alamat)}</p>
+                  <!-- Tombol Lihat Map -->
+                  <button onclick="window.open('${escapeHtml(outlet.map)}', '_blank')" 
+                          class="mt-2 text-blue-600 text-sm hover:text-blue-800 transition inline-flex items-center gap-1">
+                    <i class="fas fa-map-marker-alt"></i> Lihat Map
+                  </button>
                 </div>
               </div>
               <div class="border-t border-gray-100 pt-3 mt-2">
@@ -187,13 +199,24 @@ async function renderTentangKami(container) {
                   <span class="text-gray-500 text-sm">
                     <i class="fas fa-calendar-check mr-1"></i> Reservasi
                   </span>
-                  <span class="${outlet.reservasi === 'Ya' ? 'text-green-600' : 'text-red-600'} font-semibold">
-                    ${outlet.reservasi === 'Ya' ? '<i class="fas fa-check-circle mr-1"></i> Bisa Reservasi' : '<i class="fas fa-times-circle mr-1"></i> Walk-in Only'}
-                  </span>
+                  <div class="text-right">
+                    ${reservasiStatus ? 
+                      `<span class="text-blue-600 font-semibold text-sm">
+                        <i class="fas fa-check-circle mr-1"></i> ✓ Reservasi
+                       </span>` : 
+                      `<span class="text-red-600 font-semibold text-sm">
+                        <i class="fas fa-times-circle mr-1"></i> ✗ Reservasi
+                       </span>`
+                    }
+                    <span class="text-blue-600 font-semibold text-sm ml-2">
+                      <i class="fas fa-check-circle mr-1"></i> ✓ Walk-in
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
-          `).join('')}
+            `;
+          }).join('')}
         </div>
         
         <!-- Call to Action -->
