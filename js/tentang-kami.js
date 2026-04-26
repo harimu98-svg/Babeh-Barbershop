@@ -89,6 +89,15 @@ function getDummyOutlets() {
   ];
 }
 
+// Fungsi untuk redirect ke menu tertentu
+function redirectToMenu(menu) {
+  // Cari tombol menu dengan data-menu yang sesuai
+  const menuBtn = document.querySelector(`.menu-btn[data-menu="${menu}"]`);
+  if (menuBtn) {
+    menuBtn.click();
+  }
+}
+
 // Render halaman Tentang Kami
 async function renderTentangKami(container) {
   // Tampilkan loading
@@ -135,28 +144,42 @@ async function renderTentangKami(container) {
         </p>
       </div>
       
-      <!-- Keunggulan -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div class="bg-white rounded-2xl shadow-xl p-6 text-center">
-          <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <i class="fas fa-cut text-purple-600 text-2xl"></i>
+      <!-- Keunggulan (5 item) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+        <div class="bg-white rounded-2xl shadow-xl p-4 text-center">
+          <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+            <i class="fas fa-cut text-purple-600 text-xl"></i>
           </div>
-          <h4 class="text-xl font-bold text-slate-800 mb-2">Barber Profesional</h4>
-          <p class="text-gray-500">Tim barber berpengalaman dan tersertifikasi</p>
+          <h4 class="text-md font-bold text-slate-800 mb-1">Barber Profesional</h4>
+          <p class="text-gray-500 text-xs">Tim berpengalaman & tersertifikasi</p>
         </div>
-        <div class="bg-white rounded-2xl shadow-xl p-6 text-center">
-          <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <i class="fas fa-spray-can text-purple-600 text-2xl"></i>
+        <div class="bg-white rounded-2xl shadow-xl p-4 text-center">
+          <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+            <i class="fas fa-tag text-purple-600 text-xl"></i>
           </div>
-          <h4 class="text-xl font-bold text-slate-800 mb-2">Produk Premium</h4>
-          <p class="text-gray-500">Menggunakan produk berkualitas tinggi</p>
+          <h4 class="text-md font-bold text-slate-800 mb-1">Harga Terjangkau</h4>
+          <p class="text-gray-500 text-xs">Kualitas premium harga bersahabat</p>
         </div>
-        <div class="bg-white rounded-2xl shadow-xl p-6 text-center">
-          <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <i class="fas fa-clock text-purple-600 text-2xl"></i>
+        <div class="bg-white rounded-2xl shadow-xl p-4 text-center">
+          <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+            <i class="fas fa-calendar-check text-purple-600 text-xl"></i>
           </div>
-          <h4 class="text-xl font-bold text-slate-800 mb-2">Fleksibel Waktu</h4>
-          <p class="text-gray-500">Buka setiap hari dengan jam operasional fleksibel</p>
+          <h4 class="text-md font-bold text-slate-800 mb-1">Booking Online</h4>
+          <p class="text-gray-500 text-xs">Reservasi/Booking online mudah</p>
+        </div>
+        <div class="bg-white rounded-2xl shadow-xl p-4 text-center">
+          <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+            <i class="fas fa-id-card text-purple-600 text-xl"></i>
+          </div>
+          <h4 class="text-md font-bold text-slate-800 mb-1">Membercard Exclusive</h4>
+          <p class="text-gray-500 text-xs">Program member spesial</p>
+        </div>
+        <div class="bg-white rounded-2xl shadow-xl p-4 text-center">
+          <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+            <i class="fas fa-couch text-purple-600 text-xl"></i>
+          </div>
+          <h4 class="text-md font-bold text-slate-800 mb-1">Tempat Nyaman</h4>
+          <p class="text-gray-500 text-xs">Fasilitas & ambience premium</p>
         </div>
       </div>
       
@@ -169,7 +192,7 @@ async function renderTentangKami(container) {
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           ${outletsData.map(outlet => {
-            // Cek nilai reservation (true/false sebagai string atau boolean) - PERBAIKAN DI SINI
+            // Cek nilai reservation (true/false sebagai string atau boolean)
             const reservationStatus = outlet.reservation === 'true' || outlet.reservation === true;
             
             return `
@@ -188,29 +211,33 @@ async function renderTentangKami(container) {
                 </div>
               </div>
               <div class="border-t border-gray-100 pt-3 mt-2">
+                <!-- Hari Buka -->
+                <div class="flex justify-between items-center mb-2">
+                  <span class="text-gray-500 text-sm">
+                    <i class="fas fa-calendar-day mr-1"></i> Hari Buka
+                  </span>
+                  <span class="font-semibold text-slate-700">Senin - Minggu</span>
+                </div>
+                <!-- Jam Operasional -->
                 <div class="flex justify-between items-center mb-2">
                   <span class="text-gray-500 text-sm">
                     <i class="far fa-clock mr-1"></i> Jam Operasional
                   </span>
                   <span class="font-semibold text-slate-700">${escapeHtml(outlet.jam_buka)} - ${escapeHtml(outlet.jam_tutup)}</span>
                 </div>
+                <!-- Reservasi Status -->
                 <div class="flex justify-between items-center">
                   <span class="text-gray-500 text-sm">
                     <i class="fas fa-calendar-check mr-1"></i> Reservasi
                   </span>
-                  <div class="text-right">
-                    ${reservationStatus ? 
-                      `<span class="text-blue-600 font-semibold text-sm">
-                        <i class="fas fa-check-circle mr-1"></i> ✓ Reservasi
-                       </span>` : 
-                      `<span class="text-red-600 font-semibold text-sm">
-                        <i class="fas fa-times-circle mr-1"></i> ✗ Reservasi
-                       </span>`
-                    }
-                    <span class="text-blue-600 font-semibold text-sm ml-2">
-                      <i class="fas fa-check-circle mr-1"></i> ✓ Walk-in
-                    </span>
-                  </div>
+                  ${reservationStatus ? 
+                    `<span class="text-blue-600 font-semibold text-sm">
+                      <i class="fas fa-check-circle mr-1"></i> Tersedia
+                     </span>` : 
+                    `<span class="text-red-600 font-semibold text-sm">
+                      <i class="fas fa-times-circle mr-1"></i> Tidak Tersedia
+                     </span>`
+                  }
                 </div>
               </div>
             </div>
@@ -218,12 +245,16 @@ async function renderTentangKami(container) {
           }).join('')}
         </div>
         
-        <!-- Call to Action -->
-        <div class="mt-6 p-4 bg-purple-50 rounded-xl text-center">
-          <p class="text-gray-600">
-            <i class="fas fa-info-circle text-purple-600 mr-1"></i>
-            Untuk reservasi, silakan gunakan menu <strong>Reservasi/Booking</strong> atau hubungi WhatsApp admin.
-          </p>
+        <!-- Tombol Reservasi/Booking dan Chat Admin -->
+        <div class="mt-6 grid grid-cols-2 gap-4">
+          <button onclick="redirectToMenu('reservation')" 
+                  class="bg-gradient-to-r from-purple-600 to-purple-800 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition flex items-center justify-center gap-2">
+            <i class="fas fa-calendar-alt"></i> Reservasi/Booking
+          </button>
+          <button onclick="window.open('https://wa.me/6281234567890?text=Halo%20Babeh%20Barbershop%2C%20saya%20mau%20bertanya', '_blank')" 
+                  class="bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 transition flex items-center justify-center gap-2">
+            <i class="fab fa-whatsapp"></i> Chat Admin
+          </button>
         </div>
       </div>
     </div>
@@ -237,4 +268,7 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
-console.log('📁 Modul Tentang Kami siap digunakan! - Menggunakan kolom reservation');
+// Ekspos fungsi redirectToMenu ke global
+window.redirectToMenu = redirectToMenu;
+
+console.log('📁 Modul Tentang Kami siap digunakan! - Updated version');
