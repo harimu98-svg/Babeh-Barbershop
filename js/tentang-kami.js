@@ -46,7 +46,7 @@ async function fetchOutlets() {
     if (data && data.length > 0) {
       console.log(`✅ Ditemukan ${data.length} outlet`);
       data.forEach((outlet, idx) => {
-        console.log(`   ${idx + 1}. ${outlet.outlet} - reservasi: ${outlet.reservasi}`);
+        console.log(`   ${idx + 1}. ${outlet.outlet} - reservation: ${outlet.reservation}`);
       });
       return data;
     }
@@ -67,7 +67,7 @@ function getDummyOutlets() {
       alamat: 'Jl. Raya No. 123, Jakarta Selatan',
       jam_buka: '09:00',
       jam_tutup: '21:00',
-      reservasi: 'true',
+      reservation: 'true',
       map: 'https://maps.google.com/?q=Jl.+Raya+No.+123+Jakarta+Selatan'
     },
     {
@@ -75,7 +75,7 @@ function getDummyOutlets() {
       alamat: 'Jl. Boulevard No. 45, Jakarta Utara',
       jam_buka: '10:00',
       jam_tutup: '22:00',
-      reservasi: 'true',
+      reservation: 'true',
       map: 'https://maps.google.com/?q=Jl.+Boulevard+No.+45+Jakarta+Utara'
     },
     {
@@ -83,7 +83,7 @@ function getDummyOutlets() {
       alamat: 'Mall Grand Indonesia Lt. 3, Jakarta Pusat',
       jam_buka: '10:00',
       jam_tutup: '20:00',
-      reservasi: 'false',
+      reservation: 'false',
       map: 'https://maps.google.com/?q=Mall+Grand+Indonesia+Jakarta+Pusat'
     }
   ];
@@ -169,8 +169,8 @@ async function renderTentangKami(container) {
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           ${outletsData.map(outlet => {
-            // Cek nilai reservasi (true/false sebagai string atau boolean)
-            const reservasiStatus = outlet.reservasi === 'true' || outlet.reservasi === true;
+            // Cek nilai reservation (true/false sebagai string atau boolean) - PERBAIKAN DI SINI
+            const reservationStatus = outlet.reservation === 'true' || outlet.reservation === true;
             
             return `
             <div class="border border-gray-200 rounded-xl p-5 hover:shadow-lg transition">
@@ -181,7 +181,6 @@ async function renderTentangKami(container) {
                 <div>
                   <h4 class="font-bold text-slate-800 text-lg">${escapeHtml(outlet.outlet)}</h4>
                   <p class="text-gray-500 text-sm mt-1">${escapeHtml(outlet.alamat)}</p>
-                  <!-- Tombol Lihat Map -->
                   <button onclick="window.open('${escapeHtml(outlet.map)}', '_blank')" 
                           class="mt-2 text-blue-600 text-sm hover:text-blue-800 transition inline-flex items-center gap-1">
                     <i class="fas fa-map-marker-alt"></i> Lihat Map
@@ -200,7 +199,7 @@ async function renderTentangKami(container) {
                     <i class="fas fa-calendar-check mr-1"></i> Reservasi
                   </span>
                   <div class="text-right">
-                    ${reservasiStatus ? 
+                    ${reservationStatus ? 
                       `<span class="text-blue-600 font-semibold text-sm">
                         <i class="fas fa-check-circle mr-1"></i> ✓ Reservasi
                        </span>` : 
@@ -238,4 +237,4 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
-console.log('📁 Modul Tentang Kami siap digunakan!');
+console.log('📁 Modul Tentang Kami siap digunakan! - Menggunakan kolom reservation');
