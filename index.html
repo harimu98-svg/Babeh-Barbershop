@@ -364,8 +364,8 @@
         });
         
         // Panggil fungsi render dari module yang sesuai
-        if (menu === 'background' && typeof renderBackground === 'function') {
-          renderBackground(mainContent);
+        if (menu === 'tentang-kami' && typeof renderTentangKami === 'function') {
+          renderTentangKami(mainContent);
         } else if (menu === 'price-services' && typeof renderPriceServices === 'function') {
           renderPriceServices(mainContent);
         } else if (menu === 'barberman' && typeof renderBarberman === 'function') {
