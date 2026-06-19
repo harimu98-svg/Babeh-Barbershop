@@ -27,7 +27,7 @@ async function renderTentangKami(container) {
         <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
           <div class="p-8 text-white">
             <h2 class="text-3xl md:text-5xl font-bold mb-2">Babeh Barbershop</h2>
-            <p class="text-lg md:text-xl opacity-90">Premium Barber & Men's Grooming</p>
+            <p class="text-lg md:text-xl opacity-90">Profesional Barber & Men's Grooming</p>
           </div>
         </div>
       </div>
@@ -39,13 +39,16 @@ async function renderTentangKami(container) {
         </h3>
         <p class="text-gray-600 leading-relaxed mb-4">
           Babeh Barbershop hadir sebagai solusi kebutuhan grooming pria modern. 
-          Dengan konsep premium dan pelayanan profesional, kami berkomitmen memberikan 
+          Dengan konsep Classic-Modern dan pelayanan profesional, kami berkomitmen memberikan 
           pengalaman terbaik bagi setiap pelanggan.
         </p>
         <p class="text-gray-600 leading-relaxed">
-          Didirikan pada tahun 2020, Babeh Barbershop telah melayani ribuan pelanggan 
-          dengan berbagai gaya rambut sesuai tren terkini. Barber kami yang berpengalaman 
+          Didirikan pada tahun 2016, Babeh Barbershop telah melayani ribuan pelanggan 
+          dengan berbagai gaya rambut sesuai tren terkini. Barberman kami yang berpengalaman 
           siap memberikan rekomendasi gaya terbaik untuk Anda.
+        </p>
+         <p class="text-gray-600 leading-relaxed">
+          Saat ini Babeh Barbershop telah memiliki 6 Outlet tersebar di sekitar Depok dan Tangerang Selatan
         </p>
       </div>
       
