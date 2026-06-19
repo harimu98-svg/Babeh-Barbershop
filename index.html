@@ -352,6 +352,7 @@
   <script src="js/outlet.js"></script>
   <script src="js/lowongan.js"></script>
   <script src="js/chat-admin.js"></script>
+  <script src="js/membercard.js"></script>
   
   <script>
     // Main Controller
@@ -407,7 +408,9 @@
           renderLowongan(mainContent);
         } else if (menu === 'chat' && typeof renderChat === 'function') {
           renderChat(mainContent);
-        } else {
+          } else if (menu === 'membercard' && typeof renderMembercard === 'function') {
+      renderMembercard(mainContent);
+             } else {
           mainContent.innerHTML = `
             <div class="max-w-6xl mx-auto text-center py-20">
               <div class="bg-white rounded-2xl shadow-xl p-12">
