@@ -90,18 +90,18 @@ async function renderTentangKami(container) {
           </div>
         </div>
         
-        <!-- Membercard Exclusive -->
-        <div class="bg-gradient-to-br from-orange-500 to-orange-700 rounded-2xl shadow-xl p-4 text-center cursor-pointer hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 text-white service-card" 
-             onclick="alert('🎉 Fitur Membercard Exclusive sedang dalam pengembangan!')">
-          <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3 backdrop-blur-sm">
-            <i class="fas fa-id-card text-white text-xl"></i>
-          </div>
-          <h4 class="text-md font-bold mb-1">Membercard Exclusive</h4>
-          <p class="text-orange-200 text-xs">Program member spesial</p>
-          <div class="mt-2 text-white/80 text-xs font-semibold">
-            Segera hadir <i class="fas fa-arrow-right ml-1"></i>
-          </div>
-        </div>
+     <!-- Membercard Exclusive -> membercard.js -->
+<div class="bg-gradient-to-br from-orange-500 to-orange-700 rounded-2xl shadow-xl p-4 text-center cursor-pointer hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 text-white service-card" 
+     onclick="redirectToMenu('membercard')">
+  <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3 backdrop-blur-sm">
+    <i class="fas fa-id-card text-white text-xl"></i>
+  </div>
+  <h4 class="text-md font-bold mb-1">Membercard Exclusive</h4>
+  <p class="text-orange-200 text-xs">Program member spesial</p>
+  <div class="mt-2 text-white/80 text-xs font-semibold">
+    Klik untuk daftar <i class="fas fa-arrow-right ml-1"></i>
+  </div>
+</div>
         
         <!-- Multi Outlet -> outlet.js -->
         <div class="bg-gradient-to-br from-pink-500 to-pink-700 rounded-2xl shadow-xl p-4 text-center cursor-pointer hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 text-white service-card" 
