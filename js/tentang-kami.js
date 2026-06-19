@@ -33,24 +33,24 @@ async function renderTentangKami(container) {
       </div>
       
       <!-- Tentang Kami -->
-      <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 mb-8">
-        <h3 class="text-2xl font-bold text-purple-800 mb-4 flex items-center gap-2">
-          <i class="fas fa-info-circle text-purple-600"></i> Tentang Kami
-        </h3>
-        <p class="text-gray-600 leading-relaxed mb-4">
-          Babeh Barbershop hadir sebagai solusi kebutuhan grooming pria modern. 
-          Dengan konsep Classic-Modern dan pelayanan profesional, kami berkomitmen memberikan 
-          pengalaman terbaik bagi setiap pelanggan.
-        </p>
-        <p class="text-gray-600 leading-relaxed">
-          Didirikan pada tahun 2016, Babeh Barbershop telah melayani ribuan pelanggan 
-          dengan berbagai gaya rambut sesuai tren terkini. Barberman kami yang berpengalaman 
-          siap memberikan rekomendasi gaya terbaik untuk Anda.
-        </p>
-         <p class="text-gray-600 leading-relaxed">
-          Saat ini Babeh Barbershop telah memiliki 6 Outlet tersebar di sekitar Depok dan Tangerang Selatan
-        </p>
-      </div>
+<div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 mb-8">
+  <h3 class="text-2xl font-bold text-purple-800 mb-4 flex items-center gap-2">
+    <i class="fas fa-info-circle text-purple-600"></i> Tentang Kami
+  </h3>
+  <p class="text-gray-600 leading-relaxed mb-4">
+    Babeh Barbershop hadir sebagai solusi kebutuhan grooming pria modern. 
+    Dengan konsep Classic-Modern dan pelayanan profesional, kami berkomitmen memberikan 
+    pengalaman terbaik bagi setiap pelanggan.
+  </p>
+  <p class="text-gray-600 leading-relaxed mb-4">
+    Didirikan pada tahun 2016, Babeh Barbershop telah melayani ribuan pelanggan 
+    dengan berbagai gaya rambut sesuai tren terkini. Barberman kami yang berpengalaman 
+    siap memberikan rekomendasi gaya terbaik untuk Anda.
+  </p>
+  <p class="text-gray-600 leading-relaxed">
+    Saat ini Babeh Barbershop telah memiliki 6 Outlet tersebar di sekitar Depok dan Tangerang Selatan.
+  </p>
+</div>
       
       <!-- Card Keunggulan (5 item berwarna-warni yang bisa diklik) -->
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
