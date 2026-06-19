@@ -76,13 +76,18 @@
     }
     
     /* Card Styles */
-    .service-card, .barberman-card, .job-card {
+    .service-card {
       transition: all 0.3s ease;
+      cursor: pointer;
     }
     
-    .service-card:hover, .barberman-card:hover, .job-card:hover {
+    .service-card:hover {
       transform: translateY(-5px);
       box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+    }
+    
+    .service-card:active {
+      transform: scale(0.98);
     }
     
     /* Gallery Item */
@@ -190,6 +195,21 @@
     .overlay.show {
       display: block;
     }
+
+    /* Outlet Card Hover Effect */
+    .outlet-card {
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .outlet-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+    }
+    
+    .outlet-card:active {
+      transform: scale(0.98);
+    }
   </style>
 </head>
 <body>
@@ -200,10 +220,10 @@
       <nav class="container mx-auto px-4 py-3">
         <div class="flex items-center justify-between">
           <!-- Logo -->
-         <div class="px-5 py-4 flex items-center gap-4">
-        <div class="w-[72px] h-[72px] rounded-full shadow-md overflow-hidden bg-white flex items-center justify-center flex-shrink-0 p-2">
-          <img src="images/logo.jpg" alt="Babeh Logo" class="w-full h-full object-contain" 
-               onerror="this.onerror=null; this.parentElement.innerHTML = '<i class=\'fas fa-cut text-purple-600 text-3xl\'></i>';">
+          <div class="px-5 py-4 flex items-center gap-4">
+            <div class="w-[72px] h-[72px] rounded-full shadow-md overflow-hidden bg-white flex items-center justify-center flex-shrink-0 p-2">
+              <img src="images/logo.jpg" alt="Babeh Logo" class="w-full h-full object-contain" 
+                   onerror="this.onerror=null; this.parentElement.innerHTML = '<i class=\'fas fa-cut text-purple-600 text-3xl\'></i>';">
             </div>
             <div>
               <h1 class="text-xl font-bold text-white">Babeh Barbershop</h1>
@@ -217,7 +237,7 @@
           </button>
           
           <!-- Desktop Menu -->
-          <div class="hidden md:flex space-x-2" id="desktopMenu">
+          <div class="hidden md:flex space-x-2 flex-wrap gap-2" id="desktopMenu">
             <button class="menu-btn active" data-menu="tentang-kami">
               <i class="fas fa-home mr-1"></i> Tentang Kami
             </button>
@@ -232,6 +252,9 @@
             </button>
             <button class="menu-btn" data-menu="katalog">
               <i class="fas fa-cut mr-1"></i> Katalog
+            </button>
+            <button class="menu-btn" data-menu="outlet">
+              <i class="fas fa-store-alt mr-1"></i> Outlet
             </button>
             <button class="menu-btn" data-menu="lowongan">
               <i class="fas fa-briefcase mr-1"></i> Lowongan
@@ -266,6 +289,9 @@
       </button>
       <button class="mobile-menu-btn" data-menu="katalog">
         <i class="fas fa-cut mr-2"></i> Katalog
+      </button>
+      <button class="mobile-menu-btn" data-menu="outlet">
+        <i class="fas fa-store-alt mr-2"></i> Outlet
       </button>
       <button class="mobile-menu-btn" data-menu="lowongan">
         <i class="fas fa-briefcase mr-2"></i> Lowongan
@@ -323,6 +349,7 @@
   <script src="js/barberman.js"></script>
   <script src="js/reservation.js"></script>
   <script src="js/katalog.js"></script>
+  <script src="js/outlet.js"></script>
   <script src="js/lowongan.js"></script>
   <script src="js/chat-admin.js"></script>
   
@@ -330,7 +357,7 @@
     // Main Controller
     (function() {
       // State
-      let currentMenu = 'background';
+      let currentMenu = 'tentang-kami';
       
       // DOM Elements
       const mainContent = document.getElementById('mainContent');
@@ -374,12 +401,22 @@
           renderReservation(mainContent);
         } else if (menu === 'katalog' && typeof renderKatalog === 'function') {
           renderKatalog(mainContent);
+        } else if (menu === 'outlet' && typeof renderOutlet === 'function') {
+          renderOutlet(mainContent);
         } else if (menu === 'lowongan' && typeof renderLowongan === 'function') {
           renderLowongan(mainContent);
         } else if (menu === 'chat' && typeof renderChat === 'function') {
           renderChat(mainContent);
         } else {
-          mainContent.innerHTML = '<div class="text-center py-20"><p class="text-gray-500">Konten sedang dimuat...</p></div>';
+          mainContent.innerHTML = `
+            <div class="max-w-6xl mx-auto text-center py-20">
+              <div class="bg-white rounded-2xl shadow-xl p-12">
+                <i class="fas fa-code text-6xl text-purple-600 mb-4"></i>
+                <h3 class="text-2xl font-bold text-slate-800 mb-2">Halaman sedang dikembangkan</h3>
+                <p class="text-gray-500">Menu "${menu}" akan segera hadir</p>
+              </div>
+            </div>
+          `;
         }
         
         // Tutup mobile menu jika terbuka
@@ -422,6 +459,7 @@
       loadContent('tentang-kami');
       
       console.log('🚀 Babeh Barbershop App Ready!');
+      console.log('📋 Menu tersedia:', Array.from(desktopMenuBtns).map(b => b.dataset.menu));
     })();
   </script>
 </body>
