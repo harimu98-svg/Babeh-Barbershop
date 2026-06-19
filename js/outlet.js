@@ -276,22 +276,21 @@ async function renderOutlet(container) {
       
       <!-- Footer Info -->
       <div class="mt-8 bg-white rounded-2xl shadow-xl p-6 text-center">
-        <p class="text-gray-500 text-sm">
-          <i class="fas fa-info-circle text-purple-600 mr-2"></i>
-          Untuk informasi lebih lanjut, silakan hubungi admin melalui WhatsApp atau kunjungi outlet terdekat.
-        </p>
-        <div class="flex justify-center gap-4 mt-4">
-          <button onclick="window.open('https://wa.me/6281234567890', '_blank')" 
-                  class="bg-green-600 text-white px-6 py-2 rounded-xl font-semibold hover:bg-green-700 transition flex items-center gap-2">
-            <i class="fab fa-whatsapp"></i> Chat Admin
-          </button>
-          <button onclick="redirectToMenu('tentang-kami')" 
-                  class="bg-purple-100 text-purple-700 px-6 py-2 rounded-xl font-semibold hover:bg-purple-200 transition flex items-center gap-2">
-            <i class="fas fa-arrow-left"></i> Kembali
-          </button>
-        </div>
-      </div>
-    </div>
+  <p class="text-gray-500 text-sm">
+    <i class="fas fa-info-circle text-purple-600 mr-2"></i>
+    Untuk informasi lebih lanjut, silakan hubungi admin melalui WhatsApp atau kunjungi outlet terdekat.
+  </p>
+  <div class="flex flex-col sm:flex-row justify-center gap-4 mt-4">
+    <button onclick="window.open('https://wa.me/6281234567890', '_blank')" 
+            class="bg-green-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-green-700 transition flex items-center justify-center gap-2">
+      <i class="fab fa-whatsapp text-xl"></i> Chat Admin
+    </button>
+    <button onclick="redirectToMenu('tentang-kami')" 
+            class="bg-purple-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-purple-700 transition flex items-center justify-center gap-2">
+      <i class="fas fa-arrow-left text-xl"></i> Kembali ke Beranda
+    </button>
+  </div>
+</div>
   `;
 }
 
