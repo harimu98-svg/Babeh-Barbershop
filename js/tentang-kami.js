@@ -122,34 +122,15 @@ async function renderTentangKami(container) {
         <h3 class="text-2xl font-bold text-purple-800 mb-4 flex items-center gap-2">
           <i class="fas fa-handshake text-purple-600"></i> Butuh Bantuan?
         </h3>
-        <p class="text-gray-500 mb-6">Hubungi kami untuk reservasi atau pertanyaan lainnya</p>
+        <p class="text-gray-500 mb-6">Hubungi kami untuk informasi atau pertanyaan lainnya</p>
         
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <!-- Tombol Reservasi -->
-          <button onclick="redirectToMenu('reservation')" 
-                  class="bg-gradient-to-r from-purple-600 to-purple-800 text-white py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/30 transition-all duration-300 flex items-center justify-center gap-3 group">
-            <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center group-hover:scale-110 transition">
-              <i class="fas fa-calendar-alt text-lg"></i>
-            </div>
-            <div class="text-left">
-              <div class="font-bold text-lg">Reservasi/Booking</div>
-              <div class="text-purple-200 text-sm">Pesan tempat sekarang</div>
-            </div>
-            <i class="fas fa-arrow-right ml-auto group-hover:translate-x-1 transition"></i>
-          </button>
-          
+                   
           <!-- Tombol Chat Admin -->
-          <button onclick="window.open('https://wa.me/6281234567890?text=Halo%20Babeh%20Barbershop%2C%20saya%20mau%20bertanya%20tentang%20layanan%20dan%20reservasi', '_blank')" 
-                  class="bg-gradient-to-r from-green-600 to-green-700 text-white py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-green-500/30 transition-all duration-300 flex items-center justify-center gap-3 group">
-            <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center group-hover:scale-110 transition">
-              <i class="fab fa-whatsapp text-xl"></i>
-            </div>
-            <div class="text-left">
-              <div class="font-bold text-lg">Chat Admin</div>
-              <div class="text-green-200 text-sm">Tanya langsung via WhatsApp</div>
-            </div>
-            <i class="fas fa-arrow-right ml-auto group-hover:translate-x-1 transition"></i>
-          </button>
+           <button onclick="window.open('https://wa.me/6281234567890', '_blank')" 
+            class="bg-green-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-green-700 transition flex items-center justify-center gap-2">
+      <i class="fab fa-whatsapp text-xl"></i> Chat Admin
+    </button>
         </div>
         
         <!-- Info Tambahan -->
