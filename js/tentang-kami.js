@@ -27,7 +27,7 @@ async function renderTentangKami(container) {
         <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
           <div class="p-8 text-white">
             <h2 class="text-3xl md:text-5xl font-bold mb-2">Babeh Barbershop</h2>
-            <p class="text-lg md:text-xl opacity-90">Profesional Barber & Men's Grooming</p>
+            <p class="text-lg md:text-xl opacity-90">Right Man On The Right Place</p>
           </div>
         </div>
       </div>
@@ -48,7 +48,11 @@ async function renderTentangKami(container) {
     siap memberikan rekomendasi gaya terbaik untuk Anda.
   </p>
   <p class="text-gray-600 leading-relaxed">
-    Saat ini Babeh Barbershop telah memiliki 6 Outlet tersebar di sekitar Depok dan Tangerang Selatan.
+    Saat ini Babeh Barbershop telah memiliki Outlet tersebar di sekitar Depok dan Tangerang Selatan.
+  </p>
+  <p class="text-gray-600 leading-relaxed">
+    Segera daftar Babeh barbershop Digital Membercard Exclusive, gratis tanpa biaya, 
+    proses cepat langsung jadi, nikmati berbagai promo dan keuntungan lainya.
   </p>
 </div>
       
