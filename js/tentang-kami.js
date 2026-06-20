@@ -27,7 +27,9 @@ async function renderTentangKami(container) {
         <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
           <div class="p-8 text-white">
             <h2 class="text-3xl md:text-5xl font-bold mb-2">Babeh Barbershop</h2>
-            <p class="text-lg md:text-xl opacity-90">Right Man On The Right Place</p>
+           <p class="text-lg md:text-xl opacity-90">
+          <i>Right Man On The Right Place</i>
+          </p>
           </div>
         </div>
       </div>
@@ -45,7 +47,7 @@ async function renderTentangKami(container) {
   <p class="text-gray-600 leading-relaxed mb-4">
     Didirikan pada tahun 2016, Babeh Barbershop telah melayani ribuan pelanggan 
     dengan berbagai gaya rambut sesuai tren terkini. Barberman kami yang berpengalaman 
-    siap memberikan rekomendasi gaya terbaik untuk Anda.
+    siap memberikan rekomendasi gaya rambut terbaik untuk Anda.
   </p>
   <p class="text-gray-600 leading-relaxed mb-4">
     Saat ini Babeh Barbershop telah memiliki Outlet yang tersebar di sekitar Depok dan Tangerang Selatan.
