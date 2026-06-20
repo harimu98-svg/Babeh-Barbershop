@@ -38,9 +38,9 @@ async function renderTentangKami(container) {
     <i class="fas fa-info-circle text-purple-600"></i> Tentang Kami
   </h3>
   <p class="text-gray-600 leading-relaxed mb-4">
-    Babeh Barbershop hadir sebagai solusi kebutuhan grooming pria modern. 
+    Babeh Barbershop hadir sebagai solusi kebutuhan pangkas rambut pria modern. 
     Dengan konsep Classic-Modern dan pelayanan profesional, kami berkomitmen memberikan 
-    pengalaman terbaik bagi setiap pelanggan.
+    pengalaman terbaik bagi setiap pelanggan, dengan harga terjangkau untuk semua kalangan.
   </p>
   <p class="text-gray-600 leading-relaxed mb-4">
     Didirikan pada tahun 2016, Babeh Barbershop telah melayani ribuan pelanggan 
