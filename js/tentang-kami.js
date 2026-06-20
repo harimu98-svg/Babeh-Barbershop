@@ -47,11 +47,11 @@ async function renderTentangKami(container) {
     dengan berbagai gaya rambut sesuai tren terkini. Barberman kami yang berpengalaman 
     siap memberikan rekomendasi gaya terbaik untuk Anda.
   </p>
-  <p class="text-gray-600 leading-relaxed">
-    Saat ini Babeh Barbershop telah memiliki Outlet tersebar di sekitar Depok dan Tangerang Selatan.
+  <p class="text-gray-600 leading-relaxed mb-4">
+    Saat ini Babeh Barbershop telah memiliki Outlet yang tersebar di sekitar Depok dan Tangerang Selatan.
   </p>
   <p class="text-gray-600 leading-relaxed">
-    Segera daftar Babeh barbershop Digital Membercard Exclusive, gratis tanpa biaya, 
+    Segera daftar Babeh Barbershop Digital Membercard Exclusive, gratis tanpa biaya, 
     proses cepat langsung jadi, nikmati berbagai promo dan keuntungan lainya.
   </p>
 </div>
