@@ -135,27 +135,7 @@ async function renderOutlet(container) {
           </div>
         </div>
       </div>
-      
-      <!-- Statistik Outlet -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <div class="bg-white rounded-2xl shadow-xl p-4 text-center">
-          <div class="text-2xl font-bold text-purple-600">${outletsData.length}</div>
-          <div class="text-gray-500 text-sm">Total Outlet</div>
-        </div>
-        <div class="bg-white rounded-2xl shadow-xl p-4 text-center">
-          <div class="text-2xl font-bold text-green-600">${outletsData.filter(o => o.reservation === 'true' || o.reservation === true).length}</div>
-          <div class="text-gray-500 text-sm">Reservasi Tersedia</div>
-        </div>
-        <div class="bg-white rounded-2xl shadow-xl p-4 text-center">
-          <div class="text-2xl font-bold text-blue-600">${new Set(outletsData.map(o => o.jam_buka)).size}</div>
-          <div class="text-gray-500 text-sm">Varian Jam Buka</div>
-        </div>
-        <div class="bg-white rounded-2xl shadow-xl p-4 text-center">
-          <div class="text-2xl font-bold text-orange-600">${outletsData.length * 3}+</div>
-          <div class="text-gray-500 text-sm">Barber Profesional</div>
-        </div>
-      </div>
-      
+                 
       <!-- Grid Outlet -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         ${outletsData.map((outlet, index) => {
