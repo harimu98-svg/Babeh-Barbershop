@@ -196,31 +196,20 @@ function renderMembercard(container) {
         </div>
       </div>
 
-      <!-- Footer Info - Tombol Aksi -->
-      <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <button onclick="window.open('https://wa.me/6282210017083?text=Halo%20Babeh%20Barbershop%2C%20saya%20mau%20bertanya%20tentang%20membercard', '_blank')" 
-                  class="bg-gradient-to-r from-green-600 to-green-700 text-white py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-green-500/30 transition-all duration-300 flex items-center justify-center gap-3 group">
-            <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center group-hover:scale-110 transition">
-              <i class="fab fa-whatsapp text-xl"></i>
-            </div>
-            <div class="text-left">
-              <div class="font-bold text-lg">Chat Admin</div>
-              <div class="text-green-200 text-sm">Tanya tentang membercard</div>
-            </div>
-            <i class="fas fa-arrow-right ml-auto group-hover:translate-x-1 transition"></i>
+      <!-- Footer Info - SAMA SEPERTI MODUL OUTLET -->
+      <div class="mt-8 bg-white rounded-2xl shadow-xl p-6 text-center">
+        <p class="text-gray-500 text-sm">
+          <i class="fas fa-info-circle text-orange-600 mr-2"></i>
+          Untuk informasi lebih lanjut, silakan hubungi admin melalui WhatsApp atau kunjungi outlet terdekat.
+        </p>
+        <div class="flex flex-col sm:flex-row justify-center gap-4 mt-4">
+          <button onclick="window.open('https://wa.me/6282210017083', '_blank')" 
+                  class="bg-green-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-green-700 transition flex items-center justify-center gap-2">
+            <i class="fab fa-whatsapp text-xl"></i> Chat Admin
           </button>
-          
           <button onclick="redirectToMenu('tentang-kami')" 
-                  class="bg-gradient-to-r from-gray-600 to-gray-700 text-white py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-gray-500/30 transition-all duration-300 flex items-center justify-center gap-3 group">
-            <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center group-hover:scale-110 transition">
-              <i class="fas fa-arrow-left text-xl"></i>
-            </div>
-            <div class="text-left">
-              <div class="font-bold text-lg">Kembali</div>
-              <div class="text-gray-300 text-sm">Ke halaman utama</div>
-            </div>
-            <i class="fas fa-arrow-right ml-auto group-hover:translate-x-1 transition"></i>
+                  class="bg-orange-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-orange-700 transition flex items-center justify-center gap-2">
+            <i class="fas fa-arrow-left text-xl"></i> Kembali ke Beranda
           </button>
         </div>
       </div>
