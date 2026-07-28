@@ -1,200 +1,351 @@
-// Barberman / Barber Profile
-async function renderBarberman(container) {
-  // Pastikan container valid
-  if (!container) {
-    console.error('Container tidak ditemukan');
-    return;
-  }
+// barberman.js - Halaman Barberman Babeh Barbershop
 
-  // Menampilkan loading state
+// Mengambil data barberman dari Supabase
+let barbermanSupabaseClient = null;
+let barbermanData = [];
+
+// Konfigurasi Supabase - SAMA dengan outlet.js
+const BARBERMAN_SUPABASE_URL = 'https://intzwjmlypmopzauxeqt.supabase.co';
+const BARBERMAN_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImludHp3am1seXBtb3B6YXV4ZXF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3MTc5MTIsImV4cCI6MjA3MDI5MzkxMn0.VwwVEDdHtYP5gui4epTcNfLXhPkmfFbRVb5y8mrXJiM';
+
+// Fungsi untuk mendapatkan Supabase client
+function getBarbermanSupabaseClient() {
+  if (barbermanSupabaseClient) return barbermanSupabaseClient;
+  
+  // Cek apakah Supabase tersedia di window
+  if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
+    try {
+      barbermanSupabaseClient = window.supabase.createClient(
+        BARBERMAN_SUPABASE_URL, 
+        BARBERMAN_SUPABASE_ANON_KEY,
+        {
+          auth: {
+            persistSession: false,
+            autoRefreshToken: false
+          }
+        }
+      );
+      console.log('✅ Supabase client untuk Barberman berhasil diinisialisasi');
+      return barbermanSupabaseClient;
+    } catch (error) {
+      console.error('❌ Gagal membuat Supabase client:', error);
+      return null;
+    }
+  }
+  
+  console.error('❌ Supabase library tidak tersedia');
+  return null;
+}
+
+// Fungsi untuk mengambil data barberman dari Supabase
+async function fetchBarberman() {
+  const client = getBarbermanSupabaseClient();
+  if (!client) {
+    console.error('❌ Supabase client tidak tersedia, menggunakan data dummy');
+    return getDummyBarberman();
+  }
+  
+  try {
+    console.log('📋 Mengambil data barberman dari database...');
+    
+    const { data, error } = await client
+      .from('karyawan')
+      .select('*')
+      .eq('role', 'barberman')
+      .order('id', { ascending: true });
+    
+    if (error) {
+      console.error('Error fetching barberman:', error);
+      console.log('⚠️ Menggunakan data dummy sebagai fallback');
+      return getDummyBarberman();
+    }
+    
+    if (data && data.length > 0) {
+      console.log(`✅ Ditemukan ${data.length} barberman dari database`);
+      data.forEach((barber, idx) => {
+        console.log(`   ${idx + 1}. ${barber.nama_karyawan} - ${barber.spesialisasi || 'Spesialisasi belum diisi'}`);
+      });
+      return data;
+    }
+    
+    console.log('⚠️ Tidak ada data barberman di database, menggunakan data dummy');
+    return getDummyBarberman();
+  } catch (err) {
+    console.error('❌ Database error:', err);
+    console.log('⚠️ Menggunakan data dummy sebagai fallback');
+    return getDummyBarberman();
+  }
+}
+
+// Data dummy jika Supabase tidak bisa diakses
+function getDummyBarberman() {
+  console.log('📦 Menggunakan data dummy barberman');
+  return [
+    {
+      nama_karyawan: 'Dimas Pratama',
+      spesialisasi: 'Master Barber',
+      outlet: 'Babeh Barbershop Pusat',
+      pengalaman: '8 tahun',
+      photo_url: 'barber1.jpg'
+    },
+    {
+      nama_karyawan: 'Rizki Hidayat',
+      spesialisasi: 'Hair Stylist',
+      outlet: 'Babeh Barbershop Cabang',
+      pengalaman: '5 tahun',
+      photo_url: 'barber2.jpg'
+    },
+    {
+      nama_karyawan: 'Andi Wijaya',
+      spesialisasi: 'Color Specialist',
+      outlet: 'Babeh Barbershop Express',
+      pengalaman: '6 tahun',
+      photo_url: 'barber3.jpg'
+    }
+  ];
+}
+
+function escapeHtml(text) {
+  if (!text) return '';
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// Render halaman Barberman
+async function renderBarberman(container) {
+  // Jika container tidak ditemukan, coba cari atau buat
+  if (!container) {
+    console.warn('⚠️ Container tidak ditemukan, mencoba mencari atau membuat...');
+    container = document.getElementById('barberman-container');
+    
+    if (!container) {
+      // Coba cari dengan selector lain
+      container = document.querySelector('.barberman-section') || 
+                  document.querySelector('[data-barberman]');
+    }
+    
+    if (!container) {
+      // Buat container baru jika masih tidak ditemukan
+      console.log('📦 Membuat container barberman otomatis...');
+      container = document.createElement('div');
+      container.id = 'barberman-container';
+      container.className = 'container mx-auto px-4 py-8';
+      
+      // Cari tempat yang tepat untuk menaruh container
+      const mainContent = document.querySelector('main') || document.body;
+      const aboutSection = document.querySelector('#tentang-kami, .about-section, [data-section="about"]');
+      
+      if (aboutSection && aboutSection.parentNode) {
+        aboutSection.parentNode.insertBefore(container, aboutSection.nextSibling);
+      } else {
+        mainContent.appendChild(container);
+      }
+      
+      console.log('✅ Container barberman dibuat otomatis');
+    }
+  }
+  
+  // Tampilkan loading
   container.innerHTML = `
     <div class="max-w-6xl mx-auto">
-      <div class="text-center mb-8">
-        <h2 class="text-3xl md:text-4xl font-bold text-purple-800 mb-2">Meet Our Barbers</h2>
-        <p class="text-gray-500">Tim profesional yang siap memberikan pelayanan terbaik</p>
-      </div>
-      <div class="flex justify-center py-12">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+      <div class="text-center py-20">
+        <i class="fas fa-spinner fa-spin text-4xl text-purple-600"></i>
+        <p class="mt-4 text-gray-500">Memuat data barberman...</p>
       </div>
     </div>
   `;
-
-  try {
-    // Cek apakah supabase tersedia
-    if (typeof supabase === 'undefined') {
-      throw new Error('Supabase tidak terdefinisi. Pastikan library supabase sudah di-load.');
-    }
-
-    console.log('Mengambil data barberman dari Supabase...');
-
-    // Ambil data dari Supabase
-    const { data: barbers, error } = await supabase
-      .from('karyawan')
-      .select('*')
-      .eq('role', 'barberman');
-
-    // Log untuk debugging
-    console.log('Data dari Supabase:', { barbers, error });
-
-    if (error) {
-      console.error('Error detail:', error);
-      throw new Error(`Error dari Supabase: ${error.message || JSON.stringify(error)}`);
-    }
-
-    if (!barbers || barbers.length === 0) {
-      container.innerHTML = `
-        <div class="max-w-6xl mx-auto">
-          <div class="text-center mb-8">
-            <h2 class="text-3xl md:text-4xl font-bold text-purple-800 mb-2">Meet Our Barbers</h2>
-            <p class="text-gray-500">Tim profesional yang siap memberikan pelayanan terbaik</p>
+  
+  // Ambil data barberman
+  barbermanData = await fetchBarberman();
+  
+  // Render konten - TANPA STATISTIK
+  container.innerHTML = `
+    <div class="max-w-6xl mx-auto">
+      <!-- Header Barberman -->
+      <div class="bg-gradient-to-r from-purple-600 to-purple-800 rounded-2xl shadow-xl p-6 md:p-8 mb-8 text-white">
+        <div class="flex items-center gap-4">
+          <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
+            <i class="fas fa-users text-3xl"></i>
           </div>
-          <div class="text-center py-12">
-            <p class="text-gray-500">Belum ada barberman yang tersedia saat ini.</p>
-            <p class="text-gray-400 text-sm mt-2">Pastikan tabel karyawan memiliki data dengan role = 'barberman'</p>
+          <div>
+            <h2 class="text-3xl font-bold">Meet Our Barbers</h2>
+            <p class="text-purple-200 mt-1">Tim profesional yang siap memberikan pelayanan terbaik</p>
           </div>
         </div>
-      `;
-      return;
-    }
-
-    // Render data barberman
-    container.innerHTML = `
-      <div class="max-w-6xl mx-auto">
-        <div class="text-center mb-8">
-          <h2 class="text-3xl md:text-4xl font-bold text-purple-800 mb-2">Meet Our Barbers</h2>
-          <p class="text-gray-500">Tim profesional yang siap memberikan pelayanan terbaik</p>
+      </div>
+      
+      <!-- Search/Filter Bar -->
+      <div class="bg-white rounded-2xl shadow-xl p-4 mb-8">
+        <div class="flex flex-col md:flex-row gap-4">
+          <div class="flex-1 relative">
+            <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+            <input type="text" id="searchBarberman" placeholder="Cari barberman berdasarkan nama..." 
+                   class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+          </div>
+          <div class="flex gap-2">
+            <select id="filterSpesialisasi" class="px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500">
+              <option value="">Semua Spesialisasi</option>
+              ${[...new Set(barbermanData.map(b => b.spesialisasi).filter(s => s && s.trim() !== ''))].map(s => 
+                `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`
+              ).join('')}
+            </select>
+            <select id="filterOutlet" class="px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500">
+              <option value="">Semua Outlet</option>
+              ${[...new Set(barbermanData.map(b => b.outlet).filter(o => o && o.trim() !== ''))].map(o => 
+                `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`
+              ).join('')}
+            </select>
+          </div>
         </div>
-        
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-          ${barbers.map(barber => {
-            // Validasi URL foto
-            let photoUrl = barber.photo_url;
-            
-            // Jika photo_url tidak lengkap, tambahkan base URL
-            if (photoUrl && !photoUrl.startsWith('http')) {
-              // Asumsikan ini adalah path relatif di bucket
-              const baseUrl = 'https://intzwjmlypmopzauxeqt.supabase.co/storage/v1/object/public/fotokaryawan/';
-              photoUrl = baseUrl + photoUrl.replace(/^\/+/, ''); // Remove leading slash
-            }
-            
-            return `
-            <div class="barberman-card bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-shadow duration-300">
-              <div class="h-56 overflow-hidden bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center relative">
-                ${photoUrl ? 
-                  `<img src="${photoUrl}" alt="${barber.nama_karyawan || 'Barberman'}" 
-                       class="w-full h-full object-cover" 
-                       onerror="this.onerror=null; this.parentElement.innerHTML = '<div class=\\'text-center text-white\\'><i class=\\'fas fa-user-tie text-6xl mb-2\\'></i><p class=\\'text-sm\\'>Foto tidak tersedia</p></div>';">` :
-                  `<div class="text-center text-white">
-                    <i class="fas fa-user-tie text-6xl mb-2"></i>
-                    <p class="text-sm">Foto tidak tersedia</p>
-                   </div>`
-                }
-              </div>
-              <div class="p-6 text-center">
-                <h3 class="text-xl font-bold text-slate-800">${barber.nama_karyawan || 'Nama tidak tersedia'}</h3>
-                <p class="text-purple-600 font-semibold mt-1">${barber.spesialisasi || 'Spesialisasi tidak tersedia'}</p>
-                <div class="mt-2 space-y-1">
-                  <p class="text-gray-500 text-sm">
-                    <i class="fas fa-store text-purple-400 mr-1"></i>
-                    Outlet: ${barber.outlet || '-'}
-                  </p>
-                  <p class="text-gray-500 text-sm">
-                    <i class="fas fa-clock text-purple-400 mr-1"></i>
-                    Pengalaman: ${barber.pengalaman || '-'}
-                  </p>
-                </div>
-                <button class="mt-4 bg-purple-600 text-white px-6 py-2 rounded-full text-sm font-semibold hover:bg-purple-700 transition transform hover:scale-105">
-                  <i class="fas fa-calendar-check mr-2"></i>
-                  Book This Barber
-                </button>
-              </div>
-            </div>
-          `}).join('')}
-        </div>
-        
-        <div class="mt-10 text-center">
-          <button onclick="document.querySelector('[data-menu=\\'reservation\\']').click()" 
-                  class="bg-gradient-to-r from-purple-600 to-purple-800 text-white px-8 py-3 rounded-full font-semibold hover:shadow-lg transition transform hover:scale-105">
-            <i class="fas fa-cut mr-2"></i>
-            Buat Reservasi
+      </div>
+      
+      <!-- Grid Barberman -->
+      <div id="barbermanGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        ${renderBarbermanCards(barbermanData)}
+      </div>
+      
+      <!-- Footer Info -->
+      <div class="mt-8 bg-white rounded-2xl shadow-xl p-6 text-center">
+        <p class="text-gray-500 text-sm">
+          <i class="fas fa-info-circle text-purple-600 mr-2"></i>
+          Untuk informasi lebih lanjut atau booking, silakan hubungi kami melalui WhatsApp atau gunakan fitur reservasi.
+        </p>
+        <div class="flex flex-col sm:flex-row justify-center gap-4 mt-4">
+          <button onclick="window.open('https://wa.me/6281234567890', '_blank')" 
+                  class="bg-green-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-green-700 transition flex items-center justify-center gap-2">
+            <i class="fab fa-whatsapp text-xl"></i> Chat Admin
+          </button>
+          <button onclick="redirectToMenu('reservation')" 
+                  class="bg-purple-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-purple-700 transition flex items-center justify-center gap-2">
+            <i class="fas fa-calendar-alt text-xl"></i> Buat Reservasi
           </button>
         </div>
       </div>
-    `;
-
-  } catch (error) {
-    console.error('Error lengkap:', error);
+    </div>
+  `;
+  
+  // Tambahkan event listener untuk search dan filter
+  const searchInput = document.getElementById('searchBarberman');
+  const filterSpesialisasi = document.getElementById('filterSpesialisasi');
+  const filterOutlet = document.getElementById('filterOutlet');
+  
+  if (searchInput && filterSpesialisasi && filterOutlet) {
+    function filterBarberman() {
+      const searchTerm = searchInput.value.toLowerCase();
+      const spesialisasi = filterSpesialisasi.value;
+      const outlet = filterOutlet.value;
+      
+      const filtered = barbermanData.filter(barber => {
+        const matchName = barber.nama_karyawan?.toLowerCase().includes(searchTerm) || false;
+        const matchSpesialisasi = !spesialisasi || barber.spesialisasi === spesialisasi;
+        const matchOutlet = !outlet || barber.outlet === outlet;
+        return matchName && matchSpesialisasi && matchOutlet;
+      });
+      
+      const grid = document.getElementById('barbermanGrid');
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full text-center py-12">
+            <i class="fas fa-user-slash text-6xl text-gray-300 mb-4"></i>
+            <p class="text-gray-500">Tidak ada barberman yang sesuai dengan filter</p>
+          </div>
+        `;
+      } else {
+        grid.innerHTML = renderBarbermanCards(filtered);
+      }
+    }
     
-    // Tampilkan error detail di UI untuk debugging
-    container.innerHTML = `
-      <div class="max-w-6xl mx-auto">
-        <div class="text-center mb-8">
-          <h2 class="text-3xl md:text-4xl font-bold text-purple-800 mb-2">Meet Our Barbers</h2>
-          <p class="text-gray-500">Tim profesional yang siap memberikan pelayanan terbaik</p>
-        </div>
-        <div class="text-center py-12">
-          <div class="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md mx-auto">
-            <i class="fas fa-exclamation-triangle text-red-500 text-3xl mb-3"></i>
-            <p class="text-red-600 font-semibold">⚠️ Gagal memuat data barberman</p>
-            <p class="text-red-500 text-sm mt-2">${error.message || 'Terjadi kesalahan yang tidak diketahui'}</p>
-            <button onclick="renderBarberman(document.querySelector('#barberman-container') || document.querySelector('.barberman-section'))" 
-                    class="mt-4 bg-purple-600 text-white px-6 py-2 rounded-full hover:bg-purple-700 transition">
-              <i class="fas fa-sync mr-2"></i>
-              Muat Ulang
-            </button>
+    searchInput.addEventListener('input', filterBarberman);
+    filterSpesialisasi.addEventListener('change', filterBarberman);
+    filterOutlet.addEventListener('change', filterBarberman);
+  }
+  
+  console.log(`✅ Halaman Barberman selesai dirender dengan ${barbermanData.length} data`);
+}
+
+// Fungsi untuk render card barberman
+function renderBarbermanCards(barbers) {
+  return barbers.map((barber, index) => {
+    // Validasi URL foto
+    let photoUrl = barber.photo_url;
+    if (photoUrl && !photoUrl.startsWith('http')) {
+      const baseUrl = 'https://intzwjmlypmopzauxeqt.supabase.co/storage/v1/object/public/fotokaryawan/';
+      photoUrl = baseUrl + photoUrl.replace(/^\/+/, '');
+    }
+    
+    const colors = ['from-purple-500 to-purple-700', 'from-blue-500 to-blue-700', 'from-green-500 to-green-700', 'from-red-500 to-red-700', 'from-orange-500 to-orange-700', 'from-pink-500 to-pink-700'];
+    const colorIndex = index % colors.length;
+    
+    const nama = barber.nama_karyawan || 'Nama tidak tersedia';
+    const spesialisasi = barber.spesialisasi || 'Spesialisasi belum diisi';
+    const outlet = barber.outlet || 'Outlet belum diisi';
+    const pengalaman = barber.pengalaman || 'Pengalaman belum diisi';
+    
+    return `
+    <div class="bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 barberman-card">
+      <div class="h-64 overflow-hidden bg-gradient-to-br ${colors[colorIndex]} flex items-center justify-center relative">
+        ${photoUrl ? 
+          `<img src="${photoUrl}" alt="${escapeHtml(nama)}" 
+               class="w-full h-full object-cover" 
+               onerror="this.onerror=null; this.parentElement.innerHTML = '<div class=\\'text-center text-white\\'><i class=\\'fas fa-user-tie text-6xl mb-2\\'></i><p class=\\'text-sm\\'>Foto tidak tersedia</p></div>';">` :
+          `<div class="text-center text-white">
+            <i class="fas fa-user-tie text-6xl mb-2"></i>
+            <p class="text-sm">Foto tidak tersedia</p>
+          </div>`
+        }
+      </div>
+      <div class="p-5 text-center">
+        <h3 class="text-xl font-bold text-slate-800">${escapeHtml(nama)}</h3>
+        <p class="text-purple-600 font-semibold mt-1">${escapeHtml(outlet)}</p>
+        
+        <div class="mt-3 space-y-2 text-left">
+          <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+            <span class="text-gray-500 text-sm">
+              <i class="fas fa-cut text-purple-400 mr-2"></i> Spesialisasi
+            </span>
+            <span class="font-medium text-slate-700 text-sm">${escapeHtml(spesialisasi)}</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-gray-500 text-sm">
+              <i class="fas fa-clock text-purple-400 mr-2"></i> Pengalaman
+            </span>
+            <span class="font-medium text-slate-700 text-sm">${escapeHtml(pengalaman)}</span>
           </div>
         </div>
+        
+        <div class="mt-4 grid grid-cols-2 gap-2">
+          <button onclick="redirectToMenu('reservation')" 
+                  class="bg-purple-600 text-white py-2 rounded-xl font-semibold hover:bg-purple-700 transition flex items-center justify-center gap-2 text-sm">
+            <i class="fas fa-calendar-check"></i> Book Now
+          </button>
+          <button onclick="window.open('https://wa.me/6281234567890?text=Halo%20Babeh%20Barbershop%2C%20saya%20mau%20booking%20dengan%20${encodeURIComponent(nama)}', '_blank')" 
+                  class="bg-green-600 text-white py-2 rounded-xl font-semibold hover:bg-green-700 transition flex items-center justify-center gap-2 text-sm">
+            <i class="fab fa-whatsapp"></i> Chat
+          </button>
+        </div>
       </div>
+    </div>
     `;
-  }
+  }).join('');
 }
 
-// Fungsi untuk inisialisasi dengan container ID
-async function initBarberman(containerId = 'barberman-container') {
-  const container = document.getElementById(containerId);
-  if (!container) {
-    console.error(`Container dengan ID "${containerId}" tidak ditemukan`);
-    return;
-  }
-  await renderBarberman(container);
-}
-
-// Fungsi untuk cek koneksi Supabase
-async function checkSupabaseConnection() {
-  try {
-    if (typeof supabase === 'undefined') {
-      console.error('Supabase tidak terdefinisi');
-      return false;
-    }
-    
-    const { data, error } = await supabase
-      .from('karyawan')
-      .select('count')
-      .limit(1);
-      
-    if (error) {
-      console.error('Gagal konek ke Supabase:', error);
-      return false;
-    }
-    
-    console.log('Koneksi Supabase berhasil');
-    return true;
-  } catch (error) {
-    console.error('Error cek koneksi:', error);
-    return false;
-  }
-}
-
-// Auto-run ketika halaman dimuat
-document.addEventListener('DOMContentLoaded', function() {
-  // Cari container dengan berbagai kemungkinan ID/class
-  const container = document.getElementById('barberman-container') || 
-                   document.querySelector('.barberman-section') ||
-                   document.querySelector('[data-barberman]');
-  
-  if (container) {
-    renderBarberman(container);
+// Fungsi untuk redirect ke menu tertentu
+function redirectToMenu(menu) {
+  // Cari tombol menu dengan data-menu yang sesuai
+  const menuBtn = document.querySelector(`.menu-btn[data-menu="${menu}"]`);
+  if (menuBtn) {
+    menuBtn.click();
   } else {
-    console.warn('Container barberman tidak ditemukan. Pastikan ada elemen dengan ID "barberman-container"');
+    // Fallback: coba cari di mobile menu
+    const mobileBtn = document.querySelector(`.mobile-menu-btn[data-menu="${menu}"]`);
+    if (mobileBtn) {
+      mobileBtn.click();
+    }
   }
-});
+}
+
+// Ekspos fungsi ke global
+window.redirectToMenu = redirectToMenu;
+
+console.log('📁 Modul Barberman siap digunakan!');
