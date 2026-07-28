@@ -1,46 +1,13 @@
 // outlet.js - Halaman Outlet Babeh Barbershop
 
-// Mengambil data outlet dari Supabase
-let outletSupabaseClient = null;
 let outletsData = [];
-
-// Konfigurasi Supabase - PASTIKAN INI BENAR
-const OUTLET_SUPABASE_URL = 'https://intzwjmlypmopzauxeqt.supabase.co';
-const OUTLET_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImludHp3am1seXBtb3B6YXV4ZXF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3MTc5MTIsImV4cCI6MjA3MDI5MzkxMn0.VwwVEDdHtYP5gui4epTcNfLXhPkmfFbRVb5y8mrXJiM';
-
-// Fungsi untuk mendapatkan Supabase client
-function getOutletSupabaseClient() {
-  if (outletSupabaseClient) return outletSupabaseClient;
-  
-  // Cek apakah Supabase tersedia di window
-  if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
-    try {
-      outletSupabaseClient = window.supabase.createClient(
-        OUTLET_SUPABASE_URL, 
-        OUTLET_SUPABASE_ANON_KEY,
-        {
-          auth: {
-            persistSession: false,
-            autoRefreshToken: false
-          }
-        }
-      );
-      console.log('✅ Supabase client untuk Outlet berhasil diinisialisasi');
-      return outletSupabaseClient;
-    } catch (error) {
-      console.error('❌ Gagal membuat Supabase client:', error);
-      return null;
-    }
-  }
-  
-  console.error('❌ Supabase library tidak tersedia');
-  return null;
-}
 
 // Fungsi untuk mengambil data outlet dari Supabase
 async function fetchOutlets() {
-  const client = getOutletSupabaseClient();
-  if (!client) {
+  // Gunakan single instance dari supabase-config.js
+  const supabase = window.getSupabaseClient ? window.getSupabaseClient() : null;
+  
+  if (!supabase) {
     console.error('❌ Supabase client tidak tersedia, menggunakan data dummy');
     return getDummyOutlets();
   }
@@ -48,7 +15,7 @@ async function fetchOutlets() {
   try {
     console.log('📋 Mengambil data outlet dari database...');
     
-    const { data, error } = await client
+    const { data, error } = await supabase
       .from('outlet')
       .select('*')
       .order('id', { ascending: true });
@@ -311,5 +278,6 @@ function redirectToMenu(menu) {
 
 // Ekspos fungsi ke global
 window.redirectToMenu = redirectToMenu;
+window.renderOutlet = renderOutlet;
 
 console.log('📁 Modul Outlet siap digunakan!');
