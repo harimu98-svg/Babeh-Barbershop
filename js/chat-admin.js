@@ -8,26 +8,20 @@ function renderChat(container) {
       </div>
       
       <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8">
-        <div class="flex flex-col md:flex-row gap-8">
-          <div class="flex-1 text-center">
+        <div class="flex flex-col items-center gap-6">
+          <!-- WhatsApp Card -->
+          <div class="w-full max-w-md text-center">
             <div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <i class="fab fa-whatsapp text-green-600 text-5xl"></i>
             </div>
             <h3 class="text-xl font-bold text-slate-800 mb-2">WhatsApp Admin</h3>
-            <p class="text-gray-500 mb-4">Fast response, chat langsung dengan admin</p>
+            <p class="text-gray-500 mb-1">Fast response, chat langsung dengan admin</p>
+            <p class="text-gray-500 text-sm mb-4">
+              <i class="far fa-clock text-purple-500 mr-1"></i> 
+              Senin - Minggu, 09:00 - 21:00
+            </p>
             <button id="whatsappBtn" class="bg-green-600 text-white px-8 py-3 rounded-full font-semibold hover:bg-green-700 transition inline-flex items-center gap-2">
               <i class="fab fa-whatsapp"></i> Chat Sekarang
-            </button>
-          </div>
-          
-          <div class="flex-1 text-center">
-            <div class="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <i class="fas fa-phone-alt text-red-600 text-5xl"></i>
-            </div>
-            <h3 class="text-xl font-bold text-slate-800 mb-2">Telepon</h3>
-            <p class="text-gray-500 mb-4">Senin - Minggu, 09:00 - 22:00</p>
-            <button id="callBtn" class="bg-red-600 text-white px-8 py-3 rounded-full font-semibold hover:bg-red-700 transition inline-flex items-center gap-2">
-              <i class="fas fa-phone-alt"></i> (021) 1234-5678
             </button>
           </div>
         </div>
@@ -59,19 +53,17 @@ function renderChat(container) {
     </div>
   `;
   
+  // Event listener untuk tombol WhatsApp dengan nomor baru
   document.getElementById('whatsappBtn')?.addEventListener('click', () => {
-    window.open('https://wa.me/6281234567890?text=Halo%20Babeh%20Barbershop%2C%20saya%20mau%20konsultasi', '_blank');
+    window.open('https://wa.me/6282210017083?text=Halo%20Babeh%20Barbershop%2C%20saya%20mau%20konsultasi', '_blank');
   });
   
-  document.getElementById('callBtn')?.addEventListener('click', () => {
-    window.location.href = 'tel:02112345678';
-  });
-  
+  // Event listener untuk form kirim pesan dengan nomor baru
   document.getElementById('quickMessageForm')?.addEventListener('submit', (e) => {
     e.preventDefault();
     const name = document.getElementById('quickName').value;
     const message = document.getElementById('quickMessage').value;
     const fullMessage = `Halo Babeh Barbershop!%0A%0ANama: ${name}%0A%0APesan: ${message}`;
-    window.open(`https://wa.me/6281234567890?text=${fullMessage}`, '_blank');
+    window.open(`https://wa.me/6282210017083?text=${fullMessage}`, '_blank');
   });
 }
