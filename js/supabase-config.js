@@ -1,8 +1,8 @@
 // supabase-config.js - Single Supabase Client Instance
 
-// Konfigurasi Supabase
+// Konfigurasi Supabase - Menggunakan konfigurasi yang SAMA dengan outlet.js
 const SUPABASE_URL = 'https://intzwjmlypmopzauxeqt.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImludHp3am1seXBtb3B6YXV4ZXF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3MTc5MTIsImV4cCI6MjA3MDI5MzkxMn0.VwwVEDdHtYP5gui4epTcNfLXhPkmfFbRVb5y8mrXJiM';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImludHp3am1seXBtb3B6YXV4ZXF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3MTc5MTIsImV4cCI6MjA3MDI5MzkxMn0.VwwVEDdHtYP5gui4epTcNfLXhPkmfFbRVb5y8mrXJiM';
 
 // Buat single instance Supabase client
 let supabaseInstance = null;
@@ -26,6 +26,7 @@ function getSupabaseClient() {
         }
       );
       console.log('✅ Supabase client single instance berhasil diinisialisasi');
+      console.log('🔑 Menggunakan anon key:', SUPABASE_ANON_KEY.substring(0, 30) + '...');
       return supabaseInstance;
     } catch (error) {
       console.error('❌ Gagal membuat Supabase client:', error);
@@ -42,3 +43,4 @@ window.getSupabaseClient = getSupabaseClient;
 window.supabaseInstance = getSupabaseClient();
 
 console.log('📦 Supabase Config loaded - Single Instance');
+console.log('📌 URL:', SUPABASE_URL);
