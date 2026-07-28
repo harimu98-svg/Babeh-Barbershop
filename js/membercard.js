@@ -54,6 +54,15 @@ function renderMembercard(container) {
             </div>
           </div>
         </div>
+        
+        <!-- Informasi Pendaftaran Membercard - DITAMBAHKAN DI BAWAH GAMBAR -->
+        <div class="mt-8 text-center">
+          <h3 class="text-2xl font-bold text-orange-700 mb-3">Daftar Membercard Digital</h3>
+          <p class="text-gray-600 text-base max-w-2xl mx-auto leading-relaxed">
+            Untuk saat ini pendaftaran membercard hanya dapat dilakukan di Outlet Babeh Barbershop. 
+            Segera kunjungi outlet Babeh Barbershop terdekat.
+          </p>
+        </div>
       </div>
 
       <!-- Keuntungan Membercard -->
@@ -182,21 +191,7 @@ function renderMembercard(container) {
         </div>
       </div>
 
-      <!-- Daftar Membercard -->
-      <div class="bg-gradient-to-r from-orange-500 to-orange-700 rounded-2xl shadow-xl p-6 md:p-8 mb-8 text-white">
-        <div class="text-center">
-          <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <i class="fas fa-id-card text-4xl"></i>
-          </div>
-          <h3 class="text-2xl font-bold mb-4">Daftar Membercard Digital</h3>
-          <p class="text-orange-100 text-base max-w-2xl mx-auto leading-relaxed">
-            Untuk saat ini pendaftaran membercard hanya dapat dilakukan di Outlet Babeh Barbershop. 
-            Segera kunjungi outlet Babeh Barbershop terdekat.
-          </p>
-        </div>
-      </div>
-
-      <!-- Footer Info - SAMA SEPERTI MODUL OUTLET -->
+      <!-- Footer Info -->
       <div class="mt-8 bg-white rounded-2xl shadow-xl p-6 text-center">
         <p class="text-gray-500 text-sm">
           <i class="fas fa-info-circle text-orange-600 mr-2"></i>
