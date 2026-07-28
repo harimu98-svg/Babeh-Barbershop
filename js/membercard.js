@@ -38,7 +38,8 @@ function renderMembercard(container) {
           <i class="fas fa-id-card text-orange-500"></i> Membercard Digital
         </h3>
         <p class="text-gray-500 mb-1">Bergabunglah dengan 1000++ anggota member exclusive kami </p> 
-        <p class="text-gray-500 mb-6">Tunjukkan kartu member ini untuk mendapatkan berbagai keuntungan </p> 
+        <p class="text-gray-500 mb-1">Gratis tanpa biaya apapun, baik biaya pendaftaran maupun biaya bulanan </p> 
+        <p class="text-gray-500 mb-6">Proses cepat tidak sampai 5 menit, langsung aktif dan langsung bisa digunakan transaksi </p> 
         <div class="flex justify-center">
           <div class="relative group">
             <!-- Membercard Image -->
@@ -78,7 +79,7 @@ function renderMembercard(container) {
               <i class="fas fa-percent text-white text-xl"></i>
             </div>
             <h4 class="font-bold text-slate-800 mb-1">Diskon Khusus</h4>
-            <p class="text-gray-600 text-sm">Dapatkan diskon 10% untuk setiap layanan di semua outlet</p>
+            <p class="text-gray-600 text-sm">Dapatkan diskon langsung 10% untuk produk tertentu di semua outlet</p>
           </div>
           
           <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-5 hover:shadow-lg transition duration-300">
@@ -86,7 +87,7 @@ function renderMembercard(container) {
               <i class="fas fa-gift text-white text-xl"></i>
             </div>
             <h4 class="font-bold text-slate-800 mb-1">Hadiah Ulang Tahun</h4>
-            <p class="text-gray-600 text-sm">Dapatkan potongan spesial dan free haircut di bulan ulang tahun</p>
+            <p class="text-gray-600 text-sm">Dapatkan potongan spesial dan free haircut di hari ulang tahun (H +/-3) (</p>
           </div>
           
           <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-5 hover:shadow-lg transition duration-300">
@@ -94,7 +95,7 @@ function renderMembercard(container) {
               <i class="fas fa-star text-white text-xl"></i>
             </div>
             <h4 class="font-bold text-slate-800 mb-1">Poin Reward</h4>
-            <p class="text-gray-600 text-sm">Kumpulkan poin dari setiap transaksi untuk ditukar dengan layanan gratis</p>
+            <p class="text-gray-600 text-sm">Kumpulkan poin dari setiap transaksi untuk ditukar dengan discount atau layanan gratis</p>
           </div>
           
           <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-5 hover:shadow-lg transition duration-300">
@@ -156,9 +157,9 @@ function renderMembercard(container) {
                 <i class="fas fa-users text-white text-xl"></i>
               </div>
               <div>
-                <h4 class="font-bold text-slate-800">Buy 5 Get 1 Free</h4>
-                <p class="text-gray-600 text-sm">Setiap 5 kali kunjungan, dapatkan 1 layanan gratis</p>
-                <span class="inline-block mt-2 bg-blue-100 text-blue-700 text-xs px-3 py-1 rounded-full">Akumulasi poin</span>
+                <h4 class="font-bold text-slate-800">Buy 6 Get 1 Free</h4>
+                <p class="text-gray-600 text-sm">Setiap 6 kali kunjungan, dapatkan 1 layanan gratis</p>
+                <span class="inline-block mt-2 bg-blue-100 text-blue-700 text-xs px-3 py-1 rounded-full">Promo sesional di Outlet tertentu</span>
               </div>
             </div>
           </div>
@@ -170,8 +171,8 @@ function renderMembercard(container) {
               </div>
               <div>
                 <h4 class="font-bold text-slate-800">Bonus Poin 2x Lipat</h4>
-                <p class="text-gray-600 text-sm">Dapatkan poin 2x lipat di setiap transaksi akhir pekan</p>
-                <span class="inline-block mt-2 bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full">Sabtu - Minggu</span>
+                <p class="text-gray-600 text-sm">Dapatkan poin 2x lipat di hari besar spesial</p>
+                <span class="inline-block mt-2 bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full">Hari Kemerdekaan, Hari Raya, dsb</span>
               </div>
             </div>
           </div>
