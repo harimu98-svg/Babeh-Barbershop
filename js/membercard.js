@@ -37,8 +37,8 @@ function renderMembercard(container) {
         <h3 class="text-2xl font-bold text-orange-700 mb-4 flex items-center gap-2">
           <i class="fas fa-id-card text-orange-500"></i> Membercard Digital
         </h3>
-        <p class="text-gray-500 mb-6">Tunjukkan kartu member ini untuk mendapatkan berbagai keuntungan</p>
-        
+        <p class="text-gray-500 mb-6">Bergabunglah dengan 1000+ anggota member exclusive kami</p>
+        <p class="text-gray-500 mb-6">Tunjukkan kartu member ini untuk mendapatkan berbagai keuntungan</p> 
         <div class="flex justify-center">
           <div class="relative group">
             <!-- Membercard Image -->
