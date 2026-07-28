@@ -6,32 +6,12 @@ let currentKatalogIndex = 0;
 let currentKatalogCategory = 'Best Haircut';
 let currentKatalogInfo = null;
 
-// Konfigurasi Supabase
-const KATALOG_SUPABASE_URL = 'https://intzwjmlypmopzauxeqt.supabase.co';
-const KATALOG_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImludHp3am1seXBtb3B6YXV4ZXF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3MTc5MTIsImV4cCI6MjA3MDI5MzkxMn0.VwwVEDdHtYP5gui4epTcNfLXhPkmfFbRVb5y8mrXJiM';
-
-let katalogSupabaseClient = null;
-
-// Fungsi untuk mendapatkan Supabase client
-function getKatalogSupabaseClient() {
-  if (katalogSupabaseClient) return katalogSupabaseClient;
-  
-  if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
-    katalogSupabaseClient = window.supabase.createClient(KATALOG_SUPABASE_URL, KATALOG_SUPABASE_ANON_KEY);
-    console.log('✅ Supabase client untuk katalog berhasil diinisialisasi');
-    return katalogSupabaseClient;
-  }
-  
-  console.error('❌ Supabase library tidak tersedia');
-  return null;
-}
-
-// Inisialisasi
-setTimeout(() => {
-  getKatalogSupabaseClient();
-}, 100);
-
 const KATALOG_TABLE = 'model_rambut';
+
+// Fungsi untuk mendapatkan Supabase client (dari single instance)
+function getKatalogSupabaseClient() {
+  return window.getSupabaseClient ? window.getSupabaseClient() : null;
+}
 
 // ============================================
 // FUNGSI RENDER KATALOG (dengan gambar menu dari folder images)
@@ -54,7 +34,7 @@ function renderKatalog(container) {
         <div class="katalog-menu-card bg-white rounded-2xl shadow-xl overflow-hidden cursor-pointer transform transition hover:scale-[1.02] active:scale-95" data-cat="Best Haircut">
           <div class="h-48 bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center overflow-hidden">
             <img src="images/Best Haircut.jpg" alt="Best Haircut" class="menu-card-image w-full h-full object-cover" 
-                 onerror="this.onerror=null; this.parentElement.innerHTML = '<i class=\'fas fa-cut text-white text-6xl opacity-80\'></i>';">
+                 onerror="this.onerror=null; this.parentElement.innerHTML = '<i class=\\'fas fa-cut text-white text-6xl opacity-80\\'></i>';">
           </div>
           <div class="p-5">
             <h2 class="text-2xl font-bold text-slate-800">Best Haircut</h2>
@@ -66,7 +46,7 @@ function renderKatalog(container) {
         <div class="katalog-menu-card bg-white rounded-2xl shadow-xl overflow-hidden cursor-pointer transform transition hover:scale-[1.02] active:scale-95" data-cat="Kids Haircut">
           <div class="h-48 bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center overflow-hidden">
             <img src="images/Kids Haircut.jpg" alt="Kids Haircut" class="menu-card-image w-full h-full object-cover" 
-                 onerror="this.onerror=null; this.parentElement.innerHTML = '<i class=\'fas fa-child text-white text-6xl opacity-80\'></i>';">
+                 onerror="this.onerror=null; this.parentElement.innerHTML = '<i class=\\'fas fa-child text-white text-6xl opacity-80\\'></i>';">
           </div>
           <div class="p-5">
             <h2 class="text-2xl font-bold text-slate-800">Kids Haircut</h2>
@@ -78,7 +58,7 @@ function renderKatalog(container) {
         <div class="katalog-menu-card bg-white rounded-2xl shadow-xl overflow-hidden cursor-pointer transform transition hover:scale-[1.02] active:scale-95" data-cat="All Collection">
           <div class="h-48 bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center overflow-hidden">
             <img src="images/All Collection.jpg" alt="All Collection" class="menu-card-image w-full h-full object-cover" 
-                 onerror="this.onerror=null; this.parentElement.innerHTML = '<i class=\'fas fa-layer-group text-white text-6xl opacity-80\'></i>';">
+                 onerror="this.onerror=null; this.parentElement.innerHTML = '<i class=\\'fas fa-layer-group text-white text-6xl opacity-80\\'></i>';">
           </div>
           <div class="p-5">
             <h2 class="text-2xl font-bold text-slate-800">All Collection</h2>
@@ -90,7 +70,7 @@ function renderKatalog(container) {
         <div class="katalog-menu-card bg-white rounded-2xl shadow-xl overflow-hidden cursor-pointer transform transition hover:scale-[1.02] active:scale-95" data-cat="Celebrity Haircut">
           <div class="h-48 bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center overflow-hidden">
             <img src="images/Celebrity Haircut.jpg" alt="Celebrity Haircut" class="menu-card-image w-full h-full object-cover" 
-                 onerror="this.onerror=null; this.parentElement.innerHTML = '<i class=\'fas fa-star text-white text-6xl opacity-80\'></i>';">
+                 onerror="this.onerror=null; this.parentElement.innerHTML = '<i class=\\'fas fa-star text-white text-6xl opacity-80\\'></i>';">
           </div>
           <div class="p-5">
             <h2 class="text-2xl font-bold text-slate-800">Celebrity Haircut</h2>
@@ -102,7 +82,7 @@ function renderKatalog(container) {
         <div class="katalog-menu-card bg-white rounded-2xl shadow-xl overflow-hidden cursor-pointer transform transition hover:scale-[1.02] active:scale-95" data-cat="Football Players Haircut">
           <div class="h-48 bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center overflow-hidden">
             <img src="images/Football Players Haircut.jpg" alt="Football Players Haircut" class="menu-card-image w-full h-full object-cover" 
-                 onerror="this.onerror=null; this.parentElement.innerHTML = '<i class=\'fas fa-futbol text-white text-6xl opacity-80\'></i>';">
+                 onerror="this.onerror=null; this.parentElement.innerHTML = '<i class=\\'fas fa-futbol text-white text-6xl opacity-80\\'></i>';">
           </div>
           <div class="p-5">
             <h2 class="text-2xl font-bold text-slate-800">Football Players Haircut</h2>
@@ -114,7 +94,7 @@ function renderKatalog(container) {
         <div class="katalog-menu-card bg-white rounded-2xl shadow-xl overflow-hidden cursor-pointer transform transition hover:scale-[1.02] active:scale-95" data-cat="Other Service">
           <div class="h-48 bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center overflow-hidden">
             <img src="images/Other Service.jpg" alt="Other Service" class="menu-card-image w-full h-full object-cover" 
-                 onerror="this.onerror=null; this.parentElement.innerHTML = '<i class=\'fas fa-concierge-bell text-white text-6xl opacity-80\'></i>';">
+                 onerror="this.onerror=null; this.parentElement.innerHTML = '<i class=\\'fas fa-concierge-bell text-white text-6xl opacity-80\\'></i>';">
           </div>
           <div class="p-5">
             <h2 class="text-2xl font-bold text-slate-800">Other Service</h2>
@@ -204,8 +184,8 @@ function renderKatalog(container) {
 // ============================================
 
 async function fetchKatalogModelsByCategory(kategori) {
-  const client = getKatalogSupabaseClient();
-  if (!client) {
+  const supabase = getKatalogSupabaseClient();
+  if (!supabase) {
     console.error('❌ Supabase client tidak tersedia');
     return [];
   }
@@ -213,7 +193,7 @@ async function fetchKatalogModelsByCategory(kategori) {
   try {
     console.log(`📋 Mengambil data katalog untuk kategori: ${kategori}`);
     
-    const { data, error } = await client
+    const { data, error } = await supabase
       .from(KATALOG_TABLE)
       .select('*')
       .eq('kategori', kategori);
@@ -278,9 +258,9 @@ async function loadKatalogCategory(category) {
   currentKatalogImages = images.map(model => {
     let imageUrl = model.link_url_bucket;
     if (!imageUrl.startsWith('http')) {
-      const client = getKatalogSupabaseClient();
-      if (client) {
-        imageUrl = client.storage
+      const supabase = getKatalogSupabaseClient();
+      if (supabase) {
+        imageUrl = supabase.storage
           .from('model_rambut')
           .getPublicUrl(imageUrl).data.publicUrl;
       }
