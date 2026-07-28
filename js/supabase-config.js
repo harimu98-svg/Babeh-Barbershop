@@ -39,6 +39,6 @@ function getSupabaseClient() {
 
 // Ekspos ke global
 window.getSupabaseClient = getSupabaseClient;
-window.supabaseInstance = getSupabaseClient;
+window.supabaseInstance = getSupabaseClient();
 
 console.log('📦 Supabase Config loaded - Single Instance');
