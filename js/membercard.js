@@ -54,26 +54,6 @@ function renderMembercard(container) {
             </div>
           </div>
         </div>
-        
-        <!-- Member Info -->
-        <div class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-md mx-auto">
-          <div class="bg-orange-50 rounded-xl p-3 text-center">
-            <div class="text-orange-600 font-bold text-lg">#001</div>
-            <div class="text-gray-500 text-xs">Member ID</div>
-          </div>
-          <div class="bg-orange-50 rounded-xl p-3 text-center">
-            <div class="text-orange-600 font-bold text-lg">Premium</div>
-            <div class="text-gray-500 text-xs">Tier</div>
-          </div>
-          <div class="bg-orange-50 rounded-xl p-3 text-center">
-            <div class="text-orange-600 font-bold text-lg">10%</div>
-            <div class="text-gray-500 text-xs">Diskon</div>
-          </div>
-          <div class="bg-orange-50 rounded-xl p-3 text-center">
-            <div class="text-orange-600 font-bold text-lg">∞</div>
-            <div class="text-gray-500 text-xs">Berlaku</div>
-          </div>
-        </div>
       </div>
 
       <!-- Keuntungan Membercard -->
@@ -206,31 +186,20 @@ function renderMembercard(container) {
       <div class="bg-gradient-to-r from-orange-500 to-orange-700 rounded-2xl shadow-xl p-6 md:p-8 mb-8 text-white">
         <div class="text-center">
           <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <i class="fas fa-user-plus text-4xl"></i>
+            <i class="fas fa-id-card text-4xl"></i>
           </div>
-          <h3 class="text-3xl font-bold mb-2">Daftar Membercard Digital Gratis!</h3>
-          <p class="text-orange-200 mb-6 max-w-2xl mx-auto">
-            Nikmati berbagai promo dan keuntungan eksklusif lainnya. 
-            Daftar sekarang dan jadilah bagian dari keluarga Babeh Barbershop!
+          <h3 class="text-2xl font-bold mb-4">Daftar Membercard Digital</h3>
+          <p class="text-orange-100 text-base max-w-2xl mx-auto leading-relaxed">
+            Untuk saat ini pendaftaran membercard hanya dapat dilakukan di Outlet Babeh Barbershop. 
+            Segera kunjungi outlet Babeh Barbershop terdekat.
           </p>
-          
-          <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <button onclick="window.open('https://wa.me/6281234567890?text=Halo%20Babeh%20Barbershop%2C%20saya%20mau%20daftar%20membercard%20digital', '_blank')" 
-                    class="bg-white text-orange-700 px-8 py-3 rounded-xl font-bold hover:shadow-2xl transition duration-300 flex items-center justify-center gap-2">
-              <i class="fab fa-whatsapp"></i> Daftar via WhatsApp
-            </button>
-            <button onclick="redirectToMenu('reservation')" 
-                    class="bg-orange-800/50 text-white border-2 border-white/30 px-8 py-3 rounded-xl font-bold hover:bg-orange-800/70 transition duration-300 flex items-center justify-center gap-2">
-              <i class="fas fa-calendar-alt"></i> Booking Sekarang
-            </button>
-          </div>
         </div>
       </div>
 
-      <!-- Tombol Aksi -->
+      <!-- Footer Info - Tombol Aksi -->
       <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <button onclick="window.open('https://wa.me/6281234567890?text=Halo%20Babeh%20Barbershop%2C%20saya%20mau%20bertanya%20tentang%20membercard', '_blank')" 
+          <button onclick="window.open('https://wa.me/6282210017083?text=Halo%20Babeh%20Barbershop%2C%20saya%20mau%20bertanya%20tentang%20membercard', '_blank')" 
                   class="bg-gradient-to-r from-green-600 to-green-700 text-white py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-green-500/30 transition-all duration-300 flex items-center justify-center gap-3 group">
             <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center group-hover:scale-110 transition">
               <i class="fab fa-whatsapp text-xl"></i>
