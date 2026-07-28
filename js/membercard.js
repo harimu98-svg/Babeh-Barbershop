@@ -87,7 +87,7 @@ function renderMembercard(container) {
               <i class="fas fa-gift text-white text-xl"></i>
             </div>
             <h4 class="font-bold text-slate-800 mb-1">Hadiah Ulang Tahun</h4>
-            <p class="text-gray-600 text-sm">Dapatkan potongan spesial dan free haircut di hari ulang tahun (H +/-3) (</p>
+            <p class="text-gray-600 text-sm">Dapatkan potongan spesial dan free haircut di hari ulang tahun (H +/-3) </p>
           </div>
           
           <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-5 hover:shadow-lg transition duration-300">
