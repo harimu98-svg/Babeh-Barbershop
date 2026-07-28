@@ -86,8 +86,8 @@ function renderMembercard(container) {
             <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center mb-3">
               <i class="fas fa-gift text-white text-xl"></i>
             </div>
-            <h4 class="font-bold text-slate-800 mb-1">Hadiah Ulang Tahun</h4>
-            <p class="text-gray-600 text-sm">Dapatkan potongan spesial dan free haircut di hari ulang tahun (H +/-3) </p>
+            <h4 class="font-bold text-slate-800 mb-1">Garansi 3x24 jam</h4>
+            <p class="text-gray-600 text-sm">Jika hasil pangkas rambut dirasa belum sempurna dan ingin dilakukan perbaikan, dapat dilakukan di semua outlet, gratis ! </p>
           </div>
           
           <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-5 hover:shadow-lg transition duration-300">
@@ -141,8 +141,8 @@ function renderMembercard(container) {
                 <i class="fas fa-scissors text-white text-xl"></i>
               </div>
               <div>
-                <h4 class="font-bold text-slate-800">Free Haircut di Bulan Ulang Tahun</h4>
-                <p class="text-gray-600 text-sm">Dapatkan potong rambut gratis di bulan ulang tahun Anda</p>
+                <h4 class="font-bold text-slate-800">Free Haircut di Hari Ulang Tahun</h4>
+                <p class="text-gray-600 text-sm">Dapatkan potong rambut gratis di Hari ulang tahun Anda (H +/-3)</p>
                 <span class="inline-block mt-2 bg-orange-100 text-orange-700 text-xs px-3 py-1 rounded-full">Syarat & Ketentuan berlaku</span>
               </div>
             </div>
@@ -173,6 +173,19 @@ function renderMembercard(container) {
                 <h4 class="font-bold text-slate-800">Bonus Poin 2x Lipat</h4>
                 <p class="text-gray-600 text-sm">Dapatkan poin 2x lipat di hari besar spesial</p>
                 <span class="inline-block mt-2 bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full">Hari Kemerdekaan, Hari Raya, dsb</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="border-2 border-green-200 rounded-xl p-5 bg-gradient-to-r from-green-50 to-white">
+            <div class="flex items-start gap-3">
+              <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-gift text-white text-xl"></i>
+              </div>
+              <div>
+                <h4 class="font-bold text-slate-800">Bonus & Promo Menarik</h4>
+                <p class="text-gray-600 text-sm">Bapak dan anak discount 10%, Member baru, gratis sisir saku, Kopi gratis untuk cat rambut, Momogi gratis untck bocah</p>
+                <span class="inline-block mt-2 bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full">Berlaku di semua Outlet</span>
               </div>
             </div>
           </div>
