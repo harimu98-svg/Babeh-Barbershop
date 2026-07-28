@@ -260,7 +260,7 @@ function renderBarbermanCards(barbers) {
       </div>
       <div class="p-5 text-center">
         <h3 class="text-xl font-bold text-slate-800">${escapeHtml(nama)}</h3>
-        <p class="text-purple-600 font-semibold mt-1">${escapeHtml(outlet)}</p>
+        <p class="text-purple-600 font-semibold mt-1">Outlet: ${escapeHtml(outlet)}</p>
         
         <div class="mt-3 space-y-2 text-left">
           <div class="flex justify-between items-center border-b border-gray-100 pb-2">
