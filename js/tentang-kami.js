@@ -136,7 +136,7 @@ async function renderTentangKami(container) {
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                    
           <!-- Tombol Chat Admin -->
-           <button onclick="window.open('https://wa.me/6281234567890', '_blank')" 
+           <button onclick="window.open('https://wa.me/6282210017083', '_blank')" 
             class="bg-green-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-green-700 transition flex items-center justify-center gap-2">
       <i class="fab fa-whatsapp text-xl"></i> Chat Admin
     </button>
@@ -145,7 +145,7 @@ async function renderTentangKami(container) {
         <!-- Info Tambahan -->
         <div class="mt-4 p-4 bg-purple-50 rounded-xl flex items-center gap-3">
           <i class="fas fa-clock text-purple-600"></i>
-          <span class="text-gray-600 text-sm">Jam operasional: Senin - Minggu (09:00 - 22:00)</span>
+          <span class="text-gray-600 text-sm">Jam operasional: Senin - Minggu (09:00 - 21:00)</span>
         </div>
       </div>
     </div>
