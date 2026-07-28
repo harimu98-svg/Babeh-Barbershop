@@ -1,46 +1,13 @@
 // barberman.js - Halaman Barberman Babeh Barbershop
 
-// Mengambil data barberman dari Supabase
-let barbermanSupabaseClient = null;
 let barbermanData = [];
-
-// Konfigurasi Supabase - SAMA dengan outlet.js
-const BARBERMAN_SUPABASE_URL = 'https://intzwjmlypmopzauxeqt.supabase.co';
-const BARBERMAN_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImludHp3am1seXBtb3B6YXV4ZXF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3MTc5MTIsImV4cCI6MjA3MDI5MzkxMn0.VwwVEDdHtYP5gui4epTcNfLXhPkmfFbRVb5y8mrXJiM';
-
-// Fungsi untuk mendapatkan Supabase client
-function getBarbermanSupabaseClient() {
-  if (barbermanSupabaseClient) return barbermanSupabaseClient;
-  
-  // Cek apakah Supabase tersedia di window
-  if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
-    try {
-      barbermanSupabaseClient = window.supabase.createClient(
-        BARBERMAN_SUPABASE_URL, 
-        BARBERMAN_SUPABASE_ANON_KEY,
-        {
-          auth: {
-            persistSession: false,
-            autoRefreshToken: false
-          }
-        }
-      );
-      console.log('✅ Supabase client untuk Barberman berhasil diinisialisasi');
-      return barbermanSupabaseClient;
-    } catch (error) {
-      console.error('❌ Gagal membuat Supabase client:', error);
-      return null;
-    }
-  }
-  
-  console.error('❌ Supabase library tidak tersedia');
-  return null;
-}
 
 // Fungsi untuk mengambil data barberman dari Supabase
 async function fetchBarberman() {
-  const client = getBarbermanSupabaseClient();
-  if (!client) {
+  // Gunakan single instance dari supabase-config.js
+  const supabase = window.getSupabaseClient ? window.getSupabaseClient() : null;
+  
+  if (!supabase) {
     console.error('❌ Supabase client tidak tersedia, menggunakan data dummy');
     return getDummyBarberman();
   }
@@ -48,7 +15,7 @@ async function fetchBarberman() {
   try {
     console.log('📋 Mengambil data barberman dari database...');
     
-    const { data, error } = await client
+    const { data, error } = await supabase
       .from('karyawan')
       .select('*')
       .eq('role', 'barberman')
@@ -114,6 +81,35 @@ function escapeHtml(text) {
 
 // Render halaman Barberman
 async function renderBarberman(container) {
+  // Jika container tidak ditemukan, coba cari atau buat
+  if (!container) {
+    console.warn('⚠️ Container tidak ditemukan, mencoba mencari atau membuat...');
+    container = document.getElementById('barberman-container');
+    
+    if (!container) {
+      container = document.querySelector('.barberman-section') || 
+                  document.querySelector('[data-barberman]');
+    }
+    
+    if (!container) {
+      console.log('📦 Membuat container barberman otomatis...');
+      container = document.createElement('div');
+      container.id = 'barberman-container';
+      container.className = 'container mx-auto px-4 py-8';
+      
+      const mainContent = document.querySelector('main') || document.body;
+      const aboutSection = document.querySelector('#tentang-kami, .about-section, [data-section="about"]');
+      
+      if (aboutSection && aboutSection.parentNode) {
+        aboutSection.parentNode.insertBefore(container, aboutSection.nextSibling);
+      } else {
+        mainContent.appendChild(container);
+      }
+      
+      console.log('✅ Container barberman dibuat otomatis');
+    }
+  }
+  
   // Tampilkan loading
   container.innerHTML = `
     <div class="max-w-6xl mx-auto">
@@ -127,19 +123,7 @@ async function renderBarberman(container) {
   // Ambil data barberman
   barbermanData = await fetchBarberman();
   
-  // Siapkan data untuk statistik
-  const totalBarber = barbermanData.length;
-  const totalSpesialisasi = new Set(barbermanData.map(b => b.spesialisasi).filter(s => s && s.trim() !== '')).size;
-  const totalOutlet = new Set(barbermanData.map(b => b.outlet).filter(o => o && o.trim() !== '')).size;
-  const totalPengalaman = barbermanData
-    .map(b => {
-      if (!b.pengalaman) return 0;
-      const match = b.pengalaman.match(/(\d+)/);
-      return match ? parseInt(match[0]) : 0;
-    })
-    .reduce((acc, val) => acc + val, 0);
-  
-  // Render konten
+  // Render konten - TANPA STATISTIK
   container.innerHTML = `
     <div class="max-w-6xl mx-auto">
       <!-- Header Barberman -->
@@ -152,26 +136,6 @@ async function renderBarberman(container) {
             <h2 class="text-3xl font-bold">Meet Our Barbers</h2>
             <p class="text-purple-200 mt-1">Tim profesional yang siap memberikan pelayanan terbaik</p>
           </div>
-        </div>
-      </div>
-      
-      <!-- Statistik Barberman -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <div class="bg-white rounded-2xl shadow-xl p-4 text-center">
-          <div class="text-2xl font-bold text-purple-600">${totalBarber}</div>
-          <div class="text-gray-500 text-sm">Total Barber</div>
-        </div>
-        <div class="bg-white rounded-2xl shadow-xl p-4 text-center">
-          <div class="text-2xl font-bold text-blue-600">${totalSpesialisasi}</div>
-          <div class="text-gray-500 text-sm">Spesialisasi</div>
-        </div>
-        <div class="bg-white rounded-2xl shadow-xl p-4 text-center">
-          <div class="text-2xl font-bold text-green-600">${totalOutlet}</div>
-          <div class="text-gray-500 text-sm">Outlet</div>
-        </div>
-        <div class="bg-white rounded-2xl shadow-xl p-4 text-center">
-          <div class="text-2xl font-bold text-orange-600">${totalPengalaman > 0 ? totalPengalaman + '+' : '-'}</div>
-          <div class="text-gray-500 text-sm">Total Pengalaman</div>
         </div>
       </div>
       
@@ -230,34 +194,36 @@ async function renderBarberman(container) {
   const filterSpesialisasi = document.getElementById('filterSpesialisasi');
   const filterOutlet = document.getElementById('filterOutlet');
   
-  function filterBarberman() {
-    const searchTerm = searchInput.value.toLowerCase();
-    const spesialisasi = filterSpesialisasi.value;
-    const outlet = filterOutlet.value;
-    
-    const filtered = barbermanData.filter(barber => {
-      const matchName = barber.nama_karyawan?.toLowerCase().includes(searchTerm) || false;
-      const matchSpesialisasi = !spesialisasi || barber.spesialisasi === spesialisasi;
-      const matchOutlet = !outlet || barber.outlet === outlet;
-      return matchName && matchSpesialisasi && matchOutlet;
-    });
-    
-    const grid = document.getElementById('barbermanGrid');
-    if (filtered.length === 0) {
-      grid.innerHTML = `
-        <div class="col-span-full text-center py-12">
-          <i class="fas fa-user-slash text-6xl text-gray-300 mb-4"></i>
-          <p class="text-gray-500">Tidak ada barberman yang sesuai dengan filter</p>
-        </div>
-      `;
-    } else {
-      grid.innerHTML = renderBarbermanCards(filtered);
+  if (searchInput && filterSpesialisasi && filterOutlet) {
+    function filterBarberman() {
+      const searchTerm = searchInput.value.toLowerCase();
+      const spesialisasi = filterSpesialisasi.value;
+      const outlet = filterOutlet.value;
+      
+      const filtered = barbermanData.filter(barber => {
+        const matchName = barber.nama_karyawan?.toLowerCase().includes(searchTerm) || false;
+        const matchSpesialisasi = !spesialisasi || barber.spesialisasi === spesialisasi;
+        const matchOutlet = !outlet || barber.outlet === outlet;
+        return matchName && matchSpesialisasi && matchOutlet;
+      });
+      
+      const grid = document.getElementById('barbermanGrid');
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full text-center py-12">
+            <i class="fas fa-user-slash text-6xl text-gray-300 mb-4"></i>
+            <p class="text-gray-500">Tidak ada barberman yang sesuai dengan filter</p>
+          </div>
+        `;
+      } else {
+        grid.innerHTML = renderBarbermanCards(filtered);
+      }
     }
+    
+    searchInput.addEventListener('input', filterBarberman);
+    filterSpesialisasi.addEventListener('change', filterBarberman);
+    filterOutlet.addEventListener('change', filterBarberman);
   }
-  
-  searchInput.addEventListener('input', filterBarberman);
-  filterSpesialisasi.addEventListener('change', filterBarberman);
-  filterOutlet.addEventListener('change', filterBarberman);
   
   console.log(`✅ Halaman Barberman selesai dirender dengan ${barbermanData.length} data`);
 }
@@ -265,7 +231,6 @@ async function renderBarberman(container) {
 // Fungsi untuk render card barberman
 function renderBarbermanCards(barbers) {
   return barbers.map((barber, index) => {
-    // Validasi URL foto
     let photoUrl = barber.photo_url;
     if (photoUrl && !photoUrl.startsWith('http')) {
       const baseUrl = 'https://intzwjmlypmopzauxeqt.supabase.co/storage/v1/object/public/fotokaryawan/';
@@ -295,14 +260,14 @@ function renderBarbermanCards(barbers) {
       </div>
       <div class="p-5 text-center">
         <h3 class="text-xl font-bold text-slate-800">${escapeHtml(nama)}</h3>
-        <p class="text-purple-600 font-semibold mt-1">${escapeHtml(spesialisasi)}</p>
+        <p class="text-purple-600 font-semibold mt-1">${escapeHtml(outlet)}</p>
         
         <div class="mt-3 space-y-2 text-left">
           <div class="flex justify-between items-center border-b border-gray-100 pb-2">
             <span class="text-gray-500 text-sm">
-              <i class="fas fa-store text-purple-400 mr-2"></i> Outlet
+              <i class="fas fa-cut text-purple-400 mr-2"></i> Spesialisasi
             </span>
-            <span class="font-medium text-slate-700 text-sm">${escapeHtml(outlet)}</span>
+            <span class="font-medium text-slate-700 text-sm">${escapeHtml(spesialisasi)}</span>
           </div>
           <div class="flex justify-between items-center">
             <span class="text-gray-500 text-sm">
@@ -330,12 +295,10 @@ function renderBarbermanCards(barbers) {
 
 // Fungsi untuk redirect ke menu tertentu
 function redirectToMenu(menu) {
-  // Cari tombol menu dengan data-menu yang sesuai
   const menuBtn = document.querySelector(`.menu-btn[data-menu="${menu}"]`);
   if (menuBtn) {
     menuBtn.click();
   } else {
-    // Fallback: coba cari di mobile menu
     const mobileBtn = document.querySelector(`.mobile-menu-btn[data-menu="${menu}"]`);
     if (mobileBtn) {
       mobileBtn.click();
@@ -345,5 +308,6 @@ function redirectToMenu(menu) {
 
 // Ekspos fungsi ke global
 window.redirectToMenu = redirectToMenu;
+window.renderBarberman = renderBarberman;
 
 console.log('📁 Modul Barberman siap digunakan!');
