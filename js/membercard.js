@@ -141,8 +141,8 @@ function renderMembercard(container) {
                 <i class="fas fa-scissors text-white text-xl"></i>
               </div>
               <div>
-                <h4 class="font-bold text-slate-800">Free Haircut di Hari Ulang Tahun</h4>
-                <p class="text-gray-600 text-sm">Dapatkan potong rambut gratis di Hari ulang tahun Anda (H +/-3)</p>
+                <h4 class="font-bold text-slate-800">Discount 50% Haircut di Hari Ulang Tahun</h4>
+                <p class="text-gray-600 text-sm">Dapatkan discount 50% potong rambut di Hari ulang tahun anda (H +/-3)</p>
                 <span class="inline-block mt-2 bg-orange-100 text-orange-700 text-xs px-3 py-1 rounded-full">Syarat & Ketentuan berlaku</span>
               </div>
             </div>
