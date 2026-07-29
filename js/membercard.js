@@ -179,7 +179,7 @@ function renderMembercard(container) {
 
            <div class="border-2 border-red-200 rounded-xl p-5 bg-gradient-to-r from-red-50 to-white">
             <div class="flex items-start gap-3">
-              <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+              <div class="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0">
                 <i class="fas fa-gift text-white text-xl"></i>
               </div>
               <div>
@@ -192,7 +192,7 @@ function renderMembercard(container) {
           
           <div class="border-2 border-pink-200 rounded-xl p-5 bg-gradient-to-r from-pink-50 to-white">
             <div class="flex items-start gap-3">
-              <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+              <div class="w-12 h-12 bg-pink-500 rounded-full flex items-center justify-center flex-shrink-0">
                 <i class="fas fa-gift text-white text-xl"></i>
               </div>
               <div>
