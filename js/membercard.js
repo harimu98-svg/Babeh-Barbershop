@@ -176,16 +176,29 @@ function renderMembercard(container) {
               </div>
             </div>
           </div>
-          
-          <div class="border-2 border-green-200 rounded-xl p-5 bg-gradient-to-r from-green-50 to-white">
+
+           <div class="border-2 border-red-200 rounded-xl p-5 bg-gradient-to-r from-red-50 to-white">
             <div class="flex items-start gap-3">
               <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
                 <i class="fas fa-gift text-white text-xl"></i>
               </div>
               <div>
-                <h4 class="font-bold text-slate-800">Bonus & Promo Menarik</h4>
-                <p class="text-gray-600 text-sm">Bapak dan anak discount 10%, Member baru, gratis sisir saku, Kopi gratis untuk cat rambut, Momogi gratis untck bocah</p>
-                <span class="inline-block mt-2 bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full">Berlaku di semua Outlet</span>
+                <h4 class="font-bold text-slate-800">Bapak dan anak discount 10% </h4>
+                <p class="text-gray-600 text-sm">Bapaknya Discount 10% + Point reward 10%, anaknya : Point reward 10%</p>
+                <span class="inline-block mt-2 bg-red-100 text-red-700 text-xs px-3 py-1 rounded-full">Berlaku di semua Outlet</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="border-2 border-pink-200 rounded-xl p-5 bg-gradient-to-r from-pink-50 to-white">
+            <div class="flex items-start gap-3">
+              <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-gift text-white text-xl"></i>
+              </div>
+              <div>
+                <h4 class="font-bold text-slate-800">Bonus Menarik</h4>
+                <p class="text-gray-600 text-sm">Member baru gratis sisir saku, Kopi gratis untuk cat rambut, Momogi gratis untuk bocah</p>
+                <span class="inline-block mt-2 bg-pink-100 text-pink-700 text-xs px-3 py-1 rounded-full">Berlaku di semua Outlet</span>
               </div>
             </div>
           </div>
