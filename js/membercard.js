@@ -102,8 +102,8 @@ function renderMembercard(container) {
             <div class="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center mb-3">
               <i class="fas fa-clock text-white text-xl"></i>
             </div>
-            <h4 class="font-bold text-slate-800 mb-1">Prioritas Booking</h4>
-            <p class="text-gray-600 text-sm">Booking prioritas untuk jam sibuk tanpa perlu antri</p>
+            <h4 class="font-bold text-slate-800 mb-1">Reservasi / Booking</h4>
+            <p class="text-gray-600 text-sm">Reservasi / Booking prioritas untuk pelayanan tanpa perlu antri</p>
           </div>
           
           <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-5 hover:shadow-lg transition duration-300">
@@ -193,7 +193,7 @@ function renderMembercard(container) {
           <div class="border-2 border-pink-200 rounded-xl p-5 bg-gradient-to-r from-pink-50 to-white">
             <div class="flex items-start gap-3">
               <div class="w-12 h-12 bg-pink-500 rounded-full flex items-center justify-center flex-shrink-0">
-                <i class="fas fa-gift text-white text-xl"></i>
+                <i class="fas fa-percent text-white text-xl"></i>
               </div>
               <div>
                 <h4 class="font-bold text-slate-800">Bonus Menarik</h4>
