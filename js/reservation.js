@@ -597,7 +597,7 @@ async function sendAllWhatsAppNotifications(reservasi, data) {
     // 2. Dapatkan nomor WA group dari tabel outlet
     const { data: outletData } = await supabase
       .from('outlet')
-      .select('group_wa, whatsapp')  // group_wa untuk group
+      .select('group_wa, outlet')  // group_wa untuk group
       .eq('outlet', data.outlet)
       .single();
     
