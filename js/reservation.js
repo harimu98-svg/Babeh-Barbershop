@@ -597,7 +597,7 @@ async function sendAllWhatsAppNotifications(reservasi, data) {
     // 2. Dapatkan nomor WA group dari tabel outlet
     const { data: outletData } = await supabase
       .from('outlet')
-      .select('wa_group, whatsapp')  // wa_group untuk group, whatsapp untuk personal outlet
+      .select('group_wa, whatsapp')  // group_wa untuk group
       .eq('outlet', data.outlet)
       .single();
     
@@ -678,16 +678,12 @@ Mohon koordinasi untuk persiapan. Terima kasih! 🙌`;
       await sendWhatsAppNotification(barberData.nomor_wa, barbermanMessage);
     }
     
-    // 3. Kirim ke Group WA (langsung dari kolom wa_group - sudah format @g.us)
-    if (outletData?.wa_group) {
-      // wa_group sudah dalam format: 62811159429-1533260196@g.us
-      await sendWhatsAppNotification(outletData.wa_group, groupMessage);
+    // 3. Kirim ke Group WA (langsung dari kolom group_wa - sudah format @g.us)
+    if (outletData?.group_wa) {
+      // group_wa sudah dalam format: 62811159429-1533260196@g.us
+      await sendWhatsAppNotification(outletData.group_wa, groupMessage);
     }
     
-    // 4. Kirim ke WhatsApp Outlet (opsional, jika berbeda)
-    if (outletData?.whatsapp && outletData.whatsapp !== outletData.wa_group) {
-      await sendWhatsAppNotification(outletData.whatsapp, groupMessage);
-    }
     
     console.log('✅ Semua WhatsApp notifications terkirim!');
     
