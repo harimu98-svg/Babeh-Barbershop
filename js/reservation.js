@@ -18,14 +18,22 @@ async function sendWhatsAppNotification(phoneNumber, message) {
     try {
         if (!phoneNumber) {
             console.warn('No phone number provided');
-            return;
+            return false;
         }
         
-        // Format nomor WA: 62xxx
-        let formattedPhone = phoneNumber.replace(/^0/, '62').replace(/[^0-9]/g, '');
-        if (!formattedPhone.includes('@c.us')) {
+        // Format nomor WA: 
+        // - Jika sudah mengandung @c.us atau @g.us, gunakan langsung
+        // - Jika tidak, format ke 62xxx@c.us
+        let formattedPhone = phoneNumber.trim();
+        
+        // Cek apakah sudah ada @c.us atau @g.us
+        if (!formattedPhone.includes('@c.us') && !formattedPhone.includes('@g.us')) {
+            // Format personal number: 0xxx -> 62xxx
+            formattedPhone = formattedPhone.replace(/^0/, '62').replace(/^\+62/, '62').replace(/[^0-9]/g, '');
             formattedPhone += '@c.us';
         }
+        
+        console.log(`📱 Sending WA to: ${formattedPhone}`);
         
         const response = await fetch(WA_API_URL, {
             method: 'POST',
@@ -573,7 +581,10 @@ function showSuccessModal(reservasi, data) {
 
 async function sendAllWhatsAppNotifications(reservasi, data) {
   const supabase = window.getSupabaseClient ? window.getSupabaseClient() : null;
-  if (!supabase) return;
+  if (!supabase) {
+    console.warn('⚠️ Supabase not available for WA notifications');
+    return;
+  }
   
   try {
     // 1. Dapatkan nomor WA barberman dari tabel karyawan
@@ -583,10 +594,10 @@ async function sendAllWhatsAppNotifications(reservasi, data) {
       .eq('nama_karyawan', data.barberman)
       .single();
     
-    // 2. Dapatkan nomor WA outlet dari tabel outlet
+    // 2. Dapatkan nomor WA group dari tabel outlet
     const { data: outletData } = await supabase
       .from('outlet')
-      .select('group_wa, whatsapp')
+      .select('wa_group, whatsapp')  // wa_group untuk group, whatsapp untuk personal outlet
       .eq('outlet', data.outlet)
       .single();
     
@@ -638,26 +649,44 @@ Anda mendapatkan reservasi baru:
 
 Terima kasih! 🙌`;
 
+    // ========== PESAN UNTUK GROUP WA ==========
+    const groupMessage = `*📢 RESERVASI BARU Babeh Barbershop!*
+
+Reservasi baru masuk:
+
+📋 *Kode:* ${kodeReservasi}
+👤 *Customer:* ${data.nama}
+📱 *WA Customer:* ${data.wa}
+💇 *Barberman:* ${data.barberman}
+📅 *Tanggal:* ${data.tanggalFormatted} (${data.hari})
+🕐 *Jam:* ${data.jam}
+✂️ *Layanan:* ${data.layanan}
+📍 *Outlet:* ${data.outlet}
+💰 *Total:* Rp ${data.harga.toLocaleString()}
+
+Mohon koordinasi untuk persiapan. Terima kasih! 🙌`;
+
     // ========== KIRIM PESAN ==========
     
-    // Kirim ke Customer
+    // 1. Kirim ke Customer
     if (data.wa) {
       await sendWhatsAppNotification(data.wa, customerMessage);
     }
     
-    // Kirim ke Barberman
+    // 2. Kirim ke Barberman
     if (barberData?.nomor_wa) {
       await sendWhatsAppNotification(barberData.nomor_wa, barbermanMessage);
     }
     
-    // Kirim ke Group WA Outlet
-    if (outletData?.group_wa) {
-      await sendWhatsAppNotification(outletData.group_wa, barbermanMessage);
+    // 3. Kirim ke Group WA (langsung dari kolom wa_group - sudah format @g.us)
+    if (outletData?.wa_group) {
+      // wa_group sudah dalam format: 62811159429-1533260196@g.us
+      await sendWhatsAppNotification(outletData.wa_group, groupMessage);
     }
     
-    // Kirim ke WhatsApp outlet (opsional)
-    if (outletData?.whatsapp && outletData.whatsapp !== outletData.group_wa) {
-      await sendWhatsAppNotification(outletData.whatsapp, barbermanMessage);
+    // 4. Kirim ke WhatsApp Outlet (opsional, jika berbeda)
+    if (outletData?.whatsapp && outletData.whatsapp !== outletData.wa_group) {
+      await sendWhatsAppNotification(outletData.whatsapp, groupMessage);
     }
     
     console.log('✅ Semua WhatsApp notifications terkirim!');
