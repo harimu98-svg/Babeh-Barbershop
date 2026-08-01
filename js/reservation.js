@@ -170,9 +170,9 @@ function renderReservationForm(container) {
             <!-- No WhatsApp -->
             <div>
               <label class="block text-sm font-semibold text-slate-700 mb-2">No. WhatsApp <span class="text-red-500">*</span></label>
-              <input type="tel" id="waCustomer" required placeholder="08xx-xxxx-xxxx" 
+              <input type="tel" id="waCustomer" required placeholder="08xxxxxxxxxx" 
                      class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500">
-              <p class="text-xs text-gray-400 mt-1">Contoh: 0812-3456-7890</p>
+              <p class="text-xs text-gray-400 mt-1">Contoh: 081234567890</p>
             </div>
             
             <!-- Pilih Outlet -->
@@ -248,11 +248,11 @@ function renderReservationForm(container) {
       layananSelect.innerHTML += `<option value="${s.layanan}" data-harga="${s.harga}" data-waktu="${s.waktu}">${s.layanan} - Rp ${s.harga.toLocaleString()}</option>`;
     });
     
-    // Update barberman berdasarkan outlet
+    // Update barberman berdasarkan outlet (hanya nama barberman)
     const barbers = reservationBarbers.filter(b => b.outlet === outlet);
     barbermanSelect.innerHTML = '<option value="">-- Pilih Barberman --</option>';
     barbers.forEach(b => {
-      barbermanSelect.innerHTML += `<option value="${b.nama_karyawan}" data-wa="${b.nomor_wa || ''}">${b.nama_karyawan} - ${b.spesialisasi || ''}</option>`;
+      barbermanSelect.innerHTML += `<option value="${b.nama_karyawan}" data-wa="${b.nomor_wa || ''}">${b.nama_karyawan}</option>`;
     });
   });
   
@@ -279,7 +279,7 @@ function renderReservationForm(container) {
       if (error) throw error;
       
       if (data && data.length > 0) {
-        alert('❌ Maaf, barberman ini sudah memiliki reservasi pada jam dan tanggal tersebut. Silakan pilih barberman/jam/hari lain.');
+        showUnavailablePopup(barberman, tanggal, jam);
         return false;
       }
       return true;
@@ -309,7 +309,7 @@ function renderReservationForm(container) {
     
     // Validasi
     if (!nama || !wa || !outlet || !layanan || !barberman || !tanggal || !jam) {
-      alert('⚠️ Semua field wajib diisi!');
+      showWarningPopup('⚠️ Semua field wajib diisi!');
       return;
     }
     
@@ -333,6 +333,99 @@ function renderReservationForm(container) {
       hari, tanggalFormatted, harga
     });
   });
+}
+
+// ============================================
+// POPUP UNAVAILABLE (seperti konfirmasi reservasi)
+// ============================================
+
+function showUnavailablePopup(barberman, tanggal, jam) {
+  // Format tanggal
+  const dateObj = new Date(tanggal + 'T00:00:00');
+  const tanggalFormatted = dateObj.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+  const hari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'][dateObj.getDay()];
+  
+  // Hapus modal jika sudah ada
+  const existingModal = document.getElementById('unavailableModal');
+  if (existingModal) existingModal.remove();
+  
+  const modal = document.createElement('div');
+  modal.id = 'unavailableModal';
+  modal.className = 'fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4';
+  modal.innerHTML = `
+    <div class="bg-white rounded-2xl max-w-md w-full p-6">
+      <div class="text-center mb-4">
+        <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-2">
+          <i class="fas fa-times-circle text-red-600 text-3xl"></i>
+        </div>
+        <h3 class="text-2xl font-bold text-red-600">❌ Tidak Tersedia</h3>
+        <p class="text-gray-500 text-sm mt-2">Barberman ini sudah memiliki reservasi</p>
+      </div>
+      
+      <div class="bg-gray-50 rounded-xl p-4 mb-4">
+        <div class="space-y-2">
+          <div class="flex justify-between">
+            <span class="text-gray-500">Barberman</span>
+            <span class="font-semibold">${barberman}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500">Tanggal</span>
+            <span class="font-semibold">${tanggalFormatted} (${hari})</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500">Jam</span>
+            <span class="font-semibold">${jam}</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-3 mb-4">
+        <p class="text-sm text-yellow-800">
+          <i class="fas fa-info-circle mr-2"></i>
+          Silakan pilih barberman lain, atau ganti jam/tanggal reservasi.
+        </p>
+      </div>
+      
+      <button onclick="this.closest('#unavailableModal').remove()" 
+              class="w-full bg-purple-600 text-white py-3 rounded-xl font-semibold hover:bg-purple-700 transition">
+        <i class="fas fa-check mr-2"></i> OK, Saya Mengerti
+      </button>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+}
+
+// ============================================
+// POPUP WARNING
+// ============================================
+
+function showWarningPopup(message) {
+  const existingModal = document.getElementById('warningModal');
+  if (existingModal) existingModal.remove();
+  
+  const modal = document.createElement('div');
+  modal.id = 'warningModal';
+  modal.className = 'fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4';
+  modal.innerHTML = `
+    <div class="bg-white rounded-2xl max-w-md w-full p-6">
+      <div class="text-center mb-4">
+        <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-2">
+          <i class="fas fa-exclamation-triangle text-yellow-600 text-3xl"></i>
+        </div>
+        <h3 class="text-2xl font-bold text-yellow-600">Peringatan</h3>
+      </div>
+      
+      <p class="text-gray-600 text-center mb-4">${message}</p>
+      
+      <button onclick="this.closest('#warningModal').remove()" 
+              class="w-full bg-purple-600 text-white py-3 rounded-xl font-semibold hover:bg-purple-700 transition">
+        <i class="fas fa-check mr-2"></i> OK
+      </button>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
 }
 
 // ============================================
@@ -503,7 +596,7 @@ async function saveReservation(data) {
       layanan: data.layanan,
       harga: data.harga,
       dp: 0,
-      status: 'menunggu_pembayaran',
+      status: 'menunggu_verifikasi', // Status setelah bayar
       catatan: data.catatan || ''
     };
     
@@ -548,7 +641,7 @@ function showSuccessModal(reservasi, data) {
         </div>
         <h3 class="text-2xl font-bold text-slate-800">Reservasi Berhasil!</h3>
         <p class="text-gray-500 mt-2">Kode Reservasi: <span class="font-bold text-purple-600">${reservasi.kode_reservasi || 'BRB-' + Date.now()}</span></p>
-        <p class="text-gray-400 text-sm mt-1">Status: <span class="text-yellow-600 font-semibold">Menunggu Pembayaran</span></p>
+        <p class="text-gray-400 text-sm mt-1">Status: <span class="text-blue-600 font-semibold">Menunggu Verifikasi Pembayaran</span></p>
         
         <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mt-4 text-left">
           <p class="text-sm text-yellow-800">
@@ -680,10 +773,8 @@ Mohon koordinasi untuk persiapan. Terima kasih! 🙌`;
     
     // 3. Kirim ke Group WA (langsung dari kolom group_wa - sudah format @g.us)
     if (outletData?.group_wa) {
-      // group_wa sudah dalam format: 62811159429-1533260196@g.us
       await sendWhatsAppNotification(outletData.group_wa, groupMessage);
     }
-    
     
     console.log('✅ Semua WhatsApp notifications terkirim!');
     
