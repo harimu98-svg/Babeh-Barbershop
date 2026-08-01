@@ -28,7 +28,7 @@ async function renderPriceServices(container) {
     const { data, error } = await supabase
       .from('layanan_reservasi')
       .select('*')
-      .order('harga', { ascending: true }); // Urutkan dari harga termurah
+      .order('harga', { ascending: true });
     
     if (error) {
       console.error('Error fetching services:', error);
@@ -52,15 +52,29 @@ async function renderPriceServices(container) {
 
 function showDummyPriceServices(container) {
   const dummyServices = [
-    { outlet: 'Babeh Barbershop Pusat', layanan: 'Beard Shaving', harga: 35000, waktu: '20 menit', deskripsi: 'Cukur jenggot' },
-    { outlet: 'Babeh Barbershop Pusat', layanan: 'Haircut Classic', harga: 50000, waktu: '30 menit', deskripsi: 'Potong rambut klasik' },
-    { outlet: 'Babeh Barbershop Pusat', layanan: 'Haircut + Hair Wash', harga: 70000, waktu: '45 menit', deskripsi: 'Potong rambut + cuci rambut' },
-    { outlet: 'Babeh Barbershop Cabang', layanan: 'Hair Tattoo', harga: 100000, waktu: '60 menit', deskripsi: 'Tato rambut' },
-    { outlet: 'Babeh Barbershop Cabang', layanan: 'Hair Coloring', harga: 150000, waktu: '90 menit', deskripsi: 'Pewarnaan rambut' },
-    { outlet: 'Babeh Barbershop Cabang', layanan: 'Royal Package', harga: 200000, waktu: '120 menit', deskripsi: 'Paket lengkap' },
+    { outlet: 'Babeh Barbershop Pusat', layanan: 'Beard Shaving', harga: 35000, waktu: '20', deskripsi: 'Cukur jenggot' },
+    { outlet: 'Babeh Barbershop Pusat', layanan: 'Haircut Classic', harga: 50000, waktu: '30', deskripsi: 'Potong rambut klasik' },
+    { outlet: 'Babeh Barbershop Pusat', layanan: 'Haircut + Hair Wash', harga: 70000, waktu: '45', deskripsi: 'Potong rambut + cuci rambut' },
+    { outlet: 'Babeh Barbershop Cabang', layanan: 'Hair Tattoo', harga: 100000, waktu: '60', deskripsi: 'Tato rambut' },
+    { outlet: 'Babeh Barbershop Cabang', layanan: 'Hair Coloring', harga: 150000, waktu: '90', deskripsi: 'Pewarnaan rambut' },
+    { outlet: 'Babeh Barbershop Cabang', layanan: 'Royal Package', harga: 200000, waktu: '120', deskripsi: 'Paket lengkap' },
   ];
   priceServicesData = dummyServices;
   renderPriceServicesContent(container);
+}
+
+// Fungsi untuk format waktu dengan menit
+function formatWaktu(waktu) {
+  // Jika sudah ada "menit", return as is
+  if (waktu && waktu.toLowerCase().includes('menit')) {
+    return waktu;
+  }
+  // Jika hanya angka, tambahkan " Menit"
+  if (waktu && !isNaN(waktu)) {
+    return `${waktu} Menit`;
+  }
+  // Fallback
+  return waktu || '-';
 }
 
 function renderPriceServicesContent(container) {
@@ -99,7 +113,7 @@ function renderPriceServicesContent(container) {
       ${outlets.filter(o => !priceServicesOutletFilter || o === priceServicesOutletFilter).map(outlet => {
         const outletServices = priceServicesData
           .filter(s => s.outlet === outlet)
-          .sort((a, b) => a.harga - b.harga); // Urutkan dari termurah
+          .sort((a, b) => a.harga - b.harga);
         
         return `
           <div class="mb-8">
@@ -119,7 +133,7 @@ function renderPriceServicesContent(container) {
                       <h4 class="text-lg font-bold text-slate-800">${service.layanan}</h4>
                       <p class="text-gray-500 text-sm">
                         <i class="far fa-clock text-purple-500 mr-1"></i>
-                        Estimasi waktu: ${service.waktu}
+                        Estimasi waktu: ${formatWaktu(service.waktu)}
                       </p>
                       ${service.deskripsi ? `<p class="text-gray-400 text-xs mt-1">${service.deskripsi}</p>` : ''}
                     </div>
