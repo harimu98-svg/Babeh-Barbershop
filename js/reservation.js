@@ -21,14 +21,9 @@ async function sendWhatsAppNotification(phoneNumber, message) {
             return false;
         }
         
-        // Format nomor WA: 
-        // - Jika sudah mengandung @c.us atau @g.us, gunakan langsung
-        // - Jika tidak, format ke 62xxx@c.us
         let formattedPhone = phoneNumber.trim();
         
-        // Cek apakah sudah ada @c.us atau @g.us
         if (!formattedPhone.includes('@c.us') && !formattedPhone.includes('@g.us')) {
-            // Format personal number: 0xxx -> 62xxx
             formattedPhone = formattedPhone.replace(/^0/, '62').replace(/^\+62/, '62').replace(/[^0-9]/g, '');
             formattedPhone += '@c.us';
         }
@@ -66,7 +61,6 @@ async function sendWhatsAppNotification(phoneNumber, message) {
 // ============================================
 
 async function renderReservation(container) {
-  // Tampilkan loading
   container.innerHTML = `
     <div class="max-w-4xl mx-auto">
       <div class="text-center py-20">
@@ -96,12 +90,11 @@ async function renderReservation(container) {
     if (servicesError) throw servicesError;
     reservationServices = services || [];
     
-    // 2. Ambil data barberman
+    // 2. Ambil data barberman (semua, tanpa filter reservasi dulu)
     const { data: barbers, error: barbersError } = await supabase
       .from('karyawan')
       .select('*')
       .eq('role', 'barberman')
-      .eq('reservasi', true)
       .order('nama_karyawan', { ascending: true });
     
     if (barbersError) throw barbersError;
@@ -124,14 +117,15 @@ async function renderReservation(container) {
 
 function showDummyReservationForm(container) {
   reservationServices = [
-    { outlet: 'Babeh Barbershop Pusat', layanan: 'Haircut Classic', harga: 50000, waktu: '30 menit' },
-    { outlet: 'Babeh Barbershop Pusat', layanan: 'Haircut + Hair Wash', harga: 70000, waktu: '45 menit' },
-    { outlet: 'Babeh Barbershop Cabang', layanan: 'Beard Shaving', harga: 35000, waktu: '20 menit' },
+    { id: 1, outlet: 'Babeh Barbershop Pusat', layanan: 'Haircut Classic', harga: 50000, waktu: '30' },
+    { id: 2, outlet: 'Babeh Barbershop Pusat', layanan: 'Haircut + Hair Wash', harga: 70000, waktu: '45' },
+    { id: 3, outlet: 'Babeh Barbershop Pusat', layanan: 'Beard Shaving', harga: 35000, waktu: '20' },
+    { id: 4, outlet: 'Babeh Barbershop Cabang', layanan: 'Hair Tattoo', harga: 100000, waktu: '60' },
   ];
   reservationOutlets = [...new Set(reservationServices.map(s => s.outlet))];
   reservationBarbers = [
-    { nama_karyawan: 'Dimas Pratama', spesialisasi: 'Master Barber', outlet: 'Babeh Barbershop Pusat', nomor_wa: '6282210017083' },
-    { nama_karyawan: 'Rizki Hidayat', spesialisasi: 'Hair Stylist', outlet: 'Babeh Barbershop Cabang', nomor_wa: '6282210017083' },
+    { nama_karyawan: 'Dimas Pratama', spesialisasi: 'Master Barber', outlet: 'Babeh Barbershop Pusat', nomor_wa: '6282210017083', reservasi: '1,2,3' },
+    { nama_karyawan: 'Rizki Hidayat', spesialisasi: 'Hair Stylist', outlet: 'Babeh Barbershop Cabang', nomor_wa: '6282210017083', reservasi: '4' },
   ];
   renderReservationForm(container);
 }
@@ -141,10 +135,8 @@ function showDummyReservationForm(container) {
 // ============================================
 
 function renderReservationForm(container) {
-  // Dapatkan hari ini untuk min date
   const today = new Date().toISOString().split('T')[0];
   
-  // Generate jam (09:00 - 20:00)
   const hours = [];
   for (let i = 9; i <= 20; i++) {
     hours.push(`${String(i).padStart(2, '0')}:00`);
@@ -160,14 +152,12 @@ function renderReservationForm(container) {
       <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8">
         <form id="reservationForm" class="space-y-6">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Nama Lengkap -->
             <div>
               <label class="block text-sm font-semibold text-slate-700 mb-2">Nama Lengkap <span class="text-red-500">*</span></label>
               <input type="text" id="namaCustomer" required 
                      class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500">
             </div>
             
-            <!-- No WhatsApp -->
             <div>
               <label class="block text-sm font-semibold text-slate-700 mb-2">No. WhatsApp <span class="text-red-500">*</span></label>
               <input type="tel" id="waCustomer" required placeholder="08xxxxxxxxxx" 
@@ -175,7 +165,6 @@ function renderReservationForm(container) {
               <p class="text-xs text-gray-400 mt-1">Contoh: 081234567890</p>
             </div>
             
-            <!-- Pilih Outlet -->
             <div>
               <label class="block text-sm font-semibold text-slate-700 mb-2">Pilih Outlet <span class="text-red-500">*</span></label>
               <select id="outletSelect" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500">
@@ -184,7 +173,6 @@ function renderReservationForm(container) {
               </select>
             </div>
             
-            <!-- Pilih Layanan -->
             <div>
               <label class="block text-sm font-semibold text-slate-700 mb-2">Pilih Layanan <span class="text-red-500">*</span></label>
               <select id="layananSelect" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500">
@@ -192,7 +180,6 @@ function renderReservationForm(container) {
               </select>
             </div>
             
-            <!-- Pilih Barberman -->
             <div>
               <label class="block text-sm font-semibold text-slate-700 mb-2">Pilih Barberman <span class="text-red-500">*</span></label>
               <select id="barbermanSelect" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500">
@@ -200,14 +187,12 @@ function renderReservationForm(container) {
               </select>
             </div>
             
-            <!-- Tanggal -->
             <div>
               <label class="block text-sm font-semibold text-slate-700 mb-2">Tanggal <span class="text-red-500">*</span></label>
               <input type="date" id="tanggalReservasi" min="${today}" required 
                      class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500">
             </div>
             
-            <!-- Jam -->
             <div>
               <label class="block text-sm font-semibold text-slate-700 mb-2">Jam <span class="text-red-500">*</span></label>
               <select id="jamReservasi" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500">
@@ -217,7 +202,6 @@ function renderReservationForm(container) {
             </div>
           </div>
           
-          <!-- Catatan -->
           <div>
             <label class="block text-sm font-semibold text-slate-700 mb-2">Catatan (Opsional)</label>
             <textarea id="catatanReservasi" rows="3" 
@@ -235,28 +219,63 @@ function renderReservationForm(container) {
   
   // ============ EVENT LISTENERS ============
   
-  // 1. Ketika outlet berubah, update layanan
+  // 1. Ketika outlet berubah, update layanan dan barberman
   document.getElementById('outletSelect')?.addEventListener('change', function() {
     const outlet = this.value;
     const layananSelect = document.getElementById('layananSelect');
     const barbermanSelect = document.getElementById('barbermanSelect');
     
-    // Update layanan
-    const services = reservationServices.filter(s => s.outlet === outlet);
+    // Reset dropdowns
     layananSelect.innerHTML = '<option value="">-- Pilih Layanan --</option>';
+    barbermanSelect.innerHTML = '<option value="">-- Pilih Barberman --</option>';
+    
+    if (!outlet) return;
+    
+    // 1. Update layanan berdasarkan outlet
+    const services = reservationServices.filter(s => s.outlet === outlet);
     services.forEach(s => {
-      layananSelect.innerHTML += `<option value="${s.layanan}" data-harga="${s.harga}" data-waktu="${s.waktu}">${s.layanan} - Rp ${s.harga.toLocaleString()}</option>`;
+      layananSelect.innerHTML += `<option value="${s.layanan}" data-id="${s.id}" data-harga="${s.harga}" data-waktu="${s.waktu}">${s.layanan} - Rp ${s.harga.toLocaleString()}</option>`;
     });
     
-    // Update barberman berdasarkan outlet (hanya nama barberman)
-    const barbers = reservationBarbers.filter(b => b.outlet === outlet);
+    // 2. Update barberman berdasarkan outlet dan layanan yang dipilih
+    // Nanti akan di-trigger oleh change layanan
+  });
+  
+  // 2. Ketika layanan berubah, update barberman yang bisa melayani
+  document.getElementById('layananSelect')?.addEventListener('change', function() {
+    const outlet = document.getElementById('outletSelect').value;
+    const layananOption = this.options[this.selectedIndex];
+    const layananId = layananOption?.dataset?.id;
+    const barbermanSelect = document.getElementById('barbermanSelect');
+    
     barbermanSelect.innerHTML = '<option value="">-- Pilih Barberman --</option>';
-    barbers.forEach(b => {
+    
+    if (!outlet || !layananId) return;
+    
+    // Filter barberman berdasarkan outlet dan layanan yang bisa dilayani
+    const availableBarbers = reservationBarbers.filter(barber => {
+      // Cek apakah barberman berada di outlet yang sama
+      if (barber.outlet !== outlet) return false;
+      
+      // Cek apakah barberman bisa melayani layanan ini
+      if (!barber.reservasi) return false;
+      
+      // Parse deretan ID dari kolom reservasi (contoh: "1,2,3")
+      const serviceIds = barber.reservasi.split(',').map(id => id.trim());
+      return serviceIds.includes(layananId);
+    });
+    
+    if (availableBarbers.length === 0) {
+      barbermanSelect.innerHTML = '<option value="">-- Tidak ada barberman tersedia --</option>';
+      return;
+    }
+    
+    availableBarbers.forEach(b => {
       barbermanSelect.innerHTML += `<option value="${b.nama_karyawan}" data-wa="${b.nomor_wa || ''}">${b.nama_karyawan}</option>`;
     });
   });
   
-  // 2. Validasi ketersediaan saat tanggal/jam/barberman berubah
+  // 3. Validasi ketersediaan
   const validateAvailability = async () => {
     const barberman = document.getElementById('barbermanSelect').value;
     const tanggal = document.getElementById('tanggalReservasi').value;
@@ -274,7 +293,7 @@ function renderReservationForm(container) {
         .eq('barberman', barberman)
         .eq('tanggal_reservasi', tanggal)
         .eq('jam', jam)
-        .in('status', ['menunggu_pembayaran', 'pembayaran_berhasil', 'active']);
+        .in('status', ['menunggu_verifikasi', 'pembayaran_berhasil', 'active']);
       
       if (error) throw error;
       
@@ -289,12 +308,11 @@ function renderReservationForm(container) {
     }
   };
   
-  // Event listener untuk cek ketersediaan
   document.getElementById('barbermanSelect')?.addEventListener('change', validateAvailability);
   document.getElementById('tanggalReservasi')?.addEventListener('change', validateAvailability);
   document.getElementById('jamReservasi')?.addEventListener('change', validateAvailability);
   
-  // 3. Submit form
+  // 4. Submit form
   document.getElementById('reservationForm')?.addEventListener('submit', async function(e) {
     e.preventDefault();
     
@@ -307,27 +325,22 @@ function renderReservationForm(container) {
     const jam = document.getElementById('jamReservasi').value;
     const catatan = document.getElementById('catatanReservasi').value.trim();
     
-    // Validasi
     if (!nama || !wa || !outlet || !layanan || !barberman || !tanggal || !jam) {
       showWarningPopup('⚠️ Semua field wajib diisi!');
       return;
     }
     
-    // Cek ketersediaan
     const available = await validateAvailability();
     if (!available) return;
     
-    // Dapatkan harga
     const layananSelect = document.getElementById('layananSelect');
     const selectedOption = layananSelect.options[layananSelect.selectedIndex];
     const harga = parseInt(selectedOption?.dataset?.harga || 0);
     
-    // Format tanggal
     const dateObj = new Date(tanggal + 'T00:00:00');
     const hari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'][dateObj.getDay()];
     const tanggalFormatted = dateObj.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
     
-    // Tampilkan summary
     showReservationSummary({
       nama, wa, outlet, layanan, barberman, tanggal, jam, catatan,
       hari, tanggalFormatted, harga
@@ -336,16 +349,14 @@ function renderReservationForm(container) {
 }
 
 // ============================================
-// POPUP UNAVAILABLE (seperti konfirmasi reservasi)
+// POPUP UNAVAILABLE
 // ============================================
 
 function showUnavailablePopup(barberman, tanggal, jam) {
-  // Format tanggal
   const dateObj = new Date(tanggal + 'T00:00:00');
   const tanggalFormatted = dateObj.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
   const hari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'][dateObj.getDay()];
   
-  // Hapus modal jika sudah ada
   const existingModal = document.getElementById('unavailableModal');
   if (existingModal) existingModal.remove();
   
@@ -433,7 +444,6 @@ function showWarningPopup(message) {
 // ============================================
 
 function showReservationSummary(data) {
-  // Hapus modal jika sudah ada
   const existingModal = document.getElementById('summaryModal');
   if (existingModal) existingModal.remove();
   
@@ -477,7 +487,6 @@ function showReservationSummary(data) {
   
   document.body.appendChild(modal);
   
-  // Event listeners
   document.getElementById('cancelSummaryBtn')?.addEventListener('click', () => {
     modal.remove();
   });
@@ -493,7 +502,7 @@ function showReservationSummary(data) {
 // ============================================
 
 function showQRISPayment(data) {
-  let counter = 180; // 3 menit
+  let counter = 180;
   let timerInterval;
   
   const modal = document.createElement('div');
@@ -531,7 +540,6 @@ function showQRISPayment(data) {
   
   document.body.appendChild(modal);
   
-  // Timer
   const timerDisplay = document.getElementById('timerDisplay');
   timerInterval = setInterval(() => {
     counter--;
@@ -550,18 +558,14 @@ function showQRISPayment(data) {
     }
   }, 1000);
   
-  // Cancel
   document.getElementById('cancelPaymentBtn')?.addEventListener('click', () => {
     clearInterval(timerInterval);
     modal.remove();
   });
   
-  // Confirm Payment - Simpan ke database
   document.getElementById('confirmPaymentBtn')?.addEventListener('click', async () => {
     clearInterval(timerInterval);
     modal.remove();
-    
-    // Simpan reservasi ke database
     await saveReservation(data);
   });
 }
@@ -579,7 +583,6 @@ async function saveReservation(data) {
   }
   
   try {
-    // Format tanggal
     const dateObj = new Date(data.tanggal + 'T00:00:00');
     const hari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'][dateObj.getDay()];
     const tanggalFormatted = dateObj.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -596,7 +599,7 @@ async function saveReservation(data) {
       layanan: data.layanan,
       harga: data.harga,
       dp: 0,
-      status: 'menunggu_verifikasi', // Status setelah bayar
+      status: 'menunggu_verifikasi',
       catatan: data.catatan || ''
     };
     
@@ -611,11 +614,7 @@ async function saveReservation(data) {
     
     if (savedData && savedData.length > 0) {
       const reservasi = savedData[0];
-      
-      // Tampilkan sukses
       showSuccessModal(reservasi, data);
-      
-      // Kirim WhatsApp ke semua pihak
       await sendAllWhatsAppNotifications(reservasi, data);
     }
     
@@ -661,7 +660,6 @@ function showSuccessModal(reservasi, data) {
   
   document.body.appendChild(modal);
   
-  // Auto close after 10 seconds
   setTimeout(() => {
     const modalEl = document.getElementById('successModal');
     if (modalEl) modalEl.remove();
@@ -680,16 +678,14 @@ async function sendAllWhatsAppNotifications(reservasi, data) {
   }
   
   try {
-    // 1. Dapatkan nomor WA group dari tabel outlet
     const { data: outletData } = await supabase
       .from('outlet')
-      .select('group_wa, outlet')  // group_wa untuk group
+      .select('group_wa, outlet')
       .eq('outlet', data.outlet)
       .single();
     
     const kodeReservasi = reservasi.kode_reservasi || 'BRB-' + Date.now();
     
-    // ========== PESAN UNTUK CUSTOMER ==========
     const customerMessage = `*✅ RESERVASI Babeh Barbershop BERHASIL!*
 
 Halo *${data.nama}*,
@@ -707,13 +703,12 @@ Reservasi Anda telah kami terima dengan detail:
 
 *⚠️ PENTING:*
 • Pembayaran anda dalam proses verifikasi, Admin kami akan segera menghubungi anda melalui WA
-• Pembayaran yang sudah masuk tidak dapat dilakukan refund
+• Pembayaran yang sudah dilakukan tidak dapat dilakukan refund
 
 Terima kasih telah mempercayakan gaya rambut Anda kepada Babeh Barbershop! ✨
 
-_*Babeh Barbershop - Gaya Rambut untuk Semua*_`;
+_*Babeh Barbershop - Right Man On The Right Place*_`;
 
-    // ========== PESAN UNTUK GROUP WA ==========
     const groupMessage = `*📢 RESERVASI BARU Babeh Barbershop!*
 
 Reservasi baru masuk:
@@ -730,15 +725,11 @@ Reservasi baru masuk:
 📌 *Status:* Menunggu Verifikasi Pembayaran
 
 Mohon koordinasi untuk persiapan. Terima kasih! 🙌`;
-
-    // ========== KIRIM PESAN ==========
     
-    // 1. Kirim ke Customer
     if (data.wa) {
       await sendWhatsAppNotification(data.wa, customerMessage);
     }
     
-    // 2. Kirim ke Group WA (langsung dari kolom group_wa - sudah format @g.us)
     if (outletData?.group_wa) {
       await sendWhatsAppNotification(outletData.group_wa, groupMessage);
     }
