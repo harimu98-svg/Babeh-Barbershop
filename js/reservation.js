@@ -714,7 +714,7 @@ Reservasi Anda telah kami terima dengan detail:
 *⚠️ PENTING:*
 • Pastikan Anda standby 5 menit SEBELUM waktu reservasi
 • Jika lewat 15 menit belum hadir, reservasi akan otomatis dibatalkan
-• Bawa bukti pembayaran saat datang
+• Pembayaran anda dalam proses verifikasi,Admin kami akan segera menghbungi anda melalui WA
 
 Terima kasih telah mempercayakan gaya rambut Anda kepada Babeh Barbershop! ✨
 
