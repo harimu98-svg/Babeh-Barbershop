@@ -680,14 +680,7 @@ async function sendAllWhatsAppNotifications(reservasi, data) {
   }
   
   try {
-    // 1. Dapatkan nomor WA barberman dari tabel karyawan
-    const { data: barberData } = await supabase
-      .from('karyawan')
-      .select('nomor_wa, nama_karyawan')
-      .eq('nama_karyawan', data.barberman)
-      .single();
-    
-    // 2. Dapatkan nomor WA group dari tabel outlet
+    // 1. Dapatkan nomor WA group dari tabel outlet
     const { data: outletData } = await supabase
       .from('outlet')
       .select('group_wa, outlet')  // group_wa untuk group
@@ -710,37 +703,15 @@ Reservasi Anda telah kami terima dengan detail:
 💇 *Barberman:* ${data.barberman}
 📍 *Outlet:* ${data.outlet}
 💰 *Total:* Rp ${data.harga.toLocaleString()}
+📌 *Status:* Menunggu Verifikasi Pembayaran
 
 *⚠️ PENTING:*
-• Pastikan Anda standby 5 menit SEBELUM waktu reservasi
-• Jika lewat 15 menit belum hadir, reservasi akan otomatis dibatalkan
-• Pembayaran anda dalam proses verifikasi,Admin kami akan segera menghbungi anda melalui WA
+• Pembayaran anda dalam proses verifikasi, Admin kami akan segera menghubungi anda melalui WA
+• Pembayaran yang sudah masuk tidak dapat dilakukan refund
 
 Terima kasih telah mempercayakan gaya rambut Anda kepada Babeh Barbershop! ✨
 
 _*Babeh Barbershop - Gaya Rambut untuk Semua*_`;
-
-    // ========== PESAN UNTUK BARBERMAN ==========
-    const barbermanMessage = `*📢 RESERVASI BARU Babeh Barbershop!*
-
-Halo *${data.barberman}*,
-
-Anda mendapatkan reservasi baru:
-
-📋 *Kode:* ${kodeReservasi}
-👤 *Customer:* ${data.nama}
-📱 *WA Customer:* ${data.wa}
-📅 *Tanggal:* ${data.tanggalFormatted} (${data.hari})
-🕐 *Jam:* ${data.jam}
-✂️ *Layanan:* ${data.layanan}
-📍 *Outlet:* ${data.outlet}
-
-*⚠️ CATATAN UNTUK BARBERMAN:*
-• Pastikan Anda standby 5 menit SEBELUM waktu reservasi
-• Siapkan alat dan bahan yang diperlukan
-• Jika customer tidak hadir 15 menit, hubungi admin
-
-Terima kasih! 🙌`;
 
     // ========== PESAN UNTUK GROUP WA ==========
     const groupMessage = `*📢 RESERVASI BARU Babeh Barbershop!*
@@ -756,6 +727,7 @@ Reservasi baru masuk:
 ✂️ *Layanan:* ${data.layanan}
 📍 *Outlet:* ${data.outlet}
 💰 *Total:* Rp ${data.harga.toLocaleString()}
+📌 *Status:* Menunggu Verifikasi Pembayaran
 
 Mohon koordinasi untuk persiapan. Terima kasih! 🙌`;
 
@@ -766,17 +738,12 @@ Mohon koordinasi untuk persiapan. Terima kasih! 🙌`;
       await sendWhatsAppNotification(data.wa, customerMessage);
     }
     
-    // 2. Kirim ke Barberman
-    if (barberData?.nomor_wa) {
-      await sendWhatsAppNotification(barberData.nomor_wa, barbermanMessage);
-    }
-    
-    // 3. Kirim ke Group WA (langsung dari kolom group_wa - sudah format @g.us)
+    // 2. Kirim ke Group WA (langsung dari kolom group_wa - sudah format @g.us)
     if (outletData?.group_wa) {
       await sendWhatsAppNotification(outletData.group_wa, groupMessage);
     }
     
-    console.log('✅ Semua WhatsApp notifications terkirim!');
+    console.log('✅ WhatsApp notifications terkirim ke Customer dan Group WA!');
     
   } catch (err) {
     console.error('❌ Error sending WhatsApp notifications:', err);
