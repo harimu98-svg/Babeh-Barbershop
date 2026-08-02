@@ -57,6 +57,30 @@ async function sendWhatsAppNotification(phoneNumber, message) {
 }
 
 // ============================================
+// FUNGSI GET QRIS BY OUTLET
+// ============================================
+
+function getQRISImage(outlet) {
+    // Map outlet ke file QRIS
+    const qrisMap = {
+        'Rempoa': 'images/qris_Rempoa.jpg',
+        'Cinangka': 'images/qris_Cinangka.jpg',
+        'Pamulang': 'images/qris_Pamulang.jpg',
+        'Curug': 'images/qris_Curug.jpg',
+        'Kedaung': 'images/qris_Kedaung.jpg',
+        'Gardens': 'images/qris_Gardens.jpg'
+    };
+    
+    // Cari berdasarkan nama outlet (case insensitive)
+    const outletKey = Object.keys(qrisMap).find(key => 
+        outlet.toLowerCase().includes(key.toLowerCase()) || 
+        key.toLowerCase().includes(outlet.toLowerCase())
+    );
+    
+    return outletKey ? qrisMap[outletKey] : 'images/qris.jpg';
+}
+
+// ============================================
 // FUNGSI UTAMA RENDER RESERVASI
 // ============================================
 
@@ -81,7 +105,6 @@ async function renderReservation(container) {
   try {
     console.log('📋 Mengambil data untuk form reservasi...');
     
-    // 1. Ambil data layanan
     const { data: services, error: servicesError } = await supabase
       .from('layanan_reservasi')
       .select('*')
@@ -90,7 +113,6 @@ async function renderReservation(container) {
     if (servicesError) throw servicesError;
     reservationServices = services || [];
     
-    // 2. Ambil data barberman (semua, tanpa filter reservasi dulu)
     const { data: barbers, error: barbersError } = await supabase
       .from('karyawan')
       .select('*')
@@ -100,7 +122,6 @@ async function renderReservation(container) {
     if (barbersError) throw barbersError;
     reservationBarbers = barbers || [];
     
-    // 3. Ambil daftar outlet unik
     reservationOutlets = [...new Set(reservationServices.map(s => s.outlet))];
     
     renderReservationForm(container);
@@ -117,15 +138,15 @@ async function renderReservation(container) {
 
 function showDummyReservationForm(container) {
   reservationServices = [
-    { id: 1, outlet: 'Babeh Barbershop Pusat', layanan: 'Haircut Classic', harga: 50000, waktu: '30' },
-    { id: 2, outlet: 'Babeh Barbershop Pusat', layanan: 'Haircut + Hair Wash', harga: 70000, waktu: '45' },
-    { id: 3, outlet: 'Babeh Barbershop Pusat', layanan: 'Beard Shaving', harga: 35000, waktu: '20' },
-    { id: 4, outlet: 'Babeh Barbershop Cabang', layanan: 'Hair Tattoo', harga: 100000, waktu: '60' },
+    { id: 1, outlet: 'Rempoa', layanan: 'Haircut Classic', harga: 50000, waktu: '30' },
+    { id: 2, outlet: 'Rempoa', layanan: 'Haircut + Hair Wash', harga: 70000, waktu: '45' },
+    { id: 3, outlet: 'Cinangka', layanan: 'Beard Shaving', harga: 35000, waktu: '20' },
+    { id: 4, outlet: 'Gardens', layanan: 'Hair Tattoo', harga: 100000, waktu: '60' },
   ];
   reservationOutlets = [...new Set(reservationServices.map(s => s.outlet))];
   reservationBarbers = [
-    { nama_karyawan: 'Dimas Pratama', spesialisasi: 'Master Barber', outlet: 'Babeh Barbershop Pusat', nomor_wa: '6282210017083', reservasi: '1,2,3' },
-    { nama_karyawan: 'Rizki Hidayat', spesialisasi: 'Hair Stylist', outlet: 'Babeh Barbershop Cabang', nomor_wa: '6282210017083', reservasi: '4' },
+    { nama_karyawan: 'Dimas Pratama', spesialisasi: 'Master Barber', outlet: 'Rempoa', nomor_wa: '6282210017083', reservasi: '1,2,3' },
+    { nama_karyawan: 'Rizki Hidayat', spesialisasi: 'Hair Stylist', outlet: 'Cinangka', nomor_wa: '6282210017083', reservasi: '4' },
   ];
   renderReservationForm(container);
 }
@@ -219,29 +240,22 @@ function renderReservationForm(container) {
   
   // ============ EVENT LISTENERS ============
   
-  // 1. Ketika outlet berubah, update layanan dan barberman
   document.getElementById('outletSelect')?.addEventListener('change', function() {
     const outlet = this.value;
     const layananSelect = document.getElementById('layananSelect');
     const barbermanSelect = document.getElementById('barbermanSelect');
     
-    // Reset dropdowns
     layananSelect.innerHTML = '<option value="">-- Pilih Layanan --</option>';
     barbermanSelect.innerHTML = '<option value="">-- Pilih Barberman --</option>';
     
     if (!outlet) return;
     
-    // 1. Update layanan berdasarkan outlet
     const services = reservationServices.filter(s => s.outlet === outlet);
     services.forEach(s => {
       layananSelect.innerHTML += `<option value="${s.layanan}" data-id="${s.id}" data-harga="${s.harga}" data-waktu="${s.waktu}">${s.layanan} - Rp ${s.harga.toLocaleString()}</option>`;
     });
-    
-    // 2. Update barberman berdasarkan outlet dan layanan yang dipilih
-    // Nanti akan di-trigger oleh change layanan
   });
   
-  // 2. Ketika layanan berubah, update barberman yang bisa melayani
   document.getElementById('layananSelect')?.addEventListener('change', function() {
     const outlet = document.getElementById('outletSelect').value;
     const layananOption = this.options[this.selectedIndex];
@@ -252,15 +266,10 @@ function renderReservationForm(container) {
     
     if (!outlet || !layananId) return;
     
-    // Filter barberman berdasarkan outlet dan layanan yang bisa dilayani
     const availableBarbers = reservationBarbers.filter(barber => {
-      // Cek apakah barberman berada di outlet yang sama
       if (barber.outlet !== outlet) return false;
-      
-      // Cek apakah barberman bisa melayani layanan ini
       if (!barber.reservasi) return false;
       
-      // Parse deretan ID dari kolom reservasi (contoh: "1,2,3")
       const serviceIds = barber.reservasi.split(',').map(id => id.trim());
       return serviceIds.includes(layananId);
     });
@@ -275,7 +284,6 @@ function renderReservationForm(container) {
     });
   });
   
-  // 3. Validasi ketersediaan
   const validateAvailability = async () => {
     const barberman = document.getElementById('barbermanSelect').value;
     const tanggal = document.getElementById('tanggalReservasi').value;
@@ -312,7 +320,6 @@ function renderReservationForm(container) {
   document.getElementById('tanggalReservasi')?.addEventListener('change', validateAvailability);
   document.getElementById('jamReservasi')?.addEventListener('change', validateAvailability);
   
-  // 4. Submit form
   document.getElementById('reservationForm')?.addEventListener('submit', async function(e) {
     e.preventDefault();
     
@@ -498,12 +505,15 @@ function showReservationSummary(data) {
 }
 
 // ============================================
-// QRIS PAYMENT
+// QRIS PAYMENT (Per Outlet)
 // ============================================
 
 function showQRISPayment(data) {
   let counter = 180;
   let timerInterval;
+  
+  // Dapatkan gambar QRIS berdasarkan outlet
+  const qrisImage = getQRISImage(data.outlet);
   
   const modal = document.createElement('div');
   modal.id = 'qrisModal';
@@ -512,13 +522,14 @@ function showQRISPayment(data) {
     <div class="bg-white rounded-2xl max-w-md w-full p-6">
       <div class="text-center mb-4">
         <h3 class="text-2xl font-bold text-slate-800">Scan QRIS untuk Pembayaran</h3>
+        <p class="text-gray-500 text-sm">Outlet: <span class="font-semibold">${data.outlet}</span></p>
         <p class="text-gray-500 text-sm">Total pembayaran: <span class="font-bold text-purple-600 text-xl">Rp ${data.harga.toLocaleString()}</span></p>
       </div>
       
       <div class="flex justify-center mb-4">
-        <img src="images/qris.jpg" alt="QRIS" 
+        <img src="${qrisImage}" alt="QRIS ${data.outlet}" 
              class="w-64 h-64 object-contain border-2 border-gray-200 rounded-xl p-2"
-             onerror="this.onerror=null; this.parentElement.innerHTML = '<div class=\\'w-64 h-64 bg-gray-200 rounded-xl flex items-center justify-center text-gray-500\\'>QRIS tidak tersedia</div>'">
+             onerror="this.onerror=null; this.parentElement.innerHTML = '<div class=\\'w-64 h-64 bg-gray-200 rounded-xl flex items-center justify-center text-gray-500\\'>QRIS untuk ${data.outlet} tidak tersedia</div>'">
       </div>
       
       <div class="text-center mb-4">
@@ -708,6 +719,7 @@ Reservasi Anda telah kami terima dengan detail:
 Terima kasih telah mempercayakan gaya rambut Anda kepada Babeh Barbershop! ✨
 
 _*Babeh Barbershop - Right Man On The Right Place*_`;
+
 
     const groupMessage = `*📢 RESERVASI BARU Babeh Barbershop!*
 
