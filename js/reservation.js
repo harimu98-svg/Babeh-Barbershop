@@ -61,7 +61,6 @@ async function sendWhatsAppNotification(phoneNumber, message) {
 // ============================================
 
 function getQRISImage(outlet) {
-    // Map outlet ke file QRIS
     const qrisMap = {
         'Rempoa': 'images/qris_Rempoa.jpg',
         'Cinangka': 'images/qris_Cinangka.jpg',
@@ -71,13 +70,58 @@ function getQRISImage(outlet) {
         'Gardens': 'images/qris_Gardens.jpg'
     };
     
-    // Cari berdasarkan nama outlet (case insensitive)
     const outletKey = Object.keys(qrisMap).find(key => 
         outlet.toLowerCase().includes(key.toLowerCase()) || 
         key.toLowerCase().includes(outlet.toLowerCase())
     );
     
     return outletKey ? qrisMap[outletKey] : 'images/qris.jpg';
+}
+
+// ============================================
+// FUNGSI VALIDASI H-1 DAN JAM OPERASIONAL
+// ============================================
+
+function validateReservationTime(tanggal, jam) {
+    const now = new Date();
+    const currentHour = now.getHours();
+    const currentMinutes = now.getMinutes();
+    
+    // 1. Validasi jam operasional untuk SUBMIT (09:00 - 20:00)
+    if (currentHour < 9 || currentHour >= 20) {
+        return {
+            valid: false,
+            message: '⚠️ Reservasi hanya dapat dilakukan pada jam 09:00 - 20:00.\n\nSaat ini di luar jam operasional. Silakan kembali besok pagi.'
+        };
+    }
+    
+    // 2. Validasi H-1 (minimal 1 hari sebelum)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const selectedDateOnly = new Date(tanggal);
+    selectedDateOnly.setHours(0, 0, 0, 0);
+    
+    const diffDays = Math.ceil((selectedDateOnly - today) / (1000 * 60 * 60 * 24));
+    
+    if (diffDays < 1) {
+        return {
+            valid: false,
+            message: '⚠️ Reservasi hanya dapat dilakukan minimal H-1 (1 hari sebelum).\n\nSilakan pilih tanggal besok atau yang akan datang.'
+        };
+    }
+    
+    // 3. Validasi jam reservasi yang dipilih (09:00 - 20:00)
+    const jamInt = parseInt(jam.split(':')[0]);
+    
+    if (jamInt < 9 || jamInt > 20) {
+        return {
+            valid: false,
+            message: '⚠️ Jam reservasi hanya tersedia pukul 09:00 - 20:00.\n\nSilakan pilih jam yang tersedia.'
+        };
+    }
+    
+    return { valid: true };
 }
 
 // ============================================
@@ -156,18 +200,39 @@ function showDummyReservationForm(container) {
 // ============================================
 
 function renderReservationForm(container) {
-  const today = new Date().toISOString().split('T')[0];
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const minDate = tomorrow.toISOString().split('T')[0];
   
   const hours = [];
   for (let i = 9; i <= 20; i++) {
     hours.push(`${String(i).padStart(2, '0')}:00`);
   }
   
+  // Cek apakah saat ini jam operasional
+  const currentHour = new Date().getHours();
+  const isOperatingHour = currentHour >= 9 && currentHour < 20;
+  
   container.innerHTML = `
     <div class="max-w-4xl mx-auto">
       <div class="text-center mb-8">
         <h2 class="text-3xl md:text-4xl font-bold text-purple-800 mb-2">Reservasi & Booking</h2>
         <p class="text-gray-500">Isi form berikut untuk melakukan reservasi</p>
+        <div class="mt-2 text-sm text-gray-400">
+          <i class="fas fa-info-circle text-purple-500 mr-1"></i>
+          Reservasi hanya dapat dilakukan H-1 (minimal 1 hari sebelumnya) 
+          dan jam operasional 09:00 - 20:00
+        </div>
+        ${!isOperatingHour ? `
+        <div class="mt-3 bg-yellow-50 border border-yellow-200 rounded-xl p-3 max-w-md mx-auto">
+          <p class="text-sm text-yellow-800">
+            <i class="fas fa-clock mr-2"></i>
+            ⚠️ Saat ini di luar jam operasional (09:00 - 20:00). 
+            Reservasi hanya dapat dilakukan pada jam operasional.
+          </p>
+        </div>
+        ` : ''}
       </div>
       
       <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8">
@@ -210,8 +275,9 @@ function renderReservationForm(container) {
             
             <div>
               <label class="block text-sm font-semibold text-slate-700 mb-2">Tanggal <span class="text-red-500">*</span></label>
-              <input type="date" id="tanggalReservasi" min="${today}" required 
+              <input type="date" id="tanggalReservasi" min="${minDate}" required 
                      class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500">
+              <p class="text-xs text-gray-400 mt-1">Minimal H-1 (besok)</p>
             </div>
             
             <div>
@@ -220,6 +286,7 @@ function renderReservationForm(container) {
                 <option value="">-- Pilih Jam --</option>
                 ${hours.map(h => `<option value="${h}">${h}</option>`).join('')}
               </select>
+              <p class="text-xs text-gray-400 mt-1">Jam operasional 09:00 - 20:00</p>
             </div>
           </div>
           
@@ -337,6 +404,13 @@ function renderReservationForm(container) {
       return;
     }
     
+    // ============ VALIDASI H-1 DAN JAM ============
+    const validation = validateReservationTime(tanggal, jam);
+    if (!validation.valid) {
+      showWarningPopup(validation.message);
+      return;
+    }
+    
     const available = await validateAvailability();
     if (!available) return;
     
@@ -434,7 +508,7 @@ function showWarningPopup(message) {
         <h3 class="text-2xl font-bold text-yellow-600">Peringatan</h3>
       </div>
       
-      <p class="text-gray-600 text-center mb-4">${message}</p>
+      <div class="text-gray-600 text-center mb-4 whitespace-pre-line">${message}</div>
       
       <button onclick="this.closest('#warningModal').remove()" 
               class="w-full bg-purple-600 text-white py-3 rounded-xl font-semibold hover:bg-purple-700 transition">
@@ -512,7 +586,6 @@ function showQRISPayment(data) {
   let counter = 180;
   let timerInterval;
   
-  // Dapatkan gambar QRIS berdasarkan outlet
   const qrisImage = getQRISImage(data.outlet);
   
   const modal = document.createElement('div');
@@ -719,7 +792,6 @@ Reservasi Anda telah kami terima dengan detail:
 Terima kasih telah mempercayakan gaya rambut Anda kepada Babeh Barbershop! ✨
 
 _*Babeh Barbershop - Right Man On The Right Place*_`;
-
 
     const groupMessage = `*📢 RESERVASI BARU Babeh Barbershop!*
 
