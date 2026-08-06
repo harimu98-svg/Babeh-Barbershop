@@ -2,9 +2,9 @@
 function renderLowongan(container) {
   const jobs = [
     { title: "Senior Barber", type: "Full Time", salary: "Rp 4.000.000 - Rp 5.000.000", requirement: "Pengalaman minimal 3 tahun, memiliki sertifikasi barber", icon: "fa-user-tie" },
-    { title: "Junior Barber", type: "Full Time", salary: "Rp 3.000.000 - Rp 4.000.000", requirement: "Fresh graduate dipersilakan, memiliki passion di bidang barber", icon: "fa-user" },
+    { title: "Junior Barber", type: "Full Time", salary: "Rp 3.000.000 - Rp 4.000.000", requirement: "Pengalaman minimal 6 bulan, memiliki passion di bidang barber", icon: "fa-user" },
     { title: "Kasir", type: "Full Time", salary: "Rp 2.000.000 - Rp 2.500.000", requirement: "Ramah, komunikatif, menguasai WA & sosial media", icon: "fa-coins" },
-     { title: "Kasir", type: "Part Time", salary: "Rp 500.000 - Rp 1.000.000", requirement: "Ramah, komunikatif, menguasai WA & sosial media", icon: "fa-receipt" },
+     { title: "Kasir", type: "Part Time", salary: "Rp 500.000 - Rp 1.000.000", requirement: "Masuk Sabtu Minggu, ramah, komunikatif, menguasai WA & sosial media", icon: "fa-receipt" },
     { title: "Crew Operational", type: "Internship", salary: "Rp 1.500.000", requirement: "Memiliki Motor, Mempunyai Skill Maintenance ", icon: "fa-hammer" }
   ];
   
