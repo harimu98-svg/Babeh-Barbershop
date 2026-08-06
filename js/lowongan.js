@@ -1,9 +1,9 @@
 // Lowongan Kerja
 function renderLowongan(container) {
   const jobs = [
-    { title: "Senior Barber", type: "Full Time", salary: "Rp 5.000.000 - Rp 8.000.000", requirement: "Pengalaman minimal 3 tahun, memiliki sertifikasi barber", icon: "fa-user-tie" },
-    { title: "Junior Barber", type: "Full Time", salary: "Rp 3.000.000 - Rp 5.000.000", requirement: "Fresh graduate dipersilakan, memiliki passion di bidang barber", icon: "fa-user" },
-    { title: "Customer Service", type: "Part Time", salary: "Rp 2.000.000 - Rp 3.000.000", requirement: "Ramah, komunikatif, menguasai WA & sosial media", icon: "fa-headset" },
+    { title: "Senior Barber", type: "Full Time", salary: "Rp 4.000.000 - Rp 5.000.000", requirement: "Pengalaman minimal 3 tahun, memiliki sertifikasi barber", icon: "fa-user-tie" },
+    { title: "Junior Barber", type: "Full Time", salary: "Rp 3.000.000 - Rp 4.000.000", requirement: "Fresh graduate dipersilakan, memiliki passion di bidang barber", icon: "fa-user" },
+    { title: "Kasir", type: "Part Time", salary: "Rp 2.000.000 - Rp 2.500.000", requirement: "Ramah, komunikatif, menguasai WA & sosial media", icon: "fa-headset" },
     { title: "Barber Assistant", type: "Internship", salary: "Rp 1.500.000", requirement: "Sedang mencari pengalaman di bidang barbershop", icon: "fa-graduation-cap" }
   ];
   
@@ -50,7 +50,7 @@ function renderLowongan(container) {
             <i class="fas fa-envelope mr-2"></i> Email: career@babeh.com
           </button>
           <button id="waApplyBtn" class="bg-green-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-green-700 transition">
-            <i class="fab fa-whatsapp mr-2"></i> WhatsApp: 0812-3456-7890
+            <i class="fab fa-whatsapp mr-2"></i> WhatsApp: 0822-1001-7083
           </button>
         </div>
       </div>
@@ -60,7 +60,7 @@ function renderLowongan(container) {
   document.querySelectorAll('.apply-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const job = btn.getAttribute('data-job');
-      window.open(`https://wa.me/6281234567890?text=Halo%20Babeh%20Barbershop%2C%20saya%20tertarik%20melamar%20posisi%20${encodeURIComponent(job)}`, '_blank');
+      window.open(`https://wa.me/6282210017083?text=Halo%20Babeh%20Barbershop%2C%20saya%20tertarik%20melamar%20posisi%20${encodeURIComponent(job)}`, '_blank');
     });
   });
   
@@ -69,6 +69,6 @@ function renderLowongan(container) {
   });
   
   document.getElementById('waApplyBtn')?.addEventListener('click', () => {
-    window.open('https://wa.me/6281234567890?text=Halo%20Babeh%20Barbershop%2C%20saya%20tertarik%20melamar%20pekerjaan%20di%20Babeh%20Barbershop', '_blank');
+    window.open('https://wa.me/6282210017083?text=Halo%20Babeh%20Barbershop%2C%20saya%20tertarik%20melamar%20pekerjaan%20di%20Babeh%20Barbershop', '_blank');
   });
 }
