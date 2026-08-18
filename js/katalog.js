@@ -102,7 +102,23 @@ function renderKatalog(container) {
           </div>
         </div>
       </div>
-      
+
+      <!-- CARD SIMULASI (TAMBAHKAN DI SINI) -->
+<div id="simulasiMenuCard" class="bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl shadow-xl overflow-hidden cursor-pointer transform transition hover:scale-[1.02] active:scale-95">
+    <div class="h-48 flex items-center justify-center">
+        <div class="text-center text-white">
+            <i class="fas fa-robot text-5xl mb-2"></i>
+            <p class="text-lg font-bold">🤖 Simulasi</p>
+            <p class="text-sm opacity-80">Model Rambut dengan AI</p>
+        </div>
+    </div>
+    <div class="p-5 bg-white">
+        <h2 class="text-2xl font-bold text-slate-800">Simulasi Model Rambut</h2>
+        <p class="text-gray-500 mt-1">Coba model rambut dengan AI Nano Banana 2 Lite</p>
+        <span class="inline-block mt-2 bg-purple-100 text-purple-700 text-xs px-3 py-1 rounded-full">✨ NEW</span>
+    </div>
+</div>
+
       <!-- Gallery View (setelah klik menu) -->
       <div id="katalogGalleryView" class="hidden">
         <div class="mb-5 flex items-center justify-between">
@@ -171,6 +187,14 @@ function renderKatalog(container) {
       if (category) loadKatalogCategory(category);
     });
   });
+// Tambahkan di bagian event listener (setelah katalog-menu-card)
+document.getElementById('simulasiMenuCard')?.addEventListener('click', () => {
+    if (typeof openSimulasi === 'function') {
+        openSimulasi();
+    } else {
+        console.error('❌ Modul simulasi belum dimuat');
+    }
+});
   
   // Event listener untuk tombol back
   const backBtn = document.getElementById('katalogBackToMenuBtn');
@@ -401,6 +425,16 @@ function createKatalogFullscreenModal() {
             </button>
           </div>
         </div>
+        
+// Di dalam renderKatalogGallery(), setelah tombol info
+<div class="mt-3 flex gap-2">
+    <button class="simulasi-from-gallery-btn bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:opacity-90 active:scale-95 transition" 
+            data-nomor="${item.nomor}" 
+            data-nama="${item.nama}" 
+            data-url="${item.url}">
+        <i class="fas fa-wand-magic-sparkles mr-1"></i> Simulasi AI
+    </button>
+</div>
         
         <!-- Tombol navigasi -->
         <button id="katalogPrevImageBtn" class="absolute left-3 md:left-6 nav-btn text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg">
