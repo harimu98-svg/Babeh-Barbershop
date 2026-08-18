@@ -1,9 +1,7 @@
 // ============================================================
 // NETLIFY FUNCTION - NANO BANANA 2 LITE
-// Proxy API untuk Gemini 3.1 Flash Lite Image
+// TANPA DEPENDENCIES (pakai fetch native)
 // ============================================================
-
-const fetch = require('node-fetch');
 
 exports.handler = async (event) => {
     // CORS headers
@@ -41,26 +39,26 @@ exports.handler = async (event) => {
 
         // Ambil API key dari environment variable
         const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+
         if (!GEMINI_API_KEY) {
             return {
                 statusCode: 500,
                 headers,
-                body: JSON.stringify({ error: 'GEMINI_API_KEY tidak ditemukan di environment' })
+                body: JSON.stringify({
+                    error: 'GEMINI_API_KEY tidak ditemukan. Set di Netlify Environment Variables.'
+                })
             };
         }
 
-        // Model Nano Banana 2 Lite
         const MODEL_NAME = 'gemini-3.1-flash-lite-image';
-
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${GEMINI_API_KEY}`;
 
-        // Prompt untuk 3 sudut pandang dalam 1 gambar
         const prompt = `
         Ubah rambut pada foto pertama (selfie) dengan gaya rambut dari foto kedua (model ${modelName || 'rambut'}).
 
         BUATKAN 3 SUDUT PANDANG DALAM 1 GAMBAR:
         - Kiri: Tampak DEPAN
-        - Tengah: Tampak SAMPING KANAN
+        - Tengah: Tampak SAMPING KANAN  
         - Kanan: Tampak BELAKANG
 
         Setiap sudut harus menunjukkan orang yang SAMA dengan RAMBUT BARU.
@@ -83,9 +81,8 @@ exports.handler = async (event) => {
         };
 
         console.log('📤 Mengirim ke Nano Banana 2 Lite...');
-        console.log('📌 Model:', MODEL_NAME);
-        console.log('📌 Model Rambut:', modelName || 'custom');
 
+        // PAKAI FETCH NATIVE (Node.js 18+)
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -104,7 +101,7 @@ exports.handler = async (event) => {
             };
         }
 
-        console.log('✅ Response diterima dari Nano Banana 2 Lite');
+        console.log('✅ Response diterima');
 
         return {
             statusCode: 200,
