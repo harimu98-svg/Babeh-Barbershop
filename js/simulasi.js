@@ -1,11 +1,7 @@
 // ============================================================
-// SIMULASI.JS - BABEH BARBERSHOP
-// Fitur Simulasi Model Rambut dengan Nano Banana 2 Lite
+// SIMULASI.JS - BABEH BARBERSHOP (VERSI DEBUG)
 // ============================================================
 
-// ============================================================
-// STATE SIMULASI
-// ============================================================
 const simulasiState = {
     isProcessing: false,
     selfieBase64: null,
@@ -23,7 +19,10 @@ const simulasiState = {
 // ============================================================
 function renderSimulasiView() {
     const container = document.getElementById('simulasiContainer');
-    if (!container) return;
+    if (!container) {
+        console.error('❌ simulasiContainer tidak ditemukan!');
+        return;
+    }
 
     container.innerHTML = `
         <!-- STEP 1: PILIH MODEL -->
@@ -43,10 +42,8 @@ function renderSimulasiView() {
                 </button>
             </div>
 
-            <!-- Grid katalog untuk simulasi -->
             <div id="simulasiKatalogGrid" class="hidden grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 mb-4 max-h-60 overflow-y-auto p-2 border border-gray-200 rounded-xl"></div>
 
-            <!-- Upload sendiri -->
             <div id="simulasiUploadArea" class="hidden">
                 <div class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center cursor-pointer hover:border-purple-400 transition relative">
                     <i class="fas fa-cloud-upload-alt text-4xl text-gray-400"></i>
@@ -58,7 +55,6 @@ function renderSimulasiView() {
                 </div>
             </div>
 
-            <!-- Preview model terpilih -->
             <div id="simulasiModelPreview" class="hidden mt-4 p-4 bg-gray-50 rounded-xl flex items-center gap-4">
                 <img id="simulasiModelPreviewImg" class="w-20 h-20 object-cover rounded-lg border-2 border-purple-300" />
                 <div>
@@ -107,6 +103,7 @@ function renderSimulasiView() {
                 <div id="simulasiProgressBar" class="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
             </div>
             <p class="text-gray-400 text-sm mt-2">3 sudut pandang (depan, samping, belakang) dalam 1 gambar</p>
+            <div id="simulasiDebugInfo" class="mt-4 text-left bg-black/5 p-4 rounded-xl text-xs text-gray-600 max-h-40 overflow-auto hidden"></div>
         </div>
 
         <!-- STEP 4: HASIL -->
@@ -139,24 +136,30 @@ function renderSimulasiView() {
 // BUKA SIMULASI
 // ============================================================
 function openSimulasi(selectedModel = null) {
-    // Sembunyikan menu dan gallery
     const menuContainer = document.getElementById('katalogMenuContainer');
     const galleryView = document.getElementById('katalogGalleryView');
-    const simulasiView = document.getElementById('simulasiView');
+    let simulasiView = document.getElementById('simulasiView');
+
+    if (!simulasiView) {
+        const parent = document.querySelector('.max-w-7xl.mx-auto') || document.body;
+        const div = document.createElement('div');
+        div.id = 'simulasiView';
+        div.className = 'hidden max-w-4xl mx-auto px-4';
+        div.innerHTML = '<div id="simulasiContainer"></div>';
+        parent.appendChild(div);
+        simulasiView = div;
+    }
 
     if (menuContainer) menuContainer.classList.add('hidden');
     if (galleryView) galleryView.classList.add('hidden');
     if (simulasiView) simulasiView.classList.remove('hidden');
 
-    // Render view simulasi
     renderSimulasiView();
 
-    // Reset state
     simulasiState.step = 'select';
     simulasiState.selfieBase64 = null;
     simulasiState.selfieDataUrl = null;
 
-    // Jika ada model yang dipilih dari gallery
     if (selectedModel) {
         simulasiState.modelDataUrl = selectedModel.url;
         simulasiState.modelBase64 = selectedModel.base64 || null;
@@ -164,42 +167,33 @@ function openSimulasi(selectedModel = null) {
         simulasiState.modelNomor = selectedModel.nomor;
         showSimulasiStep('select');
         showSimulasiModelPreview(selectedModel.url, selectedModel.nama);
-        document.getElementById('simulasiNextToSelfie').classList.remove('hidden');
+        document.getElementById('simulasiNextToSelfie')?.classList.remove('hidden');
     } else {
         showSimulasiStep('select');
-        document.getElementById('simulasiNextToSelfie').classList.add('hidden');
+        document.getElementById('simulasiNextToSelfie')?.classList.add('hidden');
     }
 
-    // Scroll ke atas
     window.scrollTo({ top: 0, behavior: 'smooth' });
-
-    // Inisialisasi event listener
     initSimulasiEvents();
 }
 
-// ============================================================
-// TAMPILKAN STEP
-// ============================================================
 function showSimulasiStep(step) {
-    const steps = {
-        select: document.getElementById('simulasiStepSelect'),
-        selfie: document.getElementById('simulasiStepSelfie'),
-        generating: document.getElementById('simulasiStepGenerating'),
-        result: document.getElementById('simulasiStepResult')
+    const steps = ['simulasiStepSelect', 'simulasiStepSelfie', 'simulasiStepGenerating', 'simulasiStepResult'];
+    const stepMap = {
+        'select': 'simulasiStepSelect',
+        'selfie': 'simulasiStepSelfie',
+        'generating': 'simulasiStepGenerating',
+        'result': 'simulasiStepResult'
     };
-
-    Object.keys(steps).forEach(key => {
-        if (steps[key]) {
-            steps[key].classList.toggle('hidden', key !== step);
+    
+    steps.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.classList.toggle('hidden', id !== stepMap[step]);
         }
     });
-
-    simulasiState.step = step;
 }
 
-// ============================================================
-// TAMPILKAN PREVIEW MODEL
-// ============================================================
 function showSimulasiModelPreview(url, name) {
     const container = document.getElementById('simulasiModelPreview');
     const img = document.getElementById('simulasiModelPreviewImg');
@@ -212,9 +206,6 @@ function showSimulasiModelPreview(url, name) {
     }
 }
 
-// ============================================================
-// RENDER KATALOG UNTUK SIMULASI
-// ============================================================
 function renderSimulasiKatalog(images) {
     const grid = document.getElementById('simulasiKatalogGrid');
     if (!grid) return;
@@ -240,7 +231,6 @@ function renderSimulasiKatalog(images) {
         </div>
     `).join('');
 
-    // Event klik
     grid.querySelectorAll('.simulasi-katalog-item').forEach(el => {
         el.addEventListener('click', () => {
             const url = el.dataset.url;
@@ -254,7 +244,6 @@ function renderSimulasiKatalog(images) {
             simulasiState.modelName = nama;
             simulasiState.modelNomor = nomor;
 
-            // Ambil base64 dari URL
             fetch(url)
                 .then(res => res.blob())
                 .then(blob => {
@@ -262,28 +251,23 @@ function renderSimulasiKatalog(images) {
                     reader.onload = (ev) => {
                         simulasiState.modelBase64 = ev.target.result.split(',')[1];
                         showSimulasiModelPreview(url, `${nomor} - ${nama}`);
-                        document.getElementById('simulasiNextToSelfie').classList.remove('hidden');
+                        document.getElementById('simulasiNextToSelfie')?.classList.remove('hidden');
                     };
                     reader.readAsDataURL(blob);
                 })
                 .catch(() => {
                     showSimulasiModelPreview(url, `${nomor} - ${nama}`);
-                    document.getElementById('simulasiNextToSelfie').classList.remove('hidden');
+                    document.getElementById('simulasiNextToSelfie')?.classList.remove('hidden');
                 });
         });
     });
 }
 
-// ============================================================
-// EVENT LISTENER SIMULASI
-// ============================================================
 function initSimulasiEvents() {
-    // === BACK TO SELECT ===
     document.getElementById('simulasiBackToSelect')?.addEventListener('click', () => {
         showSimulasiStep('select');
     });
 
-    // === NEXT TO SELFIE ===
     document.getElementById('simulasiNextToSelfie')?.addEventListener('click', () => {
         if (!simulasiState.modelDataUrl) {
             alert('Silakan pilih model rambut terlebih dahulu!');
@@ -293,7 +277,6 @@ function initSimulasiEvents() {
         document.getElementById('simulasiGenerateBtn').disabled = true;
     });
 
-    // === PILIH DARI KATALOG ===
     document.getElementById('simulasiPilihDariKatalog')?.addEventListener('click', async () => {
         const grid = document.getElementById('simulasiKatalogGrid');
         const uploadArea = document.getElementById('simulasiUploadArea');
@@ -302,16 +285,14 @@ function initSimulasiEvents() {
         if (uploadArea) uploadArea.classList.add('hidden');
 
         document.getElementById('simulasiUploadInput').value = '';
-        document.getElementById('simulasiUploadPreview').classList.add('hidden');
+        document.getElementById('simulasiUploadPreview')?.classList.add('hidden');
         document.getElementById('simulasiUploadName').textContent = '';
 
         if (grid && grid.children.length === 0) {
-            // Ambil data dari katalog yang sudah dimuat
             if (window.currentKatalogImages && window.currentKatalogImages.length > 0) {
                 renderSimulasiKatalog(window.currentKatalogImages);
             } else {
-                // Coba ambil dari Supabase
-                const supabase = getKatalogSupabaseClient();
+                const supabase = window.getSupabaseClient ? window.getSupabaseClient() : null;
                 if (supabase) {
                     try {
                         const { data } = await supabase
@@ -337,7 +318,6 @@ function initSimulasiEvents() {
         }
     });
 
-    // === UPLOAD MODEL ===
     document.getElementById('simulasiUploadModel')?.addEventListener('click', () => {
         const grid = document.getElementById('simulasiKatalogGrid');
         const uploadArea = document.getElementById('simulasiUploadArea');
@@ -350,7 +330,6 @@ function initSimulasiEvents() {
         });
     });
 
-    // === UPLOAD MODEL INPUT ===
     document.getElementById('simulasiUploadInput')?.addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (!file) return;
@@ -374,24 +353,22 @@ function initSimulasiEvents() {
             if (nameEl) nameEl.textContent = `✅ ${file.name}`;
 
             showSimulasiModelPreview(dataUrl, file.name);
-            document.getElementById('simulasiNextToSelfie').classList.remove('hidden');
+            document.getElementById('simulasiNextToSelfie')?.classList.remove('hidden');
         };
         reader.readAsDataURL(file);
     });
 
-    // === CHANGE MODEL ===
     document.getElementById('simulasiChangeModel')?.addEventListener('click', () => {
-        document.getElementById('simulasiModelPreview').classList.add('hidden');
-        document.getElementById('simulasiNextToSelfie').classList.add('hidden');
+        document.getElementById('simulasiModelPreview')?.classList.add('hidden');
+        document.getElementById('simulasiNextToSelfie')?.classList.add('hidden');
         showSimulasiStep('select');
-        document.getElementById('simulasiKatalogGrid').classList.add('hidden');
-        document.getElementById('simulasiUploadArea').classList.add('hidden');
+        document.getElementById('simulasiKatalogGrid')?.classList.add('hidden');
+        document.getElementById('simulasiUploadArea')?.classList.add('hidden');
         simulasiState.modelDataUrl = null;
         simulasiState.modelBase64 = null;
         simulasiState.modelName = null;
     });
 
-    // === UPLOAD SELFIE ===
     document.getElementById('simulasiSelfieInput')?.addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (!file) return;
@@ -417,7 +394,9 @@ function initSimulasiEvents() {
         reader.readAsDataURL(file);
     });
 
-    // === GENERATE ===
+    // ============================================================
+    // GENERATE - VERSI DENGAN DEBUG LENGKAP
+    // ============================================================
     document.getElementById('simulasiGenerateBtn')?.addEventListener('click', async () => {
         if (!simulasiState.selfieBase64 || !simulasiState.modelDataUrl) {
             alert('Pastikan foto selfie dan model rambut sudah diupload!');
@@ -441,53 +420,145 @@ function initSimulasiEvents() {
         }
 
         showSimulasiStep('generating');
-        document.getElementById('simulasiGeneratingStatus').textContent = 'AI sedang menggambar model rambut baru...';
-        document.getElementById('simulasiProgressBar').style.width = '10%';
+        const statusEl = document.getElementById('simulasiGeneratingStatus');
+        const progressEl = document.getElementById('simulasiProgressBar');
+        const debugEl = document.getElementById('simulasiDebugInfo');
+        if (debugEl) debugEl.classList.remove('hidden');
+
+        statusEl.textContent = 'Mengirim request ke AI...';
+        progressEl.style.width = '10%';
+        if (debugEl) debugEl.textContent = '📤 Mengirim ke Netlify Function...';
 
         try {
+            const requestBody = {
+                selfieBase64: simulasiState.selfieBase64,
+                modelBase64: simulasiState.modelBase64,
+                modelName: simulasiState.modelName || 'Model Rambut'
+            };
+
+            console.log('📤 Request Body:', {
+                selfieLength: requestBody.selfieBase64?.length,
+                modelLength: requestBody.modelBase64?.length,
+                modelName: requestBody.modelName
+            });
+
             const response = await fetch('/.netlify/functions/nano-banana', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    selfieBase64: simulasiState.selfieBase64,
-                    modelBase64: simulasiState.modelBase64,
-                    modelName: simulasiState.modelName || 'Model Rambut'
-                })
+                body: JSON.stringify(requestBody)
             });
 
-            document.getElementById('simulasiProgressBar').style.width = '50%';
-            document.getElementById('simulasiGeneratingStatus').textContent = 'Sedang memproses hasil...';
+            statusEl.textContent = 'Menunggu response dari AI...';
+            progressEl.style.width = '50%';
+            if (debugEl) debugEl.textContent = '⏳ Menunggu response...';
 
             if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.error || `HTTP ${response.status}`);
+                const errorText = await response.text();
+                console.error('❌ HTTP Error:', response.status, errorText);
+                if (debugEl) debugEl.textContent = `❌ HTTP ${response.status}: ${errorText.substring(0, 200)}`;
+                throw new Error(`HTTP ${response.status}: ${errorText.substring(0, 100)}`);
             }
 
             const data = await response.json();
-            document.getElementById('simulasiProgressBar').style.width = '80%';
-            document.getElementById('simulasiGeneratingStatus').textContent = 'Hampir selesai...';
+            console.log('📥 FULL RESPONSE:', JSON.stringify(data, null, 2));
+            if (debugEl) debugEl.textContent = `📥 Response: ${JSON.stringify(data, null, 2).substring(0, 500)}...`;
 
-            const parts = data.candidates?.[0]?.content?.parts;
+            statusEl.textContent = 'Memproses hasil AI...';
+            progressEl.style.width = '80%';
+
+            // === COBA BEBERAPA CARA UNTUK AMBIL GAMBAR ===
             let imageBase64 = null;
+
+            // Cara 1: Cari inline_data di parts
+            const parts = data.candidates?.[0]?.content?.parts;
             if (parts) {
                 for (const part of parts) {
                     if (part.inline_data && part.inline_data.data) {
                         imageBase64 = part.inline_data.data;
+                        console.log('✅ Cara 1: Dapat dari inline_data');
                         break;
                     }
                 }
             }
 
-            if (!imageBase64) {
-                throw new Error('Tidak ada gambar dalam response AI');
+            // Cara 2: Cari di candidates[0].content.parts[0].text (mungkin berisi base64)
+            if (!imageBase64 && parts) {
+                for (const part of parts) {
+                    if (part.text) {
+                        const text = part.text;
+                        // Coba cari base64 dalam teks
+                        const base64Match = text.match(/data:image\/[^;]+;base64,([A-Za-z0-9+/=]+)/);
+                        if (base64Match) {
+                            imageBase64 = base64Match[1];
+                            console.log('✅ Cara 2: Dapat dari text (base64 match)');
+                            break;
+                        }
+                        // Coba cari string base64 panjang
+                        const longBase64Match = text.match(/([A-Za-z0-9+/=]{100,})/);
+                        if (longBase64Match) {
+                            imageBase64 = longBase64Match[1];
+                            console.log('✅ Cara 3: Dapat dari text (long base64)');
+                            break;
+                        }
+                    }
+                }
             }
 
-            document.getElementById('simulasiProgressBar').style.width = '100%';
+            // Cara 3: Cari di data.output (beberapa API pakai ini)
+            if (!imageBase64 && data.output) {
+                if (typeof data.output === 'string') {
+                    imageBase64 = data.output;
+                    console.log('✅ Cara 4: Dapat dari output (string)');
+                } else if (Array.isArray(data.output) && data.output.length > 0) {
+                    imageBase64 = data.output[0];
+                    console.log('✅ Cara 5: Dapat dari output (array)');
+                }
+            }
+
+            // Cara 4: Cari di data.image atau data.generated_image
+            if (!imageBase64 && data.image) {
+                imageBase64 = data.image;
+                console.log('✅ Cara 6: Dapat dari image');
+            }
+            if (!imageBase64 && data.generated_image) {
+                imageBase64 = data.generated_image;
+                console.log('✅ Cara 7: Dapat dari generated_image');
+            }
+
+            if (debugEl) {
+                debugEl.textContent += `\n\n🔍 Image ditemukan: ${!!imageBase64}`;
+                if (imageBase64) {
+                    debugEl.textContent += `\n📏 Panjang: ${imageBase64.length} karakter`;
+                }
+            }
+
+            if (!imageBase64) {
+                // Coba ambil teks response sebagai fallback
+                const textResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || 
+                                    data.text || 
+                                    JSON.stringify(data);
+                
+                console.warn('⚠️ Tidak ada gambar, response teks:', textResponse.substring(0, 300));
+                
+                // Tampilkan hasil sebagai teks
+                showTextResult(textResponse);
+                return;
+            }
+
+            progressEl.style.width = '100%';
+            statusEl.textContent = 'Selesai!';
+            if (debugEl) debugEl.textContent += '\n\n✅ Selesai!';
+
             simulasiState.resultImageBase64 = imageBase64;
             showSimulasiResult(imageBase64);
 
         } catch (error) {
             console.error('❌ Error:', error);
+            const debugEl = document.getElementById('simulasiDebugInfo');
+            if (debugEl) {
+                debugEl.textContent += `\n\n❌ Error: ${error.message}`;
+                debugEl.classList.remove('hidden');
+            }
             alert('Gagal generate: ' + error.message);
             showSimulasiStep('selfie');
         }
@@ -514,7 +585,7 @@ function initSimulasiEvents() {
                         simulasiState.modelNomor = nomor;
 
                         openSimulasi({ url: dataUrl, nama: `${nomor} - ${nama}`, base64: base64, nomor: nomor });
-                        document.getElementById('simulasiNextToSelfie').classList.remove('hidden');
+                        document.getElementById('simulasiNextToSelfie')?.classList.remove('hidden');
                     };
                     reader.readAsDataURL(blob);
                 })
@@ -526,7 +597,7 @@ function initSimulasiEvents() {
 }
 
 // ============================================================
-// TAMPILKAN HASIL
+// TAMPILKAN HASIL (GAMBAR)
 // ============================================================
 function showSimulasiResult(imageBase64) {
     showSimulasiStep('result');
@@ -534,7 +605,6 @@ function showSimulasiResult(imageBase64) {
     const img = document.getElementById('simulasiResultImg');
     if (img) img.src = `data:image/jpeg;base64,${imageBase64}`;
 
-    // Download
     document.getElementById('simulasiDownloadBtn')?.addEventListener('click', function() {
         const link = document.createElement('a');
         link.download = `simulasi-rambut-${simulasiState.modelNomor || 'custom'}.jpg`;
@@ -542,18 +612,16 @@ function showSimulasiResult(imageBase64) {
         link.click();
     });
 
-    // Try Again
     document.getElementById('simulasiTryAgainBtn')?.addEventListener('click', () => {
         showSimulasiStep('selfie');
         document.getElementById('simulasiSelfieInput').value = '';
-        document.getElementById('simulasiSelfiePreview').classList.add('hidden');
+        document.getElementById('simulasiSelfiePreview')?.classList.add('hidden');
         document.getElementById('simulasiSelfieName').textContent = '';
         simulasiState.selfieBase64 = null;
         simulasiState.selfieDataUrl = null;
         document.getElementById('simulasiGenerateBtn').disabled = true;
     });
 
-    // Done
     document.getElementById('simulasiDoneBtn')?.addEventListener('click', () => {
         const menuContainer = document.getElementById('katalogMenuContainer');
         const simulasiView = document.getElementById('simulasiView');
@@ -564,12 +632,58 @@ function showSimulasiResult(imageBase64) {
         simulasiState.selfieBase64 = null;
         simulasiState.selfieDataUrl = null;
         showSimulasiStep('select');
-        document.getElementById('simulasiModelPreview').classList.add('hidden');
-        document.getElementById('simulasiNextToSelfie').classList.add('hidden');
-        // Refresh katalog jika perlu
-        if (typeof loadKatalogCategory === 'function' && currentKatalogCategory) {
-            loadKatalogCategory(currentKatalogCategory);
-        }
+        document.getElementById('simulasiModelPreview')?.classList.add('hidden');
+        document.getElementById('simulasiNextToSelfie')?.classList.add('hidden');
+    });
+}
+
+// ============================================================
+// TAMPILKAN HASIL TEKS (FALLBACK)
+// ============================================================
+function showTextResult(text) {
+    showSimulasiStep('result');
+
+    const img = document.getElementById('simulasiResultImg');
+    if (img) {
+        img.style.display = 'none';
+    }
+
+    const infoEl = document.getElementById('simulasiResultInfo') || document.createElement('div');
+    infoEl.id = 'simulasiResultInfo';
+    infoEl.className = 'text-left text-gray-700 bg-gray-50 p-4 rounded-xl max-h-96 overflow-auto whitespace-pre-wrap';
+    infoEl.textContent = text;
+
+    const resultCard = document.querySelector('#simulasiStepResult .flex.justify-center');
+    if (resultCard) {
+        resultCard.innerHTML = '';
+        resultCard.appendChild(infoEl);
+    }
+
+    document.getElementById('simulasiDownloadBtn')?.addEventListener('click', function() {
+        const link = document.createElement('a');
+        link.download = `simulasi-analisis.txt`;
+        link.href = `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`;
+        link.click();
+    });
+
+    document.getElementById('simulasiTryAgainBtn')?.addEventListener('click', () => {
+        showSimulasiStep('selfie');
+        document.getElementById('simulasiSelfieInput').value = '';
+        document.getElementById('simulasiSelfiePreview')?.classList.add('hidden');
+        document.getElementById('simulasiSelfieName').textContent = '';
+        simulasiState.selfieBase64 = null;
+        simulasiState.selfieDataUrl = null;
+        document.getElementById('simulasiGenerateBtn').disabled = true;
+    });
+
+    document.getElementById('simulasiDoneBtn')?.addEventListener('click', () => {
+        const menuContainer = document.getElementById('katalogMenuContainer');
+        const simulasiView = document.getElementById('simulasiView');
+        if (menuContainer) menuContainer.classList.remove('hidden');
+        if (simulasiView) simulasiView.classList.add('hidden');
+        showSimulasiStep('select');
+        document.getElementById('simulasiModelPreview')?.classList.add('hidden');
+        document.getElementById('simulasiNextToSelfie')?.classList.add('hidden');
     });
 }
 
@@ -578,7 +692,6 @@ function showSimulasiResult(imageBase64) {
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
-        // Render view simulasi di container
         const container = document.getElementById('simulasiContainer');
         if (container) {
             renderSimulasiView();
@@ -587,5 +700,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 500);
 });
 
-// Export fungsi untuk dipanggil dari katalog.js
 window.openSimulasi = openSimulasi;
