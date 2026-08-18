@@ -395,174 +395,141 @@ function initSimulasiEvents() {
     });
 
     // ============================================================
-    // GENERATE - VERSI DENGAN DEBUG LENGKAP
-    // ============================================================
-    document.getElementById('simulasiGenerateBtn')?.addEventListener('click', async () => {
-        if (!simulasiState.selfieBase64 || !simulasiState.modelDataUrl) {
-            alert('Pastikan foto selfie dan model rambut sudah diupload!');
+// GENERATE - VERSI DENGAN EKSTRAKSI GAMBAR YANG BENAR
+// ============================================================
+document.getElementById('simulasiGenerateBtn')?.addEventListener('click', async () => {
+    if (!simulasiState.selfieBase64 || !simulasiState.modelDataUrl) {
+        alert('Pastikan foto selfie dan model rambut sudah diupload!');
+        return;
+    }
+
+    if (!simulasiState.modelBase64 && simulasiState.modelDataUrl) {
+        try {
+            const response = await fetch(simulasiState.modelDataUrl);
+            const blob = await response.blob();
+            const reader = new FileReader();
+            const base64 = await new Promise((resolve) => {
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.readAsDataURL(blob);
+            });
+            simulasiState.modelBase64 = base64;
+        } catch (e) {
+            alert('Gagal memproses gambar model: ' + e.message);
             return;
         }
+    }
 
-        if (!simulasiState.modelBase64 && simulasiState.modelDataUrl) {
-            try {
-                const response = await fetch(simulasiState.modelDataUrl);
-                const blob = await response.blob();
-                const reader = new FileReader();
-                const base64 = await new Promise((resolve) => {
-                    reader.onload = () => resolve(reader.result.split(',')[1]);
-                    reader.readAsDataURL(blob);
-                });
-                simulasiState.modelBase64 = base64;
-            } catch (e) {
-                alert('Gagal memproses gambar model: ' + e.message);
-                return;
-            }
-        }
+    showSimulasiStep('generating');
+    const statusEl = document.getElementById('simulasiGeneratingStatus');
+    const progressEl = document.getElementById('simulasiProgressBar');
+    const debugEl = document.getElementById('simulasiDebugInfo');
+    if (debugEl) debugEl.classList.remove('hidden');
 
-        showSimulasiStep('generating');
-        const statusEl = document.getElementById('simulasiGeneratingStatus');
-        const progressEl = document.getElementById('simulasiProgressBar');
-        const debugEl = document.getElementById('simulasiDebugInfo');
-        if (debugEl) debugEl.classList.remove('hidden');
+    statusEl.textContent = 'Mengirim request ke AI...';
+    progressEl.style.width = '10%';
+    if (debugEl) debugEl.textContent = '📤 Mengirim ke Netlify Function...';
 
-        statusEl.textContent = 'Mengirim request ke AI...';
-        progressEl.style.width = '10%';
-        if (debugEl) debugEl.textContent = '📤 Mengirim ke Netlify Function...';
-
-        try {
-            const requestBody = {
+    try {
+        const response = await fetch('/.netlify/functions/nano-banana', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
                 selfieBase64: simulasiState.selfieBase64,
                 modelBase64: simulasiState.modelBase64,
                 modelName: simulasiState.modelName || 'Model Rambut'
-            };
+            })
+        });
 
-            console.log('📤 Request Body:', {
-                selfieLength: requestBody.selfieBase64?.length,
-                modelLength: requestBody.modelBase64?.length,
-                modelName: requestBody.modelName
-            });
+        statusEl.textContent = 'Menunggu response dari AI...';
+        progressEl.style.width = '50%';
 
-            const response = await fetch('/.netlify/functions/nano-banana', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(requestBody)
-            });
-
-            statusEl.textContent = 'Menunggu response dari AI...';
-            progressEl.style.width = '50%';
-            if (debugEl) debugEl.textContent = '⏳ Menunggu response...';
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error('❌ HTTP Error:', response.status, errorText);
-                if (debugEl) debugEl.textContent = `❌ HTTP ${response.status}: ${errorText.substring(0, 200)}`;
-                throw new Error(`HTTP ${response.status}: ${errorText.substring(0, 100)}`);
-            }
-
-            const data = await response.json();
-            console.log('📥 FULL RESPONSE:', JSON.stringify(data, null, 2));
-            if (debugEl) debugEl.textContent = `📥 Response: ${JSON.stringify(data, null, 2).substring(0, 500)}...`;
-
-            statusEl.textContent = 'Memproses hasil AI...';
-            progressEl.style.width = '80%';
-
-            // === COBA BEBERAPA CARA UNTUK AMBIL GAMBAR ===
-            let imageBase64 = null;
-
-            // Cara 1: Cari inline_data di parts
-            const parts = data.candidates?.[0]?.content?.parts;
-            if (parts) {
-                for (const part of parts) {
-                    if (part.inline_data && part.inline_data.data) {
-                        imageBase64 = part.inline_data.data;
-                        console.log('✅ Cara 1: Dapat dari inline_data');
-                        break;
-                    }
-                }
-            }
-
-            // Cara 2: Cari di candidates[0].content.parts[0].text (mungkin berisi base64)
-            if (!imageBase64 && parts) {
-                for (const part of parts) {
-                    if (part.text) {
-                        const text = part.text;
-                        // Coba cari base64 dalam teks
-                        const base64Match = text.match(/data:image\/[^;]+;base64,([A-Za-z0-9+/=]+)/);
-                        if (base64Match) {
-                            imageBase64 = base64Match[1];
-                            console.log('✅ Cara 2: Dapat dari text (base64 match)');
-                            break;
-                        }
-                        // Coba cari string base64 panjang
-                        const longBase64Match = text.match(/([A-Za-z0-9+/=]{100,})/);
-                        if (longBase64Match) {
-                            imageBase64 = longBase64Match[1];
-                            console.log('✅ Cara 3: Dapat dari text (long base64)');
-                            break;
-                        }
-                    }
-                }
-            }
-
-            // Cara 3: Cari di data.output (beberapa API pakai ini)
-            if (!imageBase64 && data.output) {
-                if (typeof data.output === 'string') {
-                    imageBase64 = data.output;
-                    console.log('✅ Cara 4: Dapat dari output (string)');
-                } else if (Array.isArray(data.output) && data.output.length > 0) {
-                    imageBase64 = data.output[0];
-                    console.log('✅ Cara 5: Dapat dari output (array)');
-                }
-            }
-
-            // Cara 4: Cari di data.image atau data.generated_image
-            if (!imageBase64 && data.image) {
-                imageBase64 = data.image;
-                console.log('✅ Cara 6: Dapat dari image');
-            }
-            if (!imageBase64 && data.generated_image) {
-                imageBase64 = data.generated_image;
-                console.log('✅ Cara 7: Dapat dari generated_image');
-            }
-
-            if (debugEl) {
-                debugEl.textContent += `\n\n🔍 Image ditemukan: ${!!imageBase64}`;
-                if (imageBase64) {
-                    debugEl.textContent += `\n📏 Panjang: ${imageBase64.length} karakter`;
-                }
-            }
-
-            if (!imageBase64) {
-                // Coba ambil teks response sebagai fallback
-                const textResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || 
-                                    data.text || 
-                                    JSON.stringify(data);
-                
-                console.warn('⚠️ Tidak ada gambar, response teks:', textResponse.substring(0, 300));
-                
-                // Tampilkan hasil sebagai teks
-                showTextResult(textResponse);
-                return;
-            }
-
-            progressEl.style.width = '100%';
-            statusEl.textContent = 'Selesai!';
-            if (debugEl) debugEl.textContent += '\n\n✅ Selesai!';
-
-            simulasiState.resultImageBase64 = imageBase64;
-            showSimulasiResult(imageBase64);
-
-        } catch (error) {
-            console.error('❌ Error:', error);
-            const debugEl = document.getElementById('simulasiDebugInfo');
-            if (debugEl) {
-                debugEl.textContent += `\n\n❌ Error: ${error.message}`;
-                debugEl.classList.remove('hidden');
-            }
-            alert('Gagal generate: ' + error.message);
-            showSimulasiStep('selfie');
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`HTTP ${response.status}: ${errorText.substring(0, 100)}`);
         }
-    });
+
+        const data = await response.json();
+        console.log('📥 FULL RESPONSE:', JSON.stringify(data, null, 2));
+
+        if (debugEl) {
+            debugEl.textContent = `📥 Response diterima (${JSON.stringify(data).length} karakter)`;
+        }
+
+        statusEl.textContent = 'Memproses hasil AI...';
+        progressEl.style.width = '80%';
+
+        // ============================================================
+        // 🔥 CARA EKSTRAK GAMBAR YANG BENAR 🔥
+        // ============================================================
+        let imageBase64 = null;
+
+        // Cari inlineData di parts (INI YANG PALING UMUM)
+        const parts = data.candidates?.[0]?.content?.parts;
+        if (parts) {
+            for (const part of parts) {
+                if (part.inlineData && part.inlineData.data) {
+                    imageBase64 = part.inlineData.data;
+                    console.log('✅ Gambar ditemukan di inlineData!');
+                    console.log('📏 Panjang base64:', imageBase64.length);
+                    break;
+                }
+            }
+        }
+
+        // Jika masih null, coba cara lain
+        if (!imageBase64) {
+            // Coba cari di text
+            const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (text) {
+                const base64Match = text.match(/data:image\/[^;]+;base64,([A-Za-z0-9+/=]+)/);
+                if (base64Match) {
+                    imageBase64 = base64Match[1];
+                    console.log('✅ Gambar ditemukan di text (base64 match)');
+                }
+            }
+        }
+
+        // Jika masih null, coba di data langsung
+        if (!imageBase64 && data.image) {
+            imageBase64 = data.image;
+            console.log('✅ Gambar ditemukan di data.image');
+        }
+
+        if (debugEl) {
+            debugEl.textContent += `\n\n🔍 Image ditemukan: ${!!imageBase64}`;
+            if (imageBase64) {
+                debugEl.textContent += `\n📏 Panjang: ${imageBase64.length} karakter`;
+                debugEl.textContent += `\n📌 Prefix: ${imageBase64.substring(0, 30)}...`;
+            }
+        }
+
+        if (!imageBase64) {
+            // Jika tidak ada gambar, tampilkan teks response
+            const textResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || 
+                                JSON.stringify(data, null, 2);
+            console.warn('⚠️ Tidak ada gambar, response teks:', textResponse.substring(0, 300));
+            showTextResult(textResponse);
+            return;
+        }
+
+        progressEl.style.width = '100%';
+        statusEl.textContent = 'Selesai!';
+        if (debugEl) debugEl.textContent += '\n\n✅ Selesai!';
+
+        simulasiState.resultImageBase64 = imageBase64;
+        showSimulasiResult(imageBase64);
+
+    } catch (error) {
+        console.error('❌ Error:', error);
+        const debugEl = document.getElementById('simulasiDebugInfo');
+        if (debugEl) {
+            debugEl.textContent += `\n\n❌ Error: ${error.message}`;
+            debugEl.classList.remove('hidden');
+        }
+        alert('Gagal generate: ' + error.message);
+        showSimulasiStep('selfie');
+    }
+});
 
     // === TOMBOL DARI GALLERY ===
     document.querySelectorAll('.simulasi-from-gallery-btn').forEach(btn => {
