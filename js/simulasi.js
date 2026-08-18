@@ -15,8 +15,125 @@ const simulasiState = {
     modelName: null,
     modelNomor: null,
     resultImageBase64: null,
-    step: 'select' // 'select' | 'selfie' | 'generating' | 'result'
+    step: 'select'
 };
+
+// ============================================================
+// RENDER VIEW SIMULASI
+// ============================================================
+function renderSimulasiView() {
+    const container = document.getElementById('simulasiContainer');
+    if (!container) return;
+
+    container.innerHTML = `
+        <!-- STEP 1: PILIH MODEL -->
+        <div id="simulasiStepSelect" class="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg">
+            <h3 class="text-xl font-bold text-slate-800 mb-4">
+                <i class="fas fa-cut text-purple-600 mr-2"></i>Pilih Model Rambut
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <button id="simulasiPilihDariKatalog" class="flex items-center justify-center gap-2 p-4 bg-purple-50 border-2 border-purple-300 rounded-xl hover:bg-purple-100 transition active:scale-95">
+                    <i class="fas fa-images text-purple-600 text-xl"></i>
+                    <span class="font-medium text-purple-700">Pilih dari Katalog</span>
+                </button>
+                <button id="simulasiUploadModel" class="flex items-center justify-center gap-2 p-4 bg-blue-50 border-2 border-blue-300 rounded-xl hover:bg-blue-100 transition active:scale-95">
+                    <i class="fas fa-upload text-blue-600 text-xl"></i>
+                    <span class="font-medium text-blue-700">Upload Model Sendiri</span>
+                </button>
+            </div>
+
+            <!-- Grid katalog untuk simulasi -->
+            <div id="simulasiKatalogGrid" class="hidden grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 mb-4 max-h-60 overflow-y-auto p-2 border border-gray-200 rounded-xl"></div>
+
+            <!-- Upload sendiri -->
+            <div id="simulasiUploadArea" class="hidden">
+                <div class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center cursor-pointer hover:border-purple-400 transition relative">
+                    <i class="fas fa-cloud-upload-alt text-4xl text-gray-400"></i>
+                    <p class="text-gray-500 mt-2">Klik atau drag & drop gambar model rambut</p>
+                    <p class="text-gray-400 text-sm">JPG, PNG, WEBP</p>
+                    <div id="simulasiUploadName" class="text-purple-600 font-medium mt-2"></div>
+                    <img id="simulasiUploadPreview" class="max-w-full max-h-40 rounded-lg mt-2 hidden" />
+                    <input type="file" id="simulasiUploadInput" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer">
+                </div>
+            </div>
+
+            <!-- Preview model terpilih -->
+            <div id="simulasiModelPreview" class="hidden mt-4 p-4 bg-gray-50 rounded-xl flex items-center gap-4">
+                <img id="simulasiModelPreviewImg" class="w-20 h-20 object-cover rounded-lg border-2 border-purple-300" />
+                <div>
+                    <p class="font-semibold text-slate-800" id="simulasiModelPreviewName">-</p>
+                    <p class="text-sm text-gray-500">Model terpilih</p>
+                </div>
+                <button id="simulasiChangeModel" class="ml-auto text-sm text-purple-600 hover:text-purple-800">Ganti</button>
+            </div>
+
+            <button id="simulasiNextToSelfie" class="hidden w-full mt-4 py-3 bg-purple-600 text-white rounded-xl font-semibold hover:bg-purple-700 transition active:scale-95">
+                Lanjut ke Upload Selfie <i class="fas fa-arrow-right ml-2"></i>
+            </button>
+        </div>
+
+        <!-- STEP 2: UPLOAD SELFIE -->
+        <div id="simulasiStepSelfie" class="hidden bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg">
+            <h3 class="text-xl font-bold text-slate-800 mb-4">
+                <i class="fas fa-camera text-purple-600 mr-2"></i>Upload Foto Selfie
+            </h3>
+
+            <div class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:border-purple-400 transition relative">
+                <i class="fas fa-user-circle text-5xl text-gray-400"></i>
+                <p class="text-gray-500 mt-3">Upload foto selfie Anda</p>
+                <p class="text-gray-400 text-sm">Wajah harus jelas, pencahayaan baik</p>
+                <div id="simulasiSelfieName" class="text-purple-600 font-medium mt-2"></div>
+                <img id="simulasiSelfiePreview" class="max-w-full max-h-60 rounded-lg mt-3 mx-auto hidden" />
+                <input type="file" id="simulasiSelfieInput" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer">
+            </div>
+
+            <div class="flex gap-3 mt-4">
+                <button id="simulasiBackToSelect" class="flex-1 py-3 bg-gray-200 text-slate-700 rounded-xl font-semibold hover:bg-gray-300 transition active:scale-95">
+                    <i class="fas fa-arrow-left mr-2"></i>Kembali
+                </button>
+                <button id="simulasiGenerateBtn" class="flex-1 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:opacity-90 transition active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                    <i class="fas fa-wand-magic-sparkles mr-2"></i>Simulasikan
+                </button>
+            </div>
+        </div>
+
+        <!-- STEP 3: GENERATING -->
+        <div id="simulasiStepGenerating" class="hidden bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg text-center">
+            <div class="inline-block animate-spin rounded-full h-16 w-16 border-4 border-purple-500 border-t-transparent"></div>
+            <h3 class="text-xl font-bold text-slate-800 mt-4">Sedang Memproses...</h3>
+            <p class="text-gray-500 mt-2" id="simulasiGeneratingStatus">AI sedang menggambar model rambut baru</p>
+            <div class="mt-4 w-full bg-gray-200 rounded-full h-2 max-w-md mx-auto">
+                <div id="simulasiProgressBar" class="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+            <p class="text-gray-400 text-sm mt-2">3 sudut pandang (depan, samping, belakang) dalam 1 gambar</p>
+        </div>
+
+        <!-- STEP 4: HASIL -->
+        <div id="simulasiStepResult" class="hidden bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg">
+            <h3 class="text-xl font-bold text-slate-800 mb-4 text-center">
+                <i class="fas fa-check-circle text-green-500 mr-2"></i>Hasil Simulasi
+            </h3>
+            <div class="flex justify-center">
+                <img id="simulasiResultImg" class="max-w-full max-h-[60vh] rounded-xl shadow-lg" />
+            </div>
+            <div class="text-center text-sm text-gray-500 mt-3">
+                <i class="fas fa-info-circle mr-1"></i> 3 sudut pandang: Depan · Samping · Belakang
+            </div>
+            <div class="flex flex-wrap gap-3 mt-4 justify-center">
+                <button id="simulasiDownloadBtn" class="px-6 py-2 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 transition active:scale-95">
+                    <i class="fas fa-download mr-2"></i>Simpan
+                </button>
+                <button id="simulasiTryAgainBtn" class="px-6 py-2 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition active:scale-95">
+                    <i class="fas fa-redo mr-2"></i>Coba Lagi
+                </button>
+                <button id="simulasiDoneBtn" class="px-6 py-2 bg-gray-600 text-white rounded-xl font-semibold hover:bg-gray-700 transition active:scale-95">
+                    <i class="fas fa-check mr-2"></i>Selesai
+                </button>
+            </div>
+        </div>
+    `;
+}
 
 // ============================================================
 // BUKA SIMULASI
@@ -30,6 +147,9 @@ function openSimulasi(selectedModel = null) {
     if (menuContainer) menuContainer.classList.add('hidden');
     if (galleryView) galleryView.classList.add('hidden');
     if (simulasiView) simulasiView.classList.remove('hidden');
+
+    // Render view simulasi
+    renderSimulasiView();
 
     // Reset state
     simulasiState.step = 'select';
@@ -52,6 +172,9 @@ function openSimulasi(selectedModel = null) {
 
     // Scroll ke atas
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Inisialisasi event listener
+    initSimulasiEvents();
 }
 
 // ============================================================
@@ -90,7 +213,7 @@ function showSimulasiModelPreview(url, name) {
 }
 
 // ============================================================
-// RENDER KATALOG UNTUK SIMULASI (mini grid)
+// RENDER KATALOG UNTUK SIMULASI
 // ============================================================
 function renderSimulasiKatalog(images) {
     const grid = document.getElementById('simulasiKatalogGrid');
@@ -124,51 +247,50 @@ function renderSimulasiKatalog(images) {
             const nama = el.dataset.nama;
             const nomor = el.dataset.nomor;
 
-            // Hapus active sebelumnya
             grid.querySelectorAll('.simulasi-katalog-item').forEach(i => i.classList.remove('border-purple-400', 'bg-purple-50'));
             el.classList.add('border-purple-400', 'bg-purple-50');
 
-            // Simpan model yang dipilih
             simulasiState.modelDataUrl = url;
             simulasiState.modelName = nama;
             simulasiState.modelNomor = nomor;
 
-            // Tampilkan preview
-            showSimulasiModelPreview(url, `${nomor} - ${nama}`);
-
-            // Tampilkan tombol next
-            document.getElementById('simulasiNextToSelfie').classList.remove('hidden');
+            // Ambil base64 dari URL
+            fetch(url)
+                .then(res => res.blob())
+                .then(blob => {
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                        simulasiState.modelBase64 = ev.target.result.split(',')[1];
+                        showSimulasiModelPreview(url, `${nomor} - ${nama}`);
+                        document.getElementById('simulasiNextToSelfie').classList.remove('hidden');
+                    };
+                    reader.readAsDataURL(blob);
+                })
+                .catch(() => {
+                    showSimulasiModelPreview(url, `${nomor} - ${nama}`);
+                    document.getElementById('simulasiNextToSelfie').classList.remove('hidden');
+                });
         });
     });
 }
 
 // ============================================================
-// EVENT LISTENER - INIT SIMULASI
+// EVENT LISTENER SIMULASI
 // ============================================================
-function initSimulasi() {
-    // === CARD SIMULASI DI MENU ===
-    document.getElementById('simulasiMenuCard')?.addEventListener('click', () => {
-        // Reset state
-        simulasiState.modelDataUrl = null;
-        simulasiState.modelName = null;
-        simulasiState.modelNomor = null;
-        document.getElementById('simulasiModelPreview').classList.add('hidden');
-        document.getElementById('simulasiNextToSelfie').classList.add('hidden');
-        document.getElementById('simulasiKatalogGrid').classList.add('hidden');
-        document.getElementById('simulasiUploadArea').classList.add('hidden');
-        document.getElementById('simulasiUploadInput').value = '';
-        document.getElementById('simulasiUploadPreview').classList.add('hidden');
-        document.getElementById('simulasiUploadName').textContent = '';
-
-        openSimulasi();
+function initSimulasiEvents() {
+    // === BACK TO SELECT ===
+    document.getElementById('simulasiBackToSelect')?.addEventListener('click', () => {
+        showSimulasiStep('select');
     });
 
-    // === TOMBOL BACK ===
-    document.getElementById('simulasiBackBtn')?.addEventListener('click', () => {
-        const menuContainer = document.getElementById('katalogMenuContainer');
-        const simulasiView = document.getElementById('simulasiView');
-        if (menuContainer) menuContainer.classList.remove('hidden');
-        if (simulasiView) simulasiView.classList.add('hidden');
+    // === NEXT TO SELFIE ===
+    document.getElementById('simulasiNextToSelfie')?.addEventListener('click', () => {
+        if (!simulasiState.modelDataUrl) {
+            alert('Silakan pilih model rambut terlebih dahulu!');
+            return;
+        }
+        showSimulasiStep('selfie');
+        document.getElementById('simulasiGenerateBtn').disabled = true;
     });
 
     // === PILIH DARI KATALOG ===
@@ -179,41 +301,43 @@ function initSimulasi() {
         if (grid) grid.classList.toggle('hidden');
         if (uploadArea) uploadArea.classList.add('hidden');
 
-        // Reset upload
         document.getElementById('simulasiUploadInput').value = '';
         document.getElementById('simulasiUploadPreview').classList.add('hidden');
         document.getElementById('simulasiUploadName').textContent = '';
 
-        // Jika grid kosong, load data dari Supabase
         if (grid && grid.children.length === 0) {
             // Ambil data dari katalog yang sudah dimuat
             if (window.currentKatalogImages && window.currentKatalogImages.length > 0) {
                 renderSimulasiKatalog(window.currentKatalogImages);
             } else {
-                // Coba ambil dari Supabase untuk kategori Best Haircut
+                // Coba ambil dari Supabase
                 const supabase = getKatalogSupabaseClient();
                 if (supabase) {
-                    const { data } = await supabase
-                        .from('model_rambut')
-                        .select('*')
-                        .eq('kategori', 'Best Haircut')
-                        .limit(20);
+                    try {
+                        const { data } = await supabase
+                            .from('model_rambut')
+                            .select('*')
+                            .eq('kategori', 'Best Haircut')
+                            .limit(20);
 
-                    if (data && data.length > 0) {
-                        const images = data.map(item => ({
-                            url: supabase.storage.from('model_rambut').getPublicUrl(item.link_url_bucket).data.publicUrl,
-                            nomor: item.nomor || '???',
-                            nama: item.nama_model_rambut || 'Model Rambut',
-                            informasi: item.informasi || ''
-                        }));
-                        renderSimulasiKatalog(images);
+                        if (data && data.length > 0) {
+                            const images = data.map(item => ({
+                                url: supabase.storage.from('model_rambut').getPublicUrl(item.link_url_bucket).data.publicUrl,
+                                nomor: item.nomor || '???',
+                                nama: item.nama_model_rambut || 'Model Rambut',
+                                informasi: item.informasi || ''
+                            }));
+                            renderSimulasiKatalog(images);
+                        }
+                    } catch (e) {
+                        console.error('Gagal ambil data:', e);
                     }
                 }
             }
         }
     });
 
-    // === UPLOAD MODEL SENDIRI ===
+    // === UPLOAD MODEL ===
     document.getElementById('simulasiUploadModel')?.addEventListener('click', () => {
         const grid = document.getElementById('simulasiKatalogGrid');
         const uploadArea = document.getElementById('simulasiUploadArea');
@@ -221,7 +345,6 @@ function initSimulasi() {
         if (grid) grid.classList.add('hidden');
         if (uploadArea) uploadArea.classList.toggle('hidden');
 
-        // Reset grid selection
         grid?.querySelectorAll('.simulasi-katalog-item').forEach(el => {
             el.classList.remove('border-purple-400', 'bg-purple-50');
         });
@@ -242,7 +365,6 @@ function initSimulasi() {
             simulasiState.modelName = file.name;
             simulasiState.modelNomor = 'Upload';
 
-            // Preview
             const preview = document.getElementById('simulasiUploadPreview');
             const nameEl = document.getElementById('simulasiUploadName');
             if (preview) {
@@ -251,26 +373,22 @@ function initSimulasi() {
             }
             if (nameEl) nameEl.textContent = `✅ ${file.name}`;
 
-            // Tampilkan preview model
             showSimulasiModelPreview(dataUrl, file.name);
             document.getElementById('simulasiNextToSelfie').classList.remove('hidden');
         };
         reader.readAsDataURL(file);
     });
 
-    // === TOMBOL NEXT TO SELFIE ===
-    document.getElementById('simulasiNextToSelfie')?.addEventListener('click', () => {
-        if (!simulasiState.modelDataUrl) {
-            alert('Silakan pilih model rambut terlebih dahulu!');
-            return;
-        }
-        showSimulasiStep('selfie');
-        document.getElementById('simulasiGenerateBtn').disabled = true;
-    });
-
-    // === BACK TO SELECT ===
-    document.getElementById('simulasiBackToSelect')?.addEventListener('click', () => {
+    // === CHANGE MODEL ===
+    document.getElementById('simulasiChangeModel')?.addEventListener('click', () => {
+        document.getElementById('simulasiModelPreview').classList.add('hidden');
+        document.getElementById('simulasiNextToSelfie').classList.add('hidden');
         showSimulasiStep('select');
+        document.getElementById('simulasiKatalogGrid').classList.add('hidden');
+        document.getElementById('simulasiUploadArea').classList.add('hidden');
+        simulasiState.modelDataUrl = null;
+        simulasiState.modelBase64 = null;
+        simulasiState.modelName = null;
     });
 
     // === UPLOAD SELFIE ===
@@ -286,7 +404,6 @@ function initSimulasi() {
             simulasiState.selfieDataUrl = dataUrl;
             simulasiState.selfieBase64 = base64;
 
-            // Preview
             const preview = document.getElementById('simulasiSelfiePreview');
             const nameEl = document.getElementById('simulasiSelfieName');
             if (preview) {
@@ -295,20 +412,18 @@ function initSimulasi() {
             }
             if (nameEl) nameEl.textContent = `✅ ${file.name}`;
 
-            // Enable generate button
             document.getElementById('simulasiGenerateBtn').disabled = false;
         };
         reader.readAsDataURL(file);
     });
 
-    // === TOMBOL GENERATE ===
+    // === GENERATE ===
     document.getElementById('simulasiGenerateBtn')?.addEventListener('click', async () => {
         if (!simulasiState.selfieBase64 || !simulasiState.modelDataUrl) {
             alert('Pastikan foto selfie dan model rambut sudah diupload!');
             return;
         }
 
-        // Konversi modelDataUrl ke base64 jika belum
         if (!simulasiState.modelBase64 && simulasiState.modelDataUrl) {
             try {
                 const response = await fetch(simulasiState.modelDataUrl);
@@ -325,13 +440,11 @@ function initSimulasi() {
             }
         }
 
-        // Mulai generate
         showSimulasiStep('generating');
         document.getElementById('simulasiGeneratingStatus').textContent = 'AI sedang menggambar model rambut baru...';
         document.getElementById('simulasiProgressBar').style.width = '10%';
 
         try {
-            // Panggil Netlify Function
             const response = await fetch('/.netlify/functions/nano-banana', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -351,11 +464,9 @@ function initSimulasi() {
             }
 
             const data = await response.json();
-
             document.getElementById('simulasiProgressBar').style.width = '80%';
             document.getElementById('simulasiGeneratingStatus').textContent = 'Hampir selesai...';
 
-            // Ambil gambar dari response
             const parts = data.candidates?.[0]?.content?.parts;
             let imageBase64 = null;
             if (parts) {
@@ -372,8 +483,6 @@ function initSimulasi() {
             }
 
             document.getElementById('simulasiProgressBar').style.width = '100%';
-
-            // Tampilkan hasil
             simulasiState.resultImageBase64 = imageBase64;
             showSimulasiResult(imageBase64);
 
@@ -384,15 +493,14 @@ function initSimulasi() {
         }
     });
 
-    // === TOMBOL GENERATE DARI GALLERY ===
-    document.addEventListener('click', function(e) {
-        const btn = e.target.closest('.simulasi-from-gallery-btn');
-        if (btn) {
-            const url = btn.dataset.url;
-            const nama = btn.dataset.nama;
-            const nomor = btn.dataset.nomor;
+    // === TOMBOL DARI GALLERY ===
+    document.querySelectorAll('.simulasi-from-gallery-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const url = this.dataset.url;
+            const nama = this.dataset.nama;
+            const nomor = this.dataset.nomor;
 
-            // Ambil base64 dari URL
             fetch(url)
                 .then(res => res.blob())
                 .then(blob => {
@@ -406,7 +514,6 @@ function initSimulasi() {
                         simulasiState.modelNomor = nomor;
 
                         openSimulasi({ url: dataUrl, nama: `${nomor} - ${nama}`, base64: base64, nomor: nomor });
-                        showSimulasiStep('select');
                         document.getElementById('simulasiNextToSelfie').classList.remove('hidden');
                     };
                     reader.readAsDataURL(blob);
@@ -414,7 +521,7 @@ function initSimulasi() {
                 .catch(err => {
                     alert('Gagal memuat gambar: ' + err.message);
                 });
-        }
+        });
     });
 }
 
@@ -425,14 +532,10 @@ function showSimulasiResult(imageBase64) {
     showSimulasiStep('result');
 
     const img = document.getElementById('simulasiResultImg');
-    const downloadBtn = document.getElementById('simulasiDownloadBtn');
-    const tryAgainBtn = document.getElementById('simulasiTryAgainBtn');
-    const doneBtn = document.getElementById('simulasiDoneBtn');
-
     if (img) img.src = `data:image/jpeg;base64,${imageBase64}`;
 
     // Download
-    downloadBtn?.addEventListener('click', function() {
+    document.getElementById('simulasiDownloadBtn')?.addEventListener('click', function() {
         const link = document.createElement('a');
         link.download = `simulasi-rambut-${simulasiState.modelNomor || 'custom'}.jpg`;
         link.href = `data:image/jpeg;base64,${imageBase64}`;
@@ -440,7 +543,7 @@ function showSimulasiResult(imageBase64) {
     });
 
     // Try Again
-    tryAgainBtn?.addEventListener('click', () => {
+    document.getElementById('simulasiTryAgainBtn')?.addEventListener('click', () => {
         showSimulasiStep('selfie');
         document.getElementById('simulasiSelfieInput').value = '';
         document.getElementById('simulasiSelfiePreview').classList.add('hidden');
@@ -450,13 +553,12 @@ function showSimulasiResult(imageBase64) {
         document.getElementById('simulasiGenerateBtn').disabled = true;
     });
 
-    // Done -> Back to menu
-    doneBtn?.addEventListener('click', () => {
+    // Done
+    document.getElementById('simulasiDoneBtn')?.addEventListener('click', () => {
         const menuContainer = document.getElementById('katalogMenuContainer');
         const simulasiView = document.getElementById('simulasiView');
         if (menuContainer) menuContainer.classList.remove('hidden');
         if (simulasiView) simulasiView.classList.add('hidden');
-        // Reset state
         simulasiState.step = 'select';
         simulasiState.resultImageBase64 = null;
         simulasiState.selfieBase64 = null;
@@ -464,6 +566,10 @@ function showSimulasiResult(imageBase64) {
         showSimulasiStep('select');
         document.getElementById('simulasiModelPreview').classList.add('hidden');
         document.getElementById('simulasiNextToSelfie').classList.add('hidden');
+        // Refresh katalog jika perlu
+        if (typeof loadKatalogCategory === 'function' && currentKatalogCategory) {
+            loadKatalogCategory(currentKatalogCategory);
+        }
     });
 }
 
@@ -471,8 +577,15 @@ function showSimulasiResult(imageBase64) {
 // INISIALISASI
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
-    // Tunggu katalog.js selesai render
-    setTimeout(initSimulasi, 500);
+    setTimeout(() => {
+        // Render view simulasi di container
+        const container = document.getElementById('simulasiContainer');
+        if (container) {
+            renderSimulasiView();
+        }
+        console.log('📁 Modul Simulasi Model Rambut siap digunakan!');
+    }, 500);
 });
 
-console.log('📁 Modul Simulasi Model Rambut siap digunakan!');
+// Export fungsi untuk dipanggil dari katalog.js
+window.openSimulasi = openSimulasi;
