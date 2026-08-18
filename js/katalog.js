@@ -1,5 +1,7 @@
 // Katalog Model Rambut - Babeh Barbershop
 // ============================================
+// DITAMBAHKAN: Fitur Simulasi Model Rambut dengan Nano Banana 2 Lite
+// ============================================
 
 let currentKatalogImages = [];
 let currentKatalogIndex = 0;
@@ -27,7 +29,7 @@ function renderKatalog(container) {
         </h2>
         <p class="text-gray-500">Inspirasi gaya rambut terbaru untuk Anda</p>
       </div>
-      
+
       <!-- Menu Kategori dengan Gambar (seperti index.html) -->
       <div id="katalogMenuContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto mt-6 mb-12">
         <!-- Best Haircut Card -->
@@ -41,7 +43,7 @@ function renderKatalog(container) {
             <p class="text-gray-500 mt-1">Koleksi model rambut favorit pelanggan</p>
           </div>
         </div>
-        
+
         <!-- Kids Haircut Card -->
         <div class="katalog-menu-card bg-white rounded-2xl shadow-xl overflow-hidden cursor-pointer transform transition hover:scale-[1.02] active:scale-95" data-cat="Kids Haircut">
           <div class="h-48 bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center overflow-hidden">
@@ -53,7 +55,7 @@ function renderKatalog(container) {
             <p class="text-gray-500 mt-1">Gaya rambut kekinian untuk si kecil</p>
           </div>
         </div>
-        
+
         <!-- All Collection Card -->
         <div class="katalog-menu-card bg-white rounded-2xl shadow-xl overflow-hidden cursor-pointer transform transition hover:scale-[1.02] active:scale-95" data-cat="All Collection">
           <div class="h-48 bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center overflow-hidden">
@@ -65,7 +67,7 @@ function renderKatalog(container) {
             <p class="text-gray-500 mt-1">Semua model rambut eksklusif</p>
           </div>
         </div>
-        
+
         <!-- Celebrity Haircut Card -->
         <div class="katalog-menu-card bg-white rounded-2xl shadow-xl overflow-hidden cursor-pointer transform transition hover:scale-[1.02] active:scale-95" data-cat="Celebrity Haircut">
           <div class="h-48 bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center overflow-hidden">
@@ -77,7 +79,7 @@ function renderKatalog(container) {
             <p class="text-gray-500 mt-1">Model rambut ala selebriti ternama</p>
           </div>
         </div>
-        
+
         <!-- Football Players Haircut Card -->
         <div class="katalog-menu-card bg-white rounded-2xl shadow-xl overflow-hidden cursor-pointer transform transition hover:scale-[1.02] active:scale-95" data-cat="Football Players Haircut">
           <div class="h-48 bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center overflow-hidden">
@@ -89,7 +91,7 @@ function renderKatalog(container) {
             <p class="text-gray-500 mt-1">Inspirasi gaya rambut pemain bola</p>
           </div>
         </div>
-        
+
         <!-- Other Service Card -->
         <div class="katalog-menu-card bg-white rounded-2xl shadow-xl overflow-hidden cursor-pointer transform transition hover:scale-[1.02] active:scale-95" data-cat="Other Service">
           <div class="h-48 bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center overflow-hidden">
@@ -101,27 +103,28 @@ function renderKatalog(container) {
             <p class="text-gray-500 mt-1">Layanan perawatan rambut lainnya</p>
           </div>
         </div>
-      </div>
 
-      <!-- CARD SIMULASI (TAMBAHKAN DI SINI) -->
-<div id="simulasiMenuCard" class="bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl shadow-xl overflow-hidden cursor-pointer transform transition hover:scale-[1.02] active:scale-95">
-    <div class="h-48 flex items-center justify-center">
-        <div class="text-center text-white">
-            <i class="fas fa-robot text-5xl mb-2"></i>
-            <p class="text-lg font-bold">🤖 Simulasi</p>
-            <p class="text-sm opacity-80">Model Rambut dengan AI</p>
+        <!-- ============ BARU: SIMULASI MODEL RAMBUT CARD ============ -->
+        <div id="simulasiMenuCard" class="bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl shadow-xl overflow-hidden cursor-pointer transform transition hover:scale-[1.02] active:scale-95">
+          <div class="h-48 flex items-center justify-center">
+            <div class="text-center text-white">
+              <i class="fas fa-robot text-5xl mb-2"></i>
+              <p class="text-lg font-bold">🤖 Simulasi</p>
+              <p class="text-sm opacity-80">Model Rambut dengan AI</p>
+            </div>
+          </div>
+          <div class="p-5 bg-white">
+            <h2 class="text-2xl font-bold text-slate-800">Simulasi Model Rambut</h2>
+            <p class="text-gray-500 mt-1">Coba model rambut dengan AI Nano Banana 2 Lite</p>
+            <span class="inline-block mt-2 bg-purple-100 text-purple-700 text-xs px-3 py-1 rounded-full">✨ NEW</span>
+          </div>
         </div>
-    </div>
-    <div class="p-5 bg-white">
-        <h2 class="text-2xl font-bold text-slate-800">Simulasi Model Rambut</h2>
-        <p class="text-gray-500 mt-1">Coba model rambut dengan AI Nano Banana 2 Lite</p>
-        <span class="inline-block mt-2 bg-purple-100 text-purple-700 text-xs px-3 py-1 rounded-full">✨ NEW</span>
-    </div>
-</div>
+        <!-- =========================================================== -->
+      </div>
 
       <!-- Gallery View (setelah klik menu) -->
       <div id="katalogGalleryView" class="hidden">
-        <div class="mb-5 flex items-center justify-between">
+        <div class="mb-5 flex items-center justify-between flex-wrap gap-2">
           <button id="katalogBackToMenuBtn" class="inline-flex items-center gap-2 px-4 py-2 bg-white/80 rounded-full shadow-md border border-gray-200 text-slate-700 font-medium active:scale-95 transition">
             <i class="fas fa-arrow-left"></i> Back to Menu
           </button>
@@ -131,7 +134,7 @@ function renderKatalog(container) {
       </div>
     </div>
   `;
-  
+
   // Tambahkan style
   if (!document.querySelector('#katalogStyle')) {
     const style = document.createElement('style');
@@ -179,7 +182,7 @@ function renderKatalog(container) {
     `;
     document.head.appendChild(style);
   }
-  
+
   // Event listener untuk menu card
   document.querySelectorAll('.katalog-menu-card').forEach(card => {
     card.addEventListener('click', () => {
@@ -187,15 +190,23 @@ function renderKatalog(container) {
       if (category) loadKatalogCategory(category);
     });
   });
-// Tambahkan di bagian event listener (setelah katalog-menu-card)
-document.getElementById('simulasiMenuCard')?.addEventListener('click', () => {
+
+  // ============ EVENT LISTENER CARD SIMULASI ============
+  document.getElementById('simulasiMenuCard')?.addEventListener('click', () => {
     if (typeof openSimulasi === 'function') {
-        openSimulasi();
+      // Sembunyikan menu dan gallery
+      const menuContainer = document.getElementById('katalogMenuContainer');
+      const galleryView = document.getElementById('katalogGalleryView');
+      if (menuContainer) menuContainer.classList.add('hidden');
+      if (galleryView) galleryView.classList.add('hidden');
+      openSimulasi();
     } else {
-        console.error('❌ Modul simulasi belum dimuat');
+      console.error('❌ Modul simulasi belum dimuat');
+      alert('Fitur simulasi sedang dimuat. Silakan refresh halaman.');
     }
-});
-  
+  });
+  // =======================================================
+
   // Event listener untuk tombol back
   const backBtn = document.getElementById('katalogBackToMenuBtn');
   if (backBtn) {
@@ -213,20 +224,20 @@ async function fetchKatalogModelsByCategory(kategori) {
     console.error('❌ Supabase client tidak tersedia');
     return [];
   }
-  
+
   try {
     console.log(`📋 Mengambil data katalog untuk kategori: ${kategori}`);
-    
+
     const { data, error } = await supabase
       .from(KATALOG_TABLE)
       .select('*')
       .eq('kategori', kategori);
-    
+
     if (error) {
       console.error('Error fetching from database:', error);
       return [];
     }
-    
+
     if (data && data.length > 0) {
       const sortedData = sortKatalogByNomor(data);
       console.log(`✅ Ditemukan ${sortedData.length} data untuk kategori ${kategori}`);
@@ -235,7 +246,7 @@ async function fetchKatalogModelsByCategory(kategori) {
       });
       return sortedData;
     }
-    
+
     console.log(`⚠️ Tidak ada data untuk kategori ${kategori}`);
     return [];
   } catch (err) {
@@ -250,7 +261,7 @@ function sortKatalogByNomor(data) {
     const nomorB = b.nomor || '';
     const matchA = nomorA.match(/^([A-Za-z]+)(\d+)$/);
     const matchB = nomorB.match(/^([A-Za-z]+)(\d+)$/);
-    
+
     if (matchA && matchB) {
       const hurufA = matchA[1];
       const hurufB = matchB[1];
@@ -272,12 +283,12 @@ async function loadKatalogCategory(category) {
   const galleryView = document.getElementById('katalogGalleryView');
   const galleryTitle = document.getElementById('katalogGalleryTitle');
   const imageGrid = document.getElementById('katalogImageGrid');
-  
+
   if (!menuContainer || !galleryView || !imageGrid) return;
-  
+
   // Tampilkan loading
   galleryTitle.innerText = `${category} ✂️`;
-  
+
   const images = await fetchKatalogModelsByCategory(category);
   currentKatalogImages = images.map(model => {
     let imageUrl = model.link_url_bucket;
@@ -289,7 +300,7 @@ async function loadKatalogCategory(category) {
           .getPublicUrl(imageUrl).data.publicUrl;
       }
     }
-    
+
     return {
       url: imageUrl,
       nomor: model.nomor || '???',
@@ -297,19 +308,23 @@ async function loadKatalogCategory(category) {
       informasi: model.informasi || 'Informasi belum tersedia'
     };
   });
-  
+
   renderKatalogGallery(currentKatalogImages);
-  
+
   // Sembunyikan menu, tampilkan gallery
   menuContainer.classList.add('hidden');
   galleryView.classList.remove('hidden');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+// ============================================
+// RENDER GALLERY (dengan tombol Simulasi AI)
+// ============================================
+
 function renderKatalogGallery(images) {
   const imageGrid = document.getElementById('katalogImageGrid');
   if (!imageGrid) return;
-  
+
   if (!images || images.length === 0) {
     imageGrid.innerHTML = `
       <div class="col-span-full text-center py-12 bg-white/50 rounded-2xl">
@@ -319,7 +334,7 @@ function renderKatalogGallery(images) {
       </div>`;
     return;
   }
-  
+
   imageGrid.innerHTML = images.map((item, idx) => `
     <div class="katalog-gallery-item relative overflow-hidden rounded-xl shadow-md bg-white aspect-square group cursor-pointer" data-img-index="${idx}">
       <img src="${item.url}" alt="${item.nama}" class="w-full h-full object-cover rounded-xl" loading="lazy" 
@@ -327,22 +342,77 @@ function renderKatalogGallery(images) {
       <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-3">
         <p class="text-white text-sm font-semibold truncate">${escapeKatalogHtml(item.nomor)} - ${escapeKatalogHtml(item.nama)}</p>
       </div>
+      <!-- ============ TOMBOL SIMULASI AI ============ -->
+      <div class="absolute top-2 right-2">
+        <button class="simulasi-from-gallery-btn bg-gradient-to-r from-purple-600 to-pink-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:opacity-90 active:scale-95 transition shadow-lg"
+                data-nomor="${escapeKatalogHtml(item.nomor)}" 
+                data-nama="${escapeKatalogHtml(item.nama)}" 
+                data-url="${item.url}">
+          <i class="fas fa-wand-magic-sparkles mr-1"></i> Simulasi AI
+        </button>
+      </div>
+      <!-- ============================================ -->
     </div>
   `).join('');
-  
-  // Event klik untuk setiap gambar
+
+  // Event klik untuk setiap gambar (fullscreen)
   document.querySelectorAll('.katalog-gallery-item').forEach(item => {
     item.addEventListener('click', (e) => {
+      // Jangan trigger jika klik tombol simulasi
+      if (e.target.closest('.simulasi-from-gallery-btn')) return;
       const index = parseInt(item.getAttribute('data-img-index'));
       if (!isNaN(index)) openKatalogFullscreen(index);
     });
   });
+
+  // ============ EVENT LISTENER TOMBOL SIMULASI ============
+  document.querySelectorAll('.simulasi-from-gallery-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const url = this.dataset.url;
+      const nama = this.dataset.nama;
+      const nomor = this.dataset.nomor;
+
+      if (typeof openSimulasi === 'function') {
+        // Sembunyikan menu dan gallery
+        const menuContainer = document.getElementById('katalogMenuContainer');
+        const galleryView = document.getElementById('katalogGalleryView');
+        if (menuContainer) menuContainer.classList.add('hidden');
+        if (galleryView) galleryView.classList.add('hidden');
+
+        // Ambil base64 dari URL
+        fetch(url)
+          .then(res => res.blob())
+          .then(blob => {
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+              const dataUrl = ev.target.result;
+              const base64 = dataUrl.split(',')[1];
+              openSimulasi({
+                url: dataUrl,
+                nama: `${nomor} - ${nama}`,
+                base64: base64,
+                nomor: nomor
+              });
+            };
+            reader.readAsDataURL(blob);
+          })
+          .catch(err => {
+            alert('Gagal memuat gambar: ' + err.message);
+          });
+      } else {
+        console.error('❌ Modul simulasi belum dimuat');
+        alert('Fitur simulasi sedang dimuat. Silakan refresh halaman.');
+      }
+    });
+  });
+  // ========================================================
 }
 
 function backToKatalogMenu() {
   const menuContainer = document.getElementById('katalogMenuContainer');
   const galleryView = document.getElementById('katalogGalleryView');
-  
+
   if (menuContainer && galleryView) {
     galleryView.classList.add('hidden');
     menuContainer.classList.remove('hidden');
@@ -359,31 +429,31 @@ function escapeKatalogHtml(text) {
 }
 
 // ============================================
-// FUNGSI FULLSCREEN (dengan Informasi seperti index.html)
+// FUNGSI FULLSCREEN (dengan Informasi)
 // ============================================
 
 function openKatalogFullscreen(index) {
   if (!currentKatalogImages.length) return;
   currentKatalogIndex = index;
   const item = currentKatalogImages[currentKatalogIndex];
-  
+
   // Buat modal jika belum ada
   if (!document.getElementById('katalogFullscreenModal')) {
     createKatalogFullscreenModal();
   }
-  
+
   // Update konten modal
   const img = document.getElementById('katalogFullscreenImg');
   const name = document.getElementById('katalogFullscreenName');
   const counter = document.getElementById('katalogImageCounter');
-  
+
   if (img) img.src = item.url;
   if (name) name.innerText = `${item.nomor} - ${item.nama}`;
   if (counter) counter.innerText = `${index + 1} / ${currentKatalogImages.length}`;
-  
+
   // Simpan info untuk tombol informasi
   currentKatalogInfo = item;
-  
+
   const modal = document.getElementById('katalogFullscreenModal');
   if (modal) {
     modal.classList.remove('hidden');
@@ -393,7 +463,7 @@ function openKatalogFullscreen(index) {
 
 function createKatalogFullscreenModal() {
   if (document.getElementById('katalogFullscreenModal')) return;
-  
+
   const modalHTML = `
     <div id="katalogFullscreenModal" class="fixed inset-0 z-50 hidden fullscreen-overlay">
       <!-- Tombol atas -->
@@ -408,11 +478,11 @@ function createKatalogFullscreenModal() {
           <i class="fas fa-times text-xl"></i>
         </button>
       </div>
-      
+
       <!-- Gambar Fullscreen -->
       <div class="w-full h-full flex flex-col items-center justify-center relative">
         <img id="katalogFullscreenImg" class="max-w-[90%] max-h-[65vh] object-contain rounded-xl shadow-2xl" src="" alt="Fullscreen">
-        
+
         <!-- Nama Model di Fullscreen -->
         <div class="mt-6 text-center">
           <div id="katalogFullscreenName" class="text-white text-xl md:text-2xl font-bold bg-black/50 px-6 py-2 rounded-full backdrop-blur-sm inline-block">
@@ -425,17 +495,7 @@ function createKatalogFullscreenModal() {
             </button>
           </div>
         </div>
-        
-// Di dalam renderKatalogGallery(), setelah tombol info
-<div class="mt-3 flex gap-2">
-    <button class="simulasi-from-gallery-btn bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:opacity-90 active:scale-95 transition" 
-            data-nomor="${item.nomor}" 
-            data-nama="${item.nama}" 
-            data-url="${item.url}">
-        <i class="fas fa-wand-magic-sparkles mr-1"></i> Simulasi AI
-    </button>
-</div>
-        
+
         <!-- Tombol navigasi -->
         <button id="katalogPrevImageBtn" class="absolute left-3 md:left-6 nav-btn text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg">
           <i class="fas fa-chevron-left text-2xl"></i>
@@ -444,13 +504,13 @@ function createKatalogFullscreenModal() {
           <i class="fas fa-chevron-right text-2xl"></i>
         </button>
       </div>
-      
+
       <!-- Indikator -->
       <div class="absolute bottom-5 left-0 right-0 text-center text-white/80 text-sm">
         <span id="katalogImageCounter">0 / 0</span> &nbsp;|&nbsp; Geser atau tekan tombol
       </div>
     </div>
-    
+
     <!-- Modal Informasi (seperti index.html) -->
     <div id="katalogInfoModal" class="fixed inset-0 z-60 hidden bg-black/70 flex items-center justify-center p-4" style="z-index: 60;">
       <div class="bg-white rounded-2xl max-w-md w-full p-6 info-modal">
@@ -483,9 +543,9 @@ function createKatalogFullscreenModal() {
       </div>
     </div>
   `;
-  
+
   document.body.insertAdjacentHTML('beforeend', modalHTML);
-  
+
   // Style untuk nav-btn dan info-link
   if (!document.querySelector('#katalogNavStyle')) {
     const navStyle = document.createElement('style');
@@ -524,18 +584,18 @@ function createKatalogFullscreenModal() {
     `;
     document.head.appendChild(navStyle);
   }
-  
+
   // Event Listeners
   document.getElementById('katalogCloseFullscreenBtn')?.addEventListener('click', closeKatalogFullscreen);
   document.getElementById('katalogCloseFullscreenXBtn')?.addEventListener('click', closeKatalogFullscreen);
   document.getElementById('katalogPrevImageBtn')?.addEventListener('click', katalogPrevImage);
   document.getElementById('katalogNextImageBtn')?.addEventListener('click', katalogNextImage);
   document.getElementById('katalogInfoButtonFullscreen')?.addEventListener('click', showKatalogInfo);
-  
+
   // Close info modal
   document.getElementById('katalogCloseInfoModal')?.addEventListener('click', closeKatalogInfoModal);
   document.getElementById('katalogCloseInfoModalBtn')?.addEventListener('click', closeKatalogInfoModal);
-  
+
   // Touch swipe
   let touchStartX = 0;
   const modal = document.getElementById('katalogFullscreenModal');
@@ -547,7 +607,7 @@ function createKatalogFullscreenModal() {
     if (touchEndX < touchStartX - 50) katalogNextImage();
     else if (touchEndX > touchStartX + 50) katalogPrevImage();
   });
-  
+
   // Keyboard navigation
   document.addEventListener('keydown', (e) => {
     if (!modal?.classList.contains('hidden')) {
@@ -583,15 +643,15 @@ function katalogNextImage() {
   if (!currentKatalogImages.length) return;
   currentKatalogIndex = (currentKatalogIndex + 1) % currentKatalogImages.length;
   const item = currentKatalogImages[currentKatalogIndex];
-  
+
   const img = document.getElementById('katalogFullscreenImg');
   const name = document.getElementById('katalogFullscreenName');
   const counter = document.getElementById('katalogImageCounter');
-  
+
   if (img) img.src = item.url;
   if (name) name.innerText = `${item.nomor} - ${item.nama}`;
   if (counter) counter.innerText = `${currentKatalogIndex + 1} / ${currentKatalogImages.length}`;
-  
+
   currentKatalogInfo = item;
 }
 
@@ -599,15 +659,15 @@ function katalogPrevImage() {
   if (!currentKatalogImages.length) return;
   currentKatalogIndex = (currentKatalogIndex - 1 + currentKatalogImages.length) % currentKatalogImages.length;
   const item = currentKatalogImages[currentKatalogIndex];
-  
+
   const img = document.getElementById('katalogFullscreenImg');
   const name = document.getElementById('katalogFullscreenName');
   const counter = document.getElementById('katalogImageCounter');
-  
+
   if (img) img.src = item.url;
   if (name) name.innerText = `${item.nomor} - ${item.nama}`;
   if (counter) counter.innerText = `${currentKatalogIndex + 1} / ${currentKatalogImages.length}`;
-  
+
   currentKatalogInfo = item;
 }
 
