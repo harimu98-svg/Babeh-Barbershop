@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
   <title>Babeh Barbershop - Professional Barber Services</title>
-  
+
   <!-- Favicon -->
   <link rel="icon" type="image/jpeg" href="images/logohitam512.png">
-  
+
   <!-- TailwindCSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Load Supabase Library FIRST -->
@@ -16,20 +16,20 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  
+
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
-    
+
     body {
       font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
       background: linear-gradient(145deg, #f8fafc 0%, #f1f5f9 100%);
       min-height: 100vh;
     }
-    
+
     /* Menu Button Styles */
     .menu-btn {
       padding: 10px 20px;
@@ -45,25 +45,25 @@
       align-items: center;
       gap: 8px;
     }
-    
+
     .menu-btn:hover {
       background: rgba(255, 255, 255, 0.3);
       transform: translateY(-2px);
     }
-    
+
     .menu-btn.active {
       background: white;
       color: #7e22ce;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     }
-    
+
     /* Content Container */
     .content-container {
       min-height: calc(100vh - 80px);
       padding: 24px;
       animation: fadeIn 0.5s ease;
     }
-    
+
     @keyframes fadeIn {
       from {
         opacity: 0;
@@ -74,63 +74,63 @@
         transform: translateY(0);
       }
     }
-    
+
     /* Card Styles */
     .service-card {
       transition: all 0.3s ease;
       cursor: pointer;
     }
-    
+
     .service-card:hover {
       transform: translateY(-5px);
       box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
     }
-    
+
     .service-card:active {
       transform: scale(0.98);
     }
-    
+
     /* Gallery Item */
     .gallery-item {
       transition: transform 0.2s ease, box-shadow 0.2s ease;
       cursor: pointer;
     }
-    
+
     .gallery-item:active {
       transform: scale(0.98);
     }
-    
+
     /* Fullscreen Overlay */
     .fullscreen-overlay {
       background-color: rgba(0, 0, 0, 0.95);
       backdrop-filter: blur(12px);
     }
-    
+
     /* Scrollbar */
     .gallery-scroll {
       scrollbar-width: thin;
       scrollbar-color: #cbd5e1 #f1f5f9;
     }
-    
+
     .gallery-scroll::-webkit-scrollbar {
       width: 4px;
       height: 4px;
     }
-    
+
     .gallery-scroll::-webkit-scrollbar-track {
       background: #f1f5f9;
       border-radius: 10px;
     }
-    
+
     .gallery-scroll::-webkit-scrollbar-thumb {
       background: #cbd5e1;
       border-radius: 10px;
     }
-    
+
     body.no-scroll {
       overflow: hidden;
     }
-    
+
     /* Responsive */
     @media (max-width: 768px) {
       .menu-btn {
@@ -141,7 +141,7 @@
         padding: 16px;
       }
     }
-    
+
     /* Mobile Menu */
     .mobile-menu {
       position: fixed;
@@ -155,11 +155,11 @@
       padding: 20px;
       box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
     }
-    
+
     .mobile-menu.open {
       left: 0;
     }
-    
+
     .mobile-menu .mobile-menu-btn {
       display: block;
       width: 100%;
@@ -174,13 +174,13 @@
       font-weight: 500;
       transition: all 0.2s;
     }
-    
+
     .mobile-menu .mobile-menu-btn:hover,
     .mobile-menu .mobile-menu-btn.active {
       background: white;
       color: #7e22ce;
     }
-    
+
     .overlay {
       position: fixed;
       top: 0;
@@ -191,7 +191,7 @@
       z-index: 999;
       display: none;
     }
-    
+
     .overlay.show {
       display: block;
     }
@@ -201,14 +201,51 @@
       transition: all 0.3s ease;
       cursor: pointer;
     }
-    
+
     .outlet-card:hover {
       transform: translateY(-5px);
       box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
     }
-    
+
     .outlet-card:active {
       transform: scale(0.98);
+    }
+
+    /* ===== SIMULASI STYLES ===== */
+    .simulasi-katalog-item {
+      transition: all 0.2s ease;
+    }
+
+    .simulasi-katalog-item:hover {
+      transform: scale(1.02);
+    }
+
+    .simulasi-upload-area {
+      border: 2px dashed #d1d5db;
+      transition: all 0.3s ease;
+    }
+
+    .simulasi-upload-area:hover {
+      border-color: #a855f7;
+      background: rgba(168, 85, 247, 0.05);
+    }
+
+    .simulasi-progress-bar {
+      transition: width 0.5s ease;
+    }
+
+    /* Animasi spin untuk loading */
+    @keyframes spin-slow {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .animate-spin-slow {
+      animation: spin-slow 1.5s linear infinite;
     }
   </style>
 </head>
@@ -230,12 +267,12 @@
               <p class="text-xs text-purple-200">Professional Barber Services</p>
             </div>
           </div>
-          
+
           <!-- Mobile Menu Button -->
           <button id="mobileMenuBtn" class="text-white text-2xl md:hidden">
             <i class="fas fa-bars"></i>
           </button>
-          
+
           <!-- Desktop Menu -->
           <div class="hidden md:flex space-x-2 flex-wrap gap-2" id="desktopMenu">
             <button class="menu-btn active" data-menu="tentang-kami">
@@ -257,7 +294,7 @@
               <i class="fas fa-store-alt mr-1"></i> Outlet
             </button>
             <button class="menu-btn" data-menu="membercard">
-            <i class="fas fa-id-card mr-1"></i> Membercard & Promo
+              <i class="fas fa-id-card mr-1"></i> Membercard & Promo
             </button>
             <button class="menu-btn" data-menu="lowongan">
               <i class="fas fa-briefcase mr-1"></i> Lowongan
@@ -297,8 +334,8 @@
         <i class="fas fa-store-alt mr-2"></i> Outlet
       </button>
       <button class="mobile-menu-btn" data-menu="membercard">
-  <i class="fas fa-id-card mr-2"></i> Membercard & Promo
-</button>
+        <i class="fas fa-id-card mr-2"></i> Membercard & Promo
+      </button>
       <button class="mobile-menu-btn" data-menu="lowongan">
         <i class="fas fa-briefcase mr-2"></i> Lowongan
       </button>
@@ -306,7 +343,7 @@
         <i class="fab fa-whatsapp mr-2"></i> Chat Admin
       </button>
     </div>
-    
+
     <div class="overlay" id="overlay"></div>
 
     <!-- Main Content -->
@@ -332,7 +369,7 @@
           <i class="fas fa-times text-xl"></i>
         </button>
       </div>
-      
+
       <div class="w-full h-full flex flex-col items-center justify-center relative">
         <img id="fullscreenImg" class="max-w-[90%] max-h-[75vh] object-contain rounded-xl shadow-2xl" src="" alt="Fullscreen">
         <div id="fullscreenName" class="mt-4 text-white text-xl font-bold bg-black/50 px-6 py-2 rounded-full backdrop-blur-sm">-</div>
@@ -347,6 +384,12 @@
         <span id="imageCounter">0 / 0</span>
       </div>
     </div>
+
+    <!-- ===== SIMULASI VIEW CONTAINER ===== -->
+    <div id="simulasiView" class="hidden max-w-4xl mx-auto px-4">
+      <div id="simulasiContainer"></div>
+    </div>
+    <!-- ================================== -->
   </div>
 
   <!-- Load JavaScript Modules -->
@@ -361,12 +404,13 @@
   <script src="js/chat-admin.js"></script>
   <script src="js/membercard.js"></script>
   <script src="js/simulasi.js"></script>
+
   <script>
     // Main Controller
     (function() {
       // State
       let currentMenu = 'tentang-kami';
-      
+
       // DOM Elements
       const mainContent = document.getElementById('mainContent');
       const desktopMenuBtns = document.querySelectorAll('#desktopMenu .menu-btn');
@@ -375,11 +419,11 @@
       const mobileMenuBtn = document.getElementById('mobileMenuBtn');
       const closeMobileMenu = document.getElementById('closeMobileMenu');
       const overlay = document.getElementById('overlay');
-      
+
       // Fungsi untuk load konten dari module yang sudah di-load
       function loadContent(menu) {
         currentMenu = menu;
-        
+
         // Update active class di desktop menu
         desktopMenuBtns.forEach(btn => {
           if (btn.getAttribute('data-menu') === menu) {
@@ -388,7 +432,7 @@
             btn.classList.remove('active');
           }
         });
-        
+
         // Update active class di mobile menu
         mobileMenuBtns.forEach(btn => {
           if (btn.getAttribute('data-menu') === menu) {
@@ -397,7 +441,7 @@
             btn.classList.remove('active');
           }
         });
-        
+
         // Panggil fungsi render dari module yang sesuai
         if (menu === 'tentang-kami' && typeof renderTentangKami === 'function') {
           renderTentangKami(mainContent);
@@ -415,9 +459,9 @@
           renderLowongan(mainContent);
         } else if (menu === 'chat' && typeof renderChat === 'function') {
           renderChat(mainContent);
-          } else if (menu === 'membercard' && typeof renderMembercard === 'function') {
-      renderMembercard(mainContent);
-             } else {
+        } else if (menu === 'membercard' && typeof renderMembercard === 'function') {
+          renderMembercard(mainContent);
+        } else {
           mainContent.innerHTML = `
             <div class="max-w-6xl mx-auto text-center py-20">
               <div class="bg-white rounded-2xl shadow-xl p-12">
@@ -428,21 +472,21 @@
             </div>
           `;
         }
-        
+
         // Tutup mobile menu jika terbuka
         closeMobileMenuPanel();
       }
-      
+
       function closeMobileMenuPanel() {
         mobileMenu.classList.remove('open');
         overlay.classList.remove('show');
       }
-      
+
       function openMobileMenuPanel() {
         mobileMenu.classList.add('open');
         overlay.classList.add('show');
       }
-      
+
       // Event Listeners
       desktopMenuBtns.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -450,7 +494,7 @@
           if (menu) loadContent(menu);
         });
       });
-      
+
       mobileMenuBtns.forEach(btn => {
         btn.addEventListener('click', () => {
           const menu = btn.getAttribute('data-menu');
@@ -460,14 +504,14 @@
           }
         });
       });
-      
+
       mobileMenuBtn.addEventListener('click', openMobileMenuPanel);
       closeMobileMenu.addEventListener('click', closeMobileMenuPanel);
       overlay.addEventListener('click', closeMobileMenuPanel);
-      
+
       // Load default menu
       loadContent('tentang-kami');
-      
+
       console.log('🚀 Babeh Barbershop App Ready!');
       console.log('📋 Menu tersedia:', Array.from(desktopMenuBtns).map(b => b.dataset.menu));
     })();
