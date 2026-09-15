@@ -103,23 +103,6 @@ function renderKatalog(container) {
             <p class="text-gray-500 mt-1">Layanan perawatan rambut lainnya</p>
           </div>
         </div>
-
-        <!-- ============ BARU: SIMULASI MODEL RAMBUT CARD ============ -->
-        <div id="simulasiMenuCard" class="bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl shadow-xl overflow-hidden cursor-pointer transform transition hover:scale-[1.02] active:scale-95">
-          <div class="h-48 flex items-center justify-center">
-            <div class="text-center text-white">
-              <i class="fas fa-robot text-5xl mb-2"></i>
-              <p class="text-lg font-bold">🤖 Simulasi</p>
-              <p class="text-sm opacity-80">Model Rambut dengan AI</p>
-            </div>
-          </div>
-          <div class="p-5 bg-white">
-            <h2 class="text-2xl font-bold text-slate-800">Simulasi Model Rambut</h2>
-            <p class="text-gray-500 mt-1">Coba model rambut dengan AI Nano Banana 2 Lite</p>
-            <span class="inline-block mt-2 bg-purple-100 text-purple-700 text-xs px-3 py-1 rounded-full">✨ NEW</span>
-          </div>
-        </div>
-        <!-- =========================================================== -->
       </div>
 
       <!-- Gallery View (setelah klik menu) -->
@@ -191,23 +174,7 @@ function renderKatalog(container) {
     });
   });
 
-  // ============ EVENT LISTENER CARD SIMULASI ============
-  document.getElementById('simulasiMenuCard')?.addEventListener('click', () => {
-    if (typeof openSimulasi === 'function') {
-      // Sembunyikan menu dan gallery
-      const menuContainer = document.getElementById('katalogMenuContainer');
-      const galleryView = document.getElementById('katalogGalleryView');
-      if (menuContainer) menuContainer.classList.add('hidden');
-      if (galleryView) galleryView.classList.add('hidden');
-      openSimulasi();
-    } else {
-      console.error('❌ Modul simulasi belum dimuat');
-      alert('Fitur simulasi sedang dimuat. Silakan refresh halaman.');
-    }
-  });
-  // =======================================================
-
-  // Event listener untuk tombol back
+   // Event listener untuk tombol back
   const backBtn = document.getElementById('katalogBackToMenuBtn');
   if (backBtn) {
     backBtn.addEventListener('click', backToKatalogMenu);
