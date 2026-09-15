@@ -1,22 +1,18 @@
 // ============================================================
-// NETLIFY FUNCTION - NANO BANANA 2 LITE
-// TANPA DEPENDENCIES (pakai fetch native)
+// NETLIFY FUNCTION - NANO BANANA 2 LITE (1 SUDUT: DEPAN)
 // ============================================================
 
 exports.handler = async (event) => {
-    // CORS headers
     const headers = {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': 'Content-Type',
         'Access-Control-Allow-Methods': 'POST, OPTIONS',
     };
 
-    // Handle preflight (OPTIONS)
     if (event.httpMethod === 'OPTIONS') {
         return { statusCode: 204, headers };
     }
 
-    // Hanya terima POST
     if (event.httpMethod !== 'POST') {
         return {
             statusCode: 405,
@@ -28,7 +24,6 @@ exports.handler = async (event) => {
     try {
         const { selfieBase64, modelBase64, modelName } = JSON.parse(event.body);
 
-        // Validasi input
         if (!selfieBase64 || !modelBase64) {
             return {
                 statusCode: 400,
@@ -37,7 +32,6 @@ exports.handler = async (event) => {
             };
         }
 
-        // Ambil API key dari environment variable
         const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
         if (!GEMINI_API_KEY) {
@@ -45,7 +39,7 @@ exports.handler = async (event) => {
                 statusCode: 500,
                 headers,
                 body: JSON.stringify({
-                    error: 'GEMINI_API_KEY tidak ditemukan. Set di Netlify Environment Variables.'
+                    error: 'GEMINI_API_KEY tidak ditemukan.'
                 })
             };
         }
@@ -56,13 +50,18 @@ exports.handler = async (event) => {
         const prompt = `
         Ubah rambut pada foto pertama (selfie) dengan gaya rambut dari foto kedua (model ${modelName || 'rambut'}).
 
-        BUATKAN 3 SUDUT PANDANG DALAM 1 GAMBAR:
-        - Kiri: Tampak DEPAN
-        - Tengah: Tampak SAMPING KANAN  
-        - Kanan: Tampak BELAKANG
+        PENTING:
+        - Tampilkan HANYA TAMPAK DEPAN (front view, wajah menghadap kamera langsung)
+        - JANGAN buat multi-panel, JANGAN buat kolase, JANGAN buat sudut samping atau belakang
+        - Hanya SATU gambar tunggal
 
-        Setiap sudut harus menunjukkan orang yang SAMA dengan RAMBUT BARU.
-        Pertahankan ekspresi wajah, warna kulit, dan gaya foto yang natural.
+        PERTAHANKAN dengan sangat ketat:
+        - Wajah, ekspresi, bentuk wajah, warna kulit yang SAMA PERSIS
+        - Ukuran wajah dan posisi kepala SAMA PERSIS seperti foto asli
+        - Zoom, framing, dan komposisi SAMA PERSIS
+        - Background dan pencahayaan SAMA PERSIS
+
+        HANYA ubah rambutnya saja sesuai model dari foto kedua.
         Hasil harus NATURAL dan REALISTIS seperti foto asli.
         `;
 
@@ -75,14 +74,13 @@ exports.handler = async (event) => {
                 ]
             }],
             generationConfig: {
-                temperature: 0.4,
+                temperature: 0.3,
                 maxOutputTokens: 4096,
             }
         };
 
-        console.log('📤 Mengirim ke Nano Banana 2 Lite...');
+        console.log('📤 Mengirim ke Nano Banana (1 sudut depan)...');
 
-        // PAKAI FETCH NATIVE (Node.js 18+)
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -93,7 +91,7 @@ exports.handler = async (event) => {
 
         if (!response.ok) {
             const errorMsg = data.error?.message || `HTTP ${response.status}`;
-            console.error('❌ Error:', errorMsg);
+            console.error('❌ Nano Banana Error:', errorMsg);
             return {
                 statusCode: response.status,
                 headers,
@@ -101,7 +99,7 @@ exports.handler = async (event) => {
             };
         }
 
-        console.log('✅ Response diterima');
+        console.log('✅ Nano Banana Response diterima');
 
         return {
             statusCode: 200,
@@ -110,7 +108,7 @@ exports.handler = async (event) => {
         };
 
     } catch (error) {
-        console.error('❌ Server Error:', error.message);
+        console.error('❌ Nano Banana Server Error:', error.message);
         return {
             statusCode: 500,
             headers,
