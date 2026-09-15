@@ -1,8 +1,8 @@
 // ============================================================
 // SIMULASI.JS - BABEH BARBERSHOP
-// Fitur Simulasi Model Rambut dengan Fallback:
-//   1. SenseNova U1.5 Lite (gratis, dicoba dulu)
-//   2. Nano Banana 2 Lite (berbayar, fallback)
+// Fitur Simulasi Model Rambut dengan Before/After Slider
+// Prioritas: SenseNova (gratis) → fallback Nano Banana
+// Output: 1 sudut (tampak depan) saja
 // ============================================================
 
 // ============================================================
@@ -12,14 +12,40 @@ const simulasiState = {
     isProcessing: false,
     selfieBase64: null,
     selfieDataUrl: null,
+    selfieNormalized: null,   // versi 1:1 untuk slider
     modelBase64: null,
     modelDataUrl: null,
     modelName: null,
     modelNomor: null,
     resultImageBase64: null,
+    resultNormalized: null,   // versi 1:1 untuk slider
     usedProvider: null,
     step: 'select'
 };
+
+// ============================================================
+// NORMALISASI GAMBAR KE 1:1 (untuk slider before/after)
+// ============================================================
+function normalizeToSquare(dataUrl, size = 800) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+            const s = Math.min(img.naturalWidth, img.naturalHeight);
+            const sx = (img.naturalWidth - s) / 2;
+            const sy = (img.naturalHeight - s) / 2;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, sx, sy, s, s, 0, 0, size, size);
+            resolve(canvas.toDataURL('image/jpeg', 0.9));
+        };
+        img.onerror = reject;
+        img.src = dataUrl;
+    });
+}
 
 // ============================================================
 // RENDER VIEW SIMULASI
@@ -109,23 +135,31 @@ function renderSimulasiView() {
             <div class="mt-4 w-full bg-gray-200 rounded-full h-2 max-w-md mx-auto">
                 <div id="simulasiProgressBar" class="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
             </div>
-            <p class="text-gray-400 text-sm mt-2">3 sudut pandang (depan, samping, belakang) dalam 1 gambar</p>
+            <p class="text-gray-400 text-sm mt-2">Tampak depan · 1 gambar</p>
             <div id="simulasiDebugInfo" class="mt-4 text-left bg-black/5 p-4 rounded-xl text-xs text-gray-600 max-h-40 overflow-auto hidden"></div>
         </div>
 
-        <!-- STEP 4: HASIL -->
+        <!-- STEP 4: HASIL (Before/After Slider) -->
         <div id="simulasiStepResult" class="hidden bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg">
-            <h3 class="text-xl font-bold text-slate-800 mb-4 text-center">
+            <h3 class="text-xl font-bold text-slate-800 mb-2 text-center">
                 <i class="fas fa-check-circle text-green-500 mr-2"></i>Hasil Simulasi
             </h3>
-            <div class="flex justify-center">
-                <img id="simulasiResultImg" class="max-w-full max-h-[60vh] rounded-xl shadow-lg" />
-            </div>
-            <div class="text-center text-sm text-gray-500 mt-3">
-                <i class="fas fa-info-circle mr-1"></i> 3 sudut pandang: Depan · Samping · Belakang
+            <p class="text-center text-sm text-gray-500 mb-4">
+                Geser untuk membandingkan sebelum &amp; sesudah
                 <span id="simulasiProviderBadge" class="ml-2 text-xs bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full"></span>
+            </p>
+
+            <!-- Before/After Slider -->
+            <div class="ba-wrap" id="simulasiBaWrap">
+                <img id="simulasiImgBefore" class="ba-before" alt="Sebelum">
+                <img id="simulasiImgAfter" class="ba-after" alt="Sesudah">
+                <div class="ba-label before">SEBELUM</div>
+                <div class="ba-label after">SESUDAH</div>
+                <div class="ba-divider" id="simulasiBaDivider"></div>
+                <div class="ba-handle" id="simulasiBaHandle">⇔</div>
             </div>
-            <div class="flex flex-wrap gap-3 mt-4 justify-center">
+
+            <div class="flex flex-wrap gap-3 mt-5 justify-center">
                 <button id="simulasiDownloadBtn" class="px-6 py-2 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 transition active:scale-95">
                     <i class="fas fa-download mr-2"></i>Simpan
                 </button>
@@ -138,6 +172,91 @@ function renderSimulasiView() {
             </div>
         </div>
     `;
+
+    // Tambahkan style untuk slider (sekali saja)
+    if (!document.querySelector('#simulasiSliderStyle')) {
+        const style = document.createElement('style');
+        style.id = 'simulasiSliderStyle';
+        style.textContent = `
+            .ba-wrap {
+                position: relative;
+                width: 100%;
+                max-width: 500px;
+                margin: 0 auto;
+                border-radius: 12px;
+                overflow: hidden;
+                background: #eee;
+                aspect-ratio: 1 / 1;
+                user-select: none;
+                touch-action: none;
+            }
+            .ba-wrap img {
+                position: absolute;
+                top: 0; left: 0;
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+                pointer-events: none;
+            }
+            .ba-after {
+                clip-path: inset(0 0 0 100%);
+            }
+            .ba-wrap.animating .ba-after {
+                transition: clip-path 2.5s ease-in-out;
+            }
+            .ba-divider {
+                position: absolute;
+                top: 0; bottom: 0;
+                width: 3px;
+                background: #fff;
+                left: 100%;
+                transform: translateX(-50%);
+                box-shadow: 0 0 8px rgba(0,0,0,0.4);
+                pointer-events: none;
+            }
+            .ba-wrap.animating .ba-divider {
+                transition: left 2.5s ease-in-out;
+            }
+            .ba-handle {
+                position: absolute;
+                top: 50%;
+                left: 100%;
+                transform: translate(-50%, -50%);
+                width: 44px;
+                height: 44px;
+                border-radius: 50%;
+                background: #fff;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                cursor: grab;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 18px;
+                color: #333;
+                z-index: 2;
+            }
+            .ba-wrap.animating .ba-handle {
+                transition: left 2.5s ease-in-out;
+            }
+            .ba-handle:active { cursor: grabbing; }
+            .ba-label {
+                position: absolute;
+                top: 12px;
+                padding: 4px 10px;
+                background: rgba(0,0,0,0.55);
+                color: #fff;
+                font-size: 12px;
+                font-weight: 600;
+                border-radius: 6px;
+                letter-spacing: 0.5px;
+                z-index: 3;
+            }
+            .ba-label.before { left: 12px; }
+            .ba-label.after { right: 12px; }
+        `;
+        document.head.appendChild(style);
+    }
 }
 
 // ============================================================
@@ -163,7 +282,7 @@ function showSimulasiStep(step) {
 }
 
 // ============================================================
-// TAMPILKAN PREVIEW MODEL
+// PREVIEW MODEL
 // ============================================================
 function showSimulasiModelPreview(url, name) {
     const container = document.getElementById('simulasiModelPreview');
@@ -238,7 +357,7 @@ function renderSimulasiKatalog(images) {
 }
 
 // ============================================================
-// BUKA SIMULASI (DIPANGGIL DARI TOMBOL KATALOG)
+// BUKA SIMULASI
 // ============================================================
 function openSimulasi(selectedModel = null) {
     const menuContainer = document.getElementById('katalogMenuContainer');
@@ -259,13 +378,14 @@ function openSimulasi(selectedModel = null) {
     }
 
     simulasiView.classList.remove('hidden');
-
     renderSimulasiView();
 
     simulasiState.step = 'select';
     simulasiState.selfieBase64 = null;
     simulasiState.selfieDataUrl = null;
+    simulasiState.selfieNormalized = null;
     simulasiState.resultImageBase64 = null;
+    simulasiState.resultNormalized = null;
     simulasiState.usedProvider = null;
 
     if (selectedModel) {
@@ -282,12 +402,11 @@ function openSimulasi(selectedModel = null) {
     }
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
-
     initSimulasiEvents();
 }
 
 // ============================================================
-// INIT EVENT LISTENER SIMULASI
+// INIT EVENT LISTENER
 // ============================================================
 function initSimulasiEvents() {
     // === BACK TO SELECT ===
@@ -402,22 +521,30 @@ function initSimulasiEvents() {
     });
 
     // === UPLOAD SELFIE ===
-    document.getElementById('simulasiSelfieInput')?.addEventListener('change', function(e) {
+    document.getElementById('simulasiSelfieInput')?.addEventListener('change', async function(e) {
         const file = e.target.files[0];
         if (!file) return;
 
         const reader = new FileReader();
-        reader.onload = (ev) => {
+        reader.onload = async (ev) => {
             const dataUrl = ev.target.result;
             const base64 = dataUrl.split(',')[1];
 
             simulasiState.selfieDataUrl = dataUrl;
             simulasiState.selfieBase64 = base64;
 
+            // Normalisasi untuk slider before/after
+            try {
+                simulasiState.selfieNormalized = await normalizeToSquare(dataUrl);
+            } catch (e) {
+                console.warn('Gagal normalisasi selfie:', e);
+                simulasiState.selfieNormalized = dataUrl;
+            }
+
             const preview = document.getElementById('simulasiSelfiePreview');
             const nameEl = document.getElementById('simulasiSelfieName');
             if (preview) {
-                preview.src = dataUrl;
+                preview.src = simulasiState.selfieNormalized;
                 preview.classList.remove('hidden');
             }
             if (nameEl) nameEl.textContent = `✅ ${file.name}`;
@@ -434,7 +561,6 @@ function initSimulasiEvents() {
             return;
         }
 
-        // Pastikan modelBase64 tersedia
         if (!simulasiState.modelBase64 && simulasiState.modelDataUrl) {
             try {
                 const response = await fetch(simulasiState.modelDataUrl);
@@ -461,9 +587,7 @@ function initSimulasiEvents() {
         let imageBase64 = null;
         let usedProvider = null;
 
-        // ============================================================
-        // PERCOBAAN 1: SENSENOVA (GRATIS)
-        // ============================================================
+        // === PERCOBAAN 1: SENSENOVA (GRATIS) ===
         try {
             statusEl.textContent = 'Mencoba dengan SenseNova (gratis)...';
             progressEl.style.width = '10%';
@@ -490,7 +614,6 @@ function initSimulasiEvents() {
             const data = await response.json();
             console.log('📥 SenseNova response:', JSON.stringify(data).substring(0, 300));
 
-            // Parse response SenseNova: { data: [{ b64_json: "..." }] }
             if (data.data && data.data[0]) {
                 if (data.data[0].b64_json) {
                     imageBase64 = data.data[0].b64_json;
@@ -517,14 +640,12 @@ function initSimulasiEvents() {
             if (debugEl) debugEl.textContent += `\n❌ SenseNova gagal: ${err.message}`;
         }
 
-        // ============================================================
-        // PERCOBAAN 2: NANO BANANA (FALLBACK, BERBAYAR)
-        // ============================================================
+        // === PERCOBAAN 2: NANO BANANA (FALLBACK) ===
         if (!imageBase64) {
             try {
                 statusEl.textContent = 'SenseNova gagal, mencoba Nano Banana...';
                 progressEl.style.width = '60%';
-                if (debugEl) debugEl.textContent += '\n📤 [2/2] Mengirim ke Nano Banana (berbayar)...';
+                if (debugEl) debugEl.textContent += '\n📤 [2/2] Mengirim ke Nano Banana...';
 
                 const response = await fetch('/.netlify/functions/nano-banana', {
                     method: 'POST',
@@ -544,7 +665,6 @@ function initSimulasiEvents() {
                 const data = await response.json();
                 console.log('📥 Nano Banana response:', JSON.stringify(data).substring(0, 300));
 
-                // Parse response Gemini: { candidates: [{ content: { parts: [{ inlineData: { data } }] } }] }
                 const parts = data.candidates?.[0]?.content?.parts;
                 if (parts) {
                     for (const part of parts) {
@@ -568,9 +688,7 @@ function initSimulasiEvents() {
             }
         }
 
-        // ============================================================
-        // HASIL AKHIR
-        // ============================================================
+        // === HASIL AKHIR ===
         if (!imageBase64) {
             statusEl.textContent = 'Gagal - kedua provider error';
             alert('Gagal generate: SenseNova dan Nano Banana sama-sama gagal. Coba lagi nanti.');
@@ -584,37 +702,113 @@ function initSimulasiEvents() {
 
         simulasiState.resultImageBase64 = imageBase64;
         simulasiState.usedProvider = usedProvider;
-        showSimulasiResult(imageBase64);
+
+        // Normalisasi hasil untuk slider
+        try {
+            const resultDataUrl = `data:image/jpeg;base64,${imageBase64}`;
+            simulasiState.resultNormalized = await normalizeToSquare(resultDataUrl);
+        } catch (e) {
+            console.warn('Gagal normalisasi hasil:', e);
+            simulasiState.resultNormalized = `data:image/jpeg;base64,${imageBase64}`;
+        }
+
+        showSimulasiResult();
     });
 }
 
 // ============================================================
-// TAMPILKAN HASIL (GAMBAR)
+// TAMPILKAN HASIL (Before/After Slider)
 // ============================================================
-function showSimulasiResult(imageBase64) {
+function showSimulasiResult() {
     showSimulasiStep('result');
 
-    const img = document.getElementById('simulasiResultImg');
-    if (img) {
-        img.style.display = '';
-        img.src = `data:image/jpeg;base64,${imageBase64}`;
-    }
+    const imgBefore = document.getElementById('simulasiImgBefore');
+    const imgAfter = document.getElementById('simulasiImgAfter');
+    const baWrap = document.getElementById('simulasiBaWrap');
+    const divider = document.getElementById('simulasiBaDivider');
+    const handle = document.getElementById('simulasiBaHandle');
 
-    // Tampilkan badge provider
+    // Badge provider
     const badge = document.getElementById('simulasiProviderBadge');
     if (badge && simulasiState.usedProvider) {
         badge.textContent = simulasiState.usedProvider;
     }
 
-    // Download
+    // Set gambar
+    imgBefore.src = simulasiState.selfieNormalized;
+    imgAfter.src = simulasiState.resultNormalized;
+
+    // === SLIDER LOGIC ===
+    let sliderPos = 100;   // 0 = sesudah full, 100 = sebelum full
+    let isDragging = false;
+
+    function setSlider(pct) {
+        sliderPos = Math.max(0, Math.min(100, pct));
+        imgAfter.style.clipPath = `inset(0 0 0 ${sliderPos}%)`;
+        divider.style.left = sliderPos + '%';
+        handle.style.left = sliderPos + '%';
+    }
+
+    // Set awal: full SEBELUM
+    baWrap.classList.remove('animating');
+    setSlider(100);
+
+    // Mouse events
+    baWrap.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        baWrap.classList.remove('animating');
+        updateFromEvent(e);
+    });
+    window.addEventListener('mousemove', (e) => {
+        if (isDragging) updateFromEvent(e);
+    });
+    window.addEventListener('mouseup', () => { isDragging = false; });
+
+    // Touch events
+    baWrap.addEventListener('touchstart', (e) => {
+        isDragging = true;
+        baWrap.classList.remove('animating');
+        updateFromEvent(e.touches[0]);
+    }, { passive: true });
+    window.addEventListener('touchmove', (e) => {
+        if (isDragging) updateFromEvent(e.touches[0]);
+    }, { passive: true });
+    window.addEventListener('touchend', () => { isDragging = false; });
+
+    function updateFromEvent(e) {
+        const rect = baWrap.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        // Swipe kanan → tampil SESUDAH (slider ke 0)
+        // Swipe kiri → tampil SEBELUM (slider ke 100)
+        const pct = (1 - x / rect.width) * 100;
+        setSlider(pct);
+    }
+
+    // Tunggu kedua gambar load, lalu animasi smooth
+    let loaded = 0;
+    const onLoaded = () => {
+        loaded++;
+        if (loaded === 2) {
+            // Force reflow
+            void baWrap.offsetWidth;
+            // Animasi otomatis dari before → after
+            setTimeout(() => {
+                baWrap.classList.add('animating');
+                requestAnimationFrame(() => setSlider(0));
+            }, 300);
+        }
+    };
+    imgBefore.onload = onLoaded;
+    imgAfter.onload = onLoaded;
+
+    // === TOMBOL ===
     document.getElementById('simulasiDownloadBtn')?.addEventListener('click', function() {
         const link = document.createElement('a');
         link.download = `simulasi-rambut-${simulasiState.modelNomor || 'custom'}.jpg`;
-        link.href = `data:image/jpeg;base64,${imageBase64}`;
+        link.href = `data:image/jpeg;base64,${simulasiState.resultImageBase64}`;
         link.click();
     });
 
-    // Try Again
     document.getElementById('simulasiTryAgainBtn')?.addEventListener('click', () => {
         showSimulasiStep('selfie');
         document.getElementById('simulasiSelfieInput').value = '';
@@ -622,10 +816,10 @@ function showSimulasiResult(imageBase64) {
         document.getElementById('simulasiSelfieName').textContent = '';
         simulasiState.selfieBase64 = null;
         simulasiState.selfieDataUrl = null;
+        simulasiState.selfieNormalized = null;
         document.getElementById('simulasiGenerateBtn').disabled = true;
     });
 
-    // Done
     document.getElementById('simulasiDoneBtn')?.addEventListener('click', () => {
         const menuContainer = document.getElementById('katalogMenuContainer');
         const simulasiView = document.getElementById('simulasiView');
@@ -633,8 +827,10 @@ function showSimulasiResult(imageBase64) {
         if (simulasiView) simulasiView.classList.add('hidden');
         simulasiState.step = 'select';
         simulasiState.resultImageBase64 = null;
+        simulasiState.resultNormalized = null;
         simulasiState.selfieBase64 = null;
         simulasiState.selfieDataUrl = null;
+        simulasiState.selfieNormalized = null;
         showSimulasiStep('select');
         document.getElementById('simulasiModelPreview')?.classList.add('hidden');
         document.getElementById('simulasiNextToSelfie')?.classList.add('hidden');
@@ -642,56 +838,8 @@ function showSimulasiResult(imageBase64) {
 }
 
 // ============================================================
-// TAMPILKAN HASIL TEKS (FALLBACK)
-// ============================================================
-function showTextResult(text) {
-    showSimulasiStep('result');
-
-    const img = document.getElementById('simulasiResultImg');
-    if (img) img.style.display = 'none';
-
-    const infoEl = document.getElementById('simulasiResultInfo') || document.createElement('div');
-    infoEl.id = 'simulasiResultInfo';
-    infoEl.className = 'text-left text-gray-700 bg-gray-50 p-4 rounded-xl max-h-96 overflow-auto whitespace-pre-wrap';
-    infoEl.textContent = text;
-
-    const resultCard = document.querySelector('#simulasiStepResult .flex.justify-center');
-    if (resultCard) {
-        resultCard.innerHTML = '';
-        resultCard.appendChild(infoEl);
-    }
-
-    document.getElementById('simulasiDownloadBtn')?.addEventListener('click', function() {
-        const link = document.createElement('a');
-        link.download = `simulasi-analisis.txt`;
-        link.href = `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`;
-        link.click();
-    });
-
-    document.getElementById('simulasiTryAgainBtn')?.addEventListener('click', () => {
-        showSimulasiStep('selfie');
-        document.getElementById('simulasiSelfieInput').value = '';
-        document.getElementById('simulasiSelfiePreview')?.classList.add('hidden');
-        document.getElementById('simulasiSelfieName').textContent = '';
-        simulasiState.selfieBase64 = null;
-        simulasiState.selfieDataUrl = null;
-        document.getElementById('simulasiGenerateBtn').disabled = true;
-    });
-
-    document.getElementById('simulasiDoneBtn')?.addEventListener('click', () => {
-        const menuContainer = document.getElementById('katalogMenuContainer');
-        const simulasiView = document.getElementById('simulasiView');
-        if (menuContainer) menuContainer.classList.remove('hidden');
-        if (simulasiView) simulasiView.classList.add('hidden');
-        showSimulasiStep('select');
-        document.getElementById('simulasiModelPreview')?.classList.add('hidden');
-        document.getElementById('simulasiNextToSelfie')?.classList.add('hidden');
-    });
-}
-
-// ============================================================
-// EXPORT KE GLOBAL SCOPE
+// EXPORT
 // ============================================================
 window.openSimulasi = openSimulasi;
 
-console.log('📁 Modul Simulasi Model Rambut siap digunakan! (dengan fallback SenseNova → Nano Banana)');
+console.log('📁 Modul Simulasi (1 sudut, before/after slider) siap!');
