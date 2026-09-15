@@ -1,7 +1,11 @@
 // ============================================================
-// SIMULASI.JS - BABEH BARBERSHOP (VERSI FIX)
+// SIMULASI.JS - BABEH BARBERSHOP
+// Fitur Simulasi Model Rambut dengan Nano Banana 2 Lite
 // ============================================================
 
+// ============================================================
+// STATE SIMULASI
+// ============================================================
 const simulasiState = {
     isProcessing: false,
     selfieBase64: null,
@@ -133,50 +137,8 @@ function renderSimulasiView() {
 }
 
 // ============================================================
-// BUKA SIMULASI
+// TAMPILKAN STEP
 // ============================================================
-function openSimulasi(selectedModel = null) {
-    const menuContainer = document.getElementById('katalogMenuContainer');
-    const galleryView = document.getElementById('katalogGalleryView');
-    let simulasiView = document.getElementById('simulasiView');
-
-    if (!simulasiView) {
-        const parent = document.querySelector('.max-w-7xl.mx-auto') || document.body;
-        const div = document.createElement('div');
-        div.id = 'simulasiView';
-        div.className = 'hidden max-w-4xl mx-auto px-4';
-        div.innerHTML = '<div id="simulasiContainer"></div>';
-        parent.appendChild(div);
-        simulasiView = div;
-    }
-
-    if (menuContainer) menuContainer.classList.add('hidden');
-    if (galleryView) galleryView.classList.add('hidden');
-    if (simulasiView) simulasiView.classList.remove('hidden');
-
-    renderSimulasiView();
-
-    simulasiState.step = 'select';
-    simulasiState.selfieBase64 = null;
-    simulasiState.selfieDataUrl = null;
-
-    if (selectedModel) {
-        simulasiState.modelDataUrl = selectedModel.url;
-        simulasiState.modelBase64 = selectedModel.base64 || null;
-        simulasiState.modelName = selectedModel.nama;
-        simulasiState.modelNomor = selectedModel.nomor;
-        showSimulasiStep('select');
-        showSimulasiModelPreview(selectedModel.url, selectedModel.nama);
-        document.getElementById('simulasiNextToSelfie')?.classList.remove('hidden');
-    } else {
-        showSimulasiStep('select');
-        document.getElementById('simulasiNextToSelfie')?.classList.add('hidden');
-    }
-
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    initSimulasiEvents();
-}
-
 function showSimulasiStep(step) {
     const steps = ['simulasiStepSelect', 'simulasiStepSelfie', 'simulasiStepGenerating', 'simulasiStepResult'];
     const stepMap = {
@@ -185,15 +147,20 @@ function showSimulasiStep(step) {
         'generating': 'simulasiStepGenerating',
         'result': 'simulasiStepResult'
     };
-    
+
     steps.forEach(id => {
         const el = document.getElementById(id);
         if (el) {
             el.classList.toggle('hidden', id !== stepMap[step]);
         }
     });
+
+    simulasiState.step = step;
 }
 
+// ============================================================
+// TAMPILKAN PREVIEW MODEL
+// ============================================================
 function showSimulasiModelPreview(url, name) {
     const container = document.getElementById('simulasiModelPreview');
     const img = document.getElementById('simulasiModelPreviewImg');
@@ -206,6 +173,9 @@ function showSimulasiModelPreview(url, name) {
     }
 }
 
+// ============================================================
+// RENDER KATALOG UNTUK SIMULASI
+// ============================================================
 function renderSimulasiKatalog(images) {
     const grid = document.getElementById('simulasiKatalogGrid');
     if (!grid) return;
@@ -264,13 +234,69 @@ function renderSimulasiKatalog(images) {
 }
 
 // ============================================================
-// INIT SIMULASI EVENTS (DIPERBAIKI)
+// BUKA SIMULASI (DIPANGGIL DARI TOMBOL KATALOG)
+// ============================================================
+function openSimulasi(selectedModel = null) {
+    // Sembunyikan menu dan gallery katalog
+    const menuContainer = document.getElementById('katalogMenuContainer');
+    const galleryView = document.getElementById('katalogGalleryView');
+
+    if (menuContainer) menuContainer.classList.add('hidden');
+    if (galleryView) galleryView.classList.add('hidden');
+
+    // Cari atau buat container simulasiView
+    let simulasiView = document.getElementById('simulasiView');
+    if (!simulasiView) {
+        const parent = document.querySelector('.max-w-7xl.mx-auto') || document.body;
+        const div = document.createElement('div');
+        div.id = 'simulasiView';
+        div.className = 'hidden max-w-4xl mx-auto px-4';
+        div.innerHTML = '<div id="simulasiContainer"></div>';
+        parent.appendChild(div);
+        simulasiView = div;
+    }
+
+    // Tampilkan view simulasi
+    simulasiView.classList.remove('hidden');
+
+    // Render view
+    renderSimulasiView();
+
+    // Reset state
+    simulasiState.step = 'select';
+    simulasiState.selfieBase64 = null;
+    simulasiState.selfieDataUrl = null;
+
+    // Set model jika ada
+    if (selectedModel) {
+        simulasiState.modelDataUrl = selectedModel.url;
+        simulasiState.modelBase64 = selectedModel.base64 || null;
+        simulasiState.modelName = selectedModel.nama;
+        simulasiState.modelNomor = selectedModel.nomor;
+        showSimulasiStep('select');
+        showSimulasiModelPreview(selectedModel.url, selectedModel.nama);
+        document.getElementById('simulasiNextToSelfie')?.classList.remove('hidden');
+    } else {
+        showSimulasiStep('select');
+        document.getElementById('simulasiNextToSelfie')?.classList.add('hidden');
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Pasang event listener
+    initSimulasiEvents();
+}
+
+// ============================================================
+// INIT EVENT LISTENER SIMULASI
 // ============================================================
 function initSimulasiEvents() {
+    // === BACK TO SELECT ===
     document.getElementById('simulasiBackToSelect')?.addEventListener('click', () => {
         showSimulasiStep('select');
     });
 
+    // === NEXT TO SELFIE ===
     document.getElementById('simulasiNextToSelfie')?.addEventListener('click', () => {
         if (!simulasiState.modelDataUrl) {
             alert('Silakan pilih model rambut terlebih dahulu!');
@@ -280,6 +306,7 @@ function initSimulasiEvents() {
         document.getElementById('simulasiGenerateBtn').disabled = true;
     });
 
+    // === PILIH DARI KATALOG ===
     document.getElementById('simulasiPilihDariKatalog')?.addEventListener('click', async () => {
         const grid = document.getElementById('simulasiKatalogGrid');
         const uploadArea = document.getElementById('simulasiUploadArea');
@@ -321,6 +348,7 @@ function initSimulasiEvents() {
         }
     });
 
+    // === UPLOAD MODEL SENDIRI ===
     document.getElementById('simulasiUploadModel')?.addEventListener('click', () => {
         const grid = document.getElementById('simulasiKatalogGrid');
         const uploadArea = document.getElementById('simulasiUploadArea');
@@ -333,6 +361,7 @@ function initSimulasiEvents() {
         });
     });
 
+    // === UPLOAD MODEL INPUT ===
     document.getElementById('simulasiUploadInput')?.addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (!file) return;
@@ -361,6 +390,7 @@ function initSimulasiEvents() {
         reader.readAsDataURL(file);
     });
 
+    // === GANTI MODEL ===
     document.getElementById('simulasiChangeModel')?.addEventListener('click', () => {
         document.getElementById('simulasiModelPreview')?.classList.add('hidden');
         document.getElementById('simulasiNextToSelfie')?.classList.add('hidden');
@@ -372,6 +402,7 @@ function initSimulasiEvents() {
         simulasiState.modelName = null;
     });
 
+    // === UPLOAD SELFIE ===
     document.getElementById('simulasiSelfieInput')?.addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (!file) return;
@@ -397,15 +428,14 @@ function initSimulasiEvents() {
         reader.readAsDataURL(file);
     });
 
-    // ============================================================
-    // GENERATE - SEKARANG DI DALAM initSimulasiEvents()
-    // ============================================================
+    // === TOMBOL GENERATE ===
     document.getElementById('simulasiGenerateBtn')?.addEventListener('click', async () => {
         if (!simulasiState.selfieBase64 || !simulasiState.modelDataUrl) {
             alert('Pastikan foto selfie dan model rambut sudah diupload!');
             return;
         }
 
+        // Pastikan modelBase64 tersedia
         if (!simulasiState.modelBase64 && simulasiState.modelDataUrl) {
             try {
                 const response = await fetch(simulasiState.modelDataUrl);
@@ -423,6 +453,7 @@ function initSimulasiEvents() {
         }
 
         showSimulasiStep('generating');
+
         const statusEl = document.getElementById('simulasiGeneratingStatus');
         const progressEl = document.getElementById('simulasiProgressBar');
         const debugEl = document.getElementById('simulasiDebugInfo');
@@ -461,7 +492,7 @@ function initSimulasiEvents() {
             statusEl.textContent = 'Memproses hasil AI...';
             progressEl.style.width = '80%';
 
-            // Ekstrak gambar
+            // === EKSTRAK GAMBAR ===
             let imageBase64 = null;
 
             const parts = data.candidates?.[0]?.content?.parts;
@@ -480,7 +511,7 @@ function initSimulasiEvents() {
             }
 
             if (!imageBase64) {
-                const textResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || 
+                const textResponse = data.candidates?.[0]?.content?.parts?.[0]?.text ||
                                     JSON.stringify(data, null, 2);
                 showTextResult(textResponse);
                 return;
@@ -501,9 +532,7 @@ function initSimulasiEvents() {
             showSimulasiStep('selfie');
         }
     });
-    // ============================================================
 }
-// ← INI PENUTUP initSimulasiEvents() YANG BENAR
 
 // ============================================================
 // TAMPILKAN HASIL (GAMBAR)
@@ -514,6 +543,7 @@ function showSimulasiResult(imageBase64) {
     const img = document.getElementById('simulasiResultImg');
     if (img) img.src = `data:image/jpeg;base64,${imageBase64}`;
 
+    // Download
     document.getElementById('simulasiDownloadBtn')?.addEventListener('click', function() {
         const link = document.createElement('a');
         link.download = `simulasi-rambut-${simulasiState.modelNomor || 'custom'}.jpg`;
@@ -521,6 +551,7 @@ function showSimulasiResult(imageBase64) {
         link.click();
     });
 
+    // Try Again
     document.getElementById('simulasiTryAgainBtn')?.addEventListener('click', () => {
         showSimulasiStep('selfie');
         document.getElementById('simulasiSelfieInput').value = '';
@@ -531,6 +562,7 @@ function showSimulasiResult(imageBase64) {
         document.getElementById('simulasiGenerateBtn').disabled = true;
     });
 
+    // Done
     document.getElementById('simulasiDoneBtn')?.addEventListener('click', () => {
         const menuContainer = document.getElementById('katalogMenuContainer');
         const simulasiView = document.getElementById('simulasiView');
@@ -595,16 +627,8 @@ function showTextResult(text) {
 }
 
 // ============================================================
-// INISIALISASI
+// EXPORT KE GLOBAL SCOPE
 // ============================================================
-document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => {
-        const container = document.getElementById('simulasiContainer');
-        if (container) {
-            renderSimulasiView();
-        }
-        console.log('📁 Modul Simulasi Model Rambut siap digunakan!');
-    }, 500);
-});
-
 window.openSimulasi = openSimulasi;
+
+console.log('📁 Modul Simulasi Model Rambut siap digunakan!');
