@@ -171,7 +171,7 @@ function renderSimulasiView() {
                     <i class="fas fa-check mr-2"></i>Selesai
                 </button>
             </div>
-             <p class="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4 text-left leading-relaxed">
+             <p class="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4 mt-4 text-left leading-relaxed">
                 <i class="fas fa-exclamation-triangle mr-1"></i>
                 <strong>Disclaimer:</strong> Simulasi AI hanya prediksi untuk memberikan gambaran model rambut, hasil potongan bisa berbeda tergantung jenis dan kondisi rambut, bentuk wajah, dan faktor lainnya.
             </p>
