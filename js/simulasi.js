@@ -428,7 +428,7 @@ function initSimulasiEvents() {
         reader.readAsDataURL(file);
     });
 
-    // === TOMBOL GENERATE ===
+        // === TOMBOL GENERATE ===
     document.getElementById('simulasiGenerateBtn')?.addEventListener('click', async () => {
         if (!simulasiState.selfieBase64 || !simulasiState.modelDataUrl) {
             alert('Pastikan foto selfie dan model rambut sudah diupload!');
@@ -459,12 +459,18 @@ function initSimulasiEvents() {
         const debugEl = document.getElementById('simulasiDebugInfo');
         if (debugEl) debugEl.classList.remove('hidden');
 
-        statusEl.textContent = 'Mengirim request ke AI...';
-        progressEl.style.width = '10%';
-        if (debugEl) debugEl.textContent = '📤 Mengirim ke Netlify Function...';
+        let imageBase64 = null;
+        let usedProvider = null;
 
+        // ============================================================
+        // PERCOBAAN 1: SENSENOVA (GRATIS)
+        // ============================================================
         try {
-            const response = await fetch('/.netlify/functions/nano-banana', {
+            statusEl.textContent = 'Mencoba dengan SenseNova (gratis)...';
+            progressEl.style.width = '10%';
+            if (debugEl) debugEl.textContent = '📤 [1/2] Mengirim ke SenseNova...';
+
+            const response = await fetch('/.netlify/functions/sensenova', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -474,66 +480,114 @@ function initSimulasiEvents() {
                 })
             });
 
-            statusEl.textContent = 'Menunggu response dari AI...';
-            progressEl.style.width = '50%';
-
             if (!response.ok) {
                 const errorText = await response.text();
                 throw new Error(`HTTP ${response.status}: ${errorText.substring(0, 100)}`);
             }
 
+            statusEl.textContent = 'Memproses hasil SenseNova...';
+            progressEl.style.width = '50%';
+
             const data = await response.json();
-            console.log('📥 FULL RESPONSE:', JSON.stringify(data, null, 2));
+            console.log('📥 SenseNova response:', JSON.stringify(data).substring(0, 300));
 
-            if (debugEl) {
-                debugEl.textContent = `📥 Response diterima (${JSON.stringify(data).length} karakter)`;
-            }
-
-            statusEl.textContent = 'Memproses hasil AI...';
-            progressEl.style.width = '80%';
-
-            // === EKSTRAK GAMBAR ===
-            let imageBase64 = null;
-
-            const parts = data.candidates?.[0]?.content?.parts;
-            if (parts) {
-                for (const part of parts) {
-                    if (part.inlineData && part.inlineData.data) {
-                        imageBase64 = part.inlineData.data;
-                        console.log('✅ Gambar ditemukan di inlineData!');
-                        break;
-                    }
+            // Parse response SenseNova: { data: [{ b64_json: "..." }] }
+            if (data.data && data.data[0]) {
+                if (data.data[0].b64_json) {
+                    imageBase64 = data.data[0].b64_json;
+                } else if (data.data[0].url) {
+                    // Kalau URL, fetch dulu jadi base64
+                    const imgRes = await fetch(data.data[0].url);
+                    const imgBlob = await imgRes.blob();
+                    const reader = new FileReader();
+                    imageBase64 = await new Promise((resolve) => {
+                        reader.onload = () => resolve(reader.result.split(',')[1]);
+                        reader.readAsDataURL(imgBlob);
+                    });
                 }
             }
 
-            if (!imageBase64 && data.image) {
-                imageBase64 = data.image;
+            if (imageBase64) {
+                usedProvider = 'SenseNova';
+                console.log('✅ Berhasil dengan SenseNova (gratis)');
+            } else {
+                throw new Error('SenseNova tidak mengembalikan gambar');
             }
 
-            if (!imageBase64) {
-                const textResponse = data.candidates?.[0]?.content?.parts?.[0]?.text ||
-                                    JSON.stringify(data, null, 2);
-                showTextResult(textResponse);
-                return;
-            }
-
-            progressEl.style.width = '100%';
-            statusEl.textContent = 'Selesai!';
-
-            simulasiState.resultImageBase64 = imageBase64;
-            showSimulasiResult(imageBase64);
-
-        } catch (error) {
-            console.error('❌ Error:', error);
-            if (debugEl) {
-                debugEl.textContent += `\n\n❌ Error: ${error.message}`;
-            }
-            alert('Gagal generate: ' + error.message);
-            showSimulasiStep('selfie');
+        } catch (err) {
+            console.warn('❌ SenseNova gagal:', err.message);
+            if (debugEl) debugEl.textContent += `\n❌ SenseNova gagal: ${err.message}`;
         }
-    });
-}
 
+        // ============================================================
+        // PERCOBAAN 2: NANO BANANA (BERBAYAR) - FALLBACK
+        // ============================================================
+        if (!imageBase64) {
+            try {
+                statusEl.textContent = 'SenseNova gagal, mencoba Nano Banana...';
+                progressEl.style.width = '60%';
+                if (debugEl) debugEl.textContent += '\n📤 [2/2] Mengirim ke Nano Banana (berbayar)...';
+
+                const response = await fetch('/.netlify/functions/nano-banana', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        selfieBase64: simulasiState.selfieBase64,
+                        modelBase64: simulasiState.modelBase64,
+                        modelName: simulasiState.modelName || 'Model Rambut'
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText.substring(0, 100)}`);
+                }
+
+                const data = await response.json();
+                console.log('📥 Nano Banana response:', JSON.stringify(data).substring(0, 300));
+
+                // Parse response Gemini: { candidates: [{ content: { parts: [{ inlineData: { data } }] } }] }
+                const parts = data.candidates?.[0]?.content?.parts;
+                if (parts) {
+                    for (const part of parts) {
+                        if (part.inlineData && part.inlineData.data) {
+                            imageBase64 = part.inlineData.data;
+                            break;
+                        }
+                    }
+                }
+
+                if (imageBase64) {
+                    usedProvider = 'Nano Banana';
+                    console.log('✅ Berhasil dengan Nano Banana (fallback)');
+                } else {
+                    throw new Error('Nano Banana tidak mengembalikan gambar');
+                }
+
+            } catch (err) {
+                console.error('❌ Nano Banana gagal:', err.message);
+                if (debugEl) debugEl.textContent += `\n❌ Nano Banana gagal: ${err.message}`;
+            }
+        }
+
+        // ============================================================
+        // HASIL AKHIR
+        // ============================================================
+        if (!imageBase64) {
+            statusEl.textContent = 'Gagal - kedua provider error';
+            alert('Gagal generate: SenseNova dan Nano Banana sama-sama gagal. Coba lagi nanti.');
+            showSimulasiStep('selfie');
+            return;
+        }
+
+        progressEl.style.width = '100%';
+        statusEl.textContent = `Selesai! (${usedProvider})`;
+        if (debugEl) debugEl.textContent += `\n\n✅ Berhasil via ${usedProvider}`;
+
+        simulasiState.resultImageBase64 = imageBase64;
+        simulasiState.usedProvider = usedProvider;
+        showSimulasiResult(imageBase64);
+    });
 // ============================================================
 // TAMPILKAN HASIL (GAMBAR)
 // ============================================================
