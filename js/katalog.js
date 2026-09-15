@@ -30,7 +30,7 @@ function renderKatalog(container) {
         <p class="text-gray-500">Inspirasi gaya rambut terbaru untuk Anda</p>
         <p class="text-purple-600 mt-2 text-sm md:text-base inline-flex items-center gap-2 bg-purple-50 px-4 py-2 rounded-full">
           <i class="fas fa-wand-magic-sparkles"></i>
-          Gunakan Fitur Simulasi AI untuk memprediksi Model Rambut Pilihan Anda
+          Gunakan fitur simulasi AI untuk memprediksi model rambut pilihan anda
         </p>
       </div>
 
