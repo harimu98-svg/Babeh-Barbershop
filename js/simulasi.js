@@ -531,38 +531,6 @@ document.getElementById('simulasiGenerateBtn')?.addEventListener('click', async 
     }
 });
 
-    // === TOMBOL DARI GALLERY ===
-    document.querySelectorAll('.simulasi-from-gallery-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            const url = this.dataset.url;
-            const nama = this.dataset.nama;
-            const nomor = this.dataset.nomor;
-
-            fetch(url)
-                .then(res => res.blob())
-                .then(blob => {
-                    const reader = new FileReader();
-                    reader.onload = (ev) => {
-                        const dataUrl = ev.target.result;
-                        const base64 = dataUrl.split(',')[1];
-                        simulasiState.modelDataUrl = dataUrl;
-                        simulasiState.modelBase64 = base64;
-                        simulasiState.modelName = nama;
-                        simulasiState.modelNomor = nomor;
-
-                        openSimulasi({ url: dataUrl, nama: `${nomor} - ${nama}`, base64: base64, nomor: nomor });
-                        document.getElementById('simulasiNextToSelfie')?.classList.remove('hidden');
-                    };
-                    reader.readAsDataURL(blob);
-                })
-                .catch(err => {
-                    alert('Gagal memuat gambar: ' + err.message);
-                });
-        });
-    });
-}
-
 // ============================================================
 // TAMPILKAN HASIL (GAMBAR)
 // ============================================================
