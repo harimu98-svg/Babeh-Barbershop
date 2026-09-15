@@ -1,5 +1,5 @@
 // ============================================================
-// SIMULASI.JS - BABEH BARBERSHOP (VERSI DEBUG)
+// SIMULASI.JS - BABEH BARBERSHOP (VERSI FIX)
 // ============================================================
 
 const simulasiState = {
@@ -263,6 +263,9 @@ function renderSimulasiKatalog(images) {
     });
 }
 
+// ============================================================
+// INIT SIMULASI EVENTS (DIPERBAIKI)
+// ============================================================
 function initSimulasiEvents() {
     document.getElementById('simulasiBackToSelect')?.addEventListener('click', () => {
         showSimulasiStep('select');
@@ -395,141 +398,112 @@ function initSimulasiEvents() {
     });
 
     // ============================================================
-// GENERATE - VERSI DENGAN EKSTRAKSI GAMBAR YANG BENAR
-// ============================================================
-document.getElementById('simulasiGenerateBtn')?.addEventListener('click', async () => {
-    if (!simulasiState.selfieBase64 || !simulasiState.modelDataUrl) {
-        alert('Pastikan foto selfie dan model rambut sudah diupload!');
-        return;
-    }
-
-    if (!simulasiState.modelBase64 && simulasiState.modelDataUrl) {
-        try {
-            const response = await fetch(simulasiState.modelDataUrl);
-            const blob = await response.blob();
-            const reader = new FileReader();
-            const base64 = await new Promise((resolve) => {
-                reader.onload = () => resolve(reader.result.split(',')[1]);
-                reader.readAsDataURL(blob);
-            });
-            simulasiState.modelBase64 = base64;
-        } catch (e) {
-            alert('Gagal memproses gambar model: ' + e.message);
-            return;
-        }
-    }
-
-    showSimulasiStep('generating');
-    const statusEl = document.getElementById('simulasiGeneratingStatus');
-    const progressEl = document.getElementById('simulasiProgressBar');
-    const debugEl = document.getElementById('simulasiDebugInfo');
-    if (debugEl) debugEl.classList.remove('hidden');
-
-    statusEl.textContent = 'Mengirim request ke AI...';
-    progressEl.style.width = '10%';
-    if (debugEl) debugEl.textContent = '📤 Mengirim ke Netlify Function...';
-
-    try {
-        const response = await fetch('/.netlify/functions/nano-banana', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                selfieBase64: simulasiState.selfieBase64,
-                modelBase64: simulasiState.modelBase64,
-                modelName: simulasiState.modelName || 'Model Rambut'
-            })
-        });
-
-        statusEl.textContent = 'Menunggu response dari AI...';
-        progressEl.style.width = '50%';
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`HTTP ${response.status}: ${errorText.substring(0, 100)}`);
-        }
-
-        const data = await response.json();
-        console.log('📥 FULL RESPONSE:', JSON.stringify(data, null, 2));
-
-        if (debugEl) {
-            debugEl.textContent = `📥 Response diterima (${JSON.stringify(data).length} karakter)`;
-        }
-
-        statusEl.textContent = 'Memproses hasil AI...';
-        progressEl.style.width = '80%';
-
-        // ============================================================
-        // 🔥 CARA EKSTRAK GAMBAR YANG BENAR 🔥
-        // ============================================================
-        let imageBase64 = null;
-
-        // Cari inlineData di parts (INI YANG PALING UMUM)
-        const parts = data.candidates?.[0]?.content?.parts;
-        if (parts) {
-            for (const part of parts) {
-                if (part.inlineData && part.inlineData.data) {
-                    imageBase64 = part.inlineData.data;
-                    console.log('✅ Gambar ditemukan di inlineData!');
-                    console.log('📏 Panjang base64:', imageBase64.length);
-                    break;
-                }
-            }
-        }
-
-        // Jika masih null, coba cara lain
-        if (!imageBase64) {
-            // Coba cari di text
-            const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-            if (text) {
-                const base64Match = text.match(/data:image\/[^;]+;base64,([A-Za-z0-9+/=]+)/);
-                if (base64Match) {
-                    imageBase64 = base64Match[1];
-                    console.log('✅ Gambar ditemukan di text (base64 match)');
-                }
-            }
-        }
-
-        // Jika masih null, coba di data langsung
-        if (!imageBase64 && data.image) {
-            imageBase64 = data.image;
-            console.log('✅ Gambar ditemukan di data.image');
-        }
-
-        if (debugEl) {
-            debugEl.textContent += `\n\n🔍 Image ditemukan: ${!!imageBase64}`;
-            if (imageBase64) {
-                debugEl.textContent += `\n📏 Panjang: ${imageBase64.length} karakter`;
-                debugEl.textContent += `\n📌 Prefix: ${imageBase64.substring(0, 30)}...`;
-            }
-        }
-
-        if (!imageBase64) {
-            // Jika tidak ada gambar, tampilkan teks response
-            const textResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || 
-                                JSON.stringify(data, null, 2);
-            console.warn('⚠️ Tidak ada gambar, response teks:', textResponse.substring(0, 300));
-            showTextResult(textResponse);
+    // GENERATE - SEKARANG DI DALAM initSimulasiEvents()
+    // ============================================================
+    document.getElementById('simulasiGenerateBtn')?.addEventListener('click', async () => {
+        if (!simulasiState.selfieBase64 || !simulasiState.modelDataUrl) {
+            alert('Pastikan foto selfie dan model rambut sudah diupload!');
             return;
         }
 
-        progressEl.style.width = '100%';
-        statusEl.textContent = 'Selesai!';
-        if (debugEl) debugEl.textContent += '\n\n✅ Selesai!';
+        if (!simulasiState.modelBase64 && simulasiState.modelDataUrl) {
+            try {
+                const response = await fetch(simulasiState.modelDataUrl);
+                const blob = await response.blob();
+                const reader = new FileReader();
+                const base64 = await new Promise((resolve) => {
+                    reader.onload = () => resolve(reader.result.split(',')[1]);
+                    reader.readAsDataURL(blob);
+                });
+                simulasiState.modelBase64 = base64;
+            } catch (e) {
+                alert('Gagal memproses gambar model: ' + e.message);
+                return;
+            }
+        }
 
-        simulasiState.resultImageBase64 = imageBase64;
-        showSimulasiResult(imageBase64);
-
-    } catch (error) {
-        console.error('❌ Error:', error);
+        showSimulasiStep('generating');
+        const statusEl = document.getElementById('simulasiGeneratingStatus');
+        const progressEl = document.getElementById('simulasiProgressBar');
         const debugEl = document.getElementById('simulasiDebugInfo');
-        if (debugEl) {
-            debugEl.textContent += `\n\n❌ Error: ${error.message}`;
-            debugEl.classList.remove('hidden');
+        if (debugEl) debugEl.classList.remove('hidden');
+
+        statusEl.textContent = 'Mengirim request ke AI...';
+        progressEl.style.width = '10%';
+        if (debugEl) debugEl.textContent = '📤 Mengirim ke Netlify Function...';
+
+        try {
+            const response = await fetch('/.netlify/functions/nano-banana', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    selfieBase64: simulasiState.selfieBase64,
+                    modelBase64: simulasiState.modelBase64,
+                    modelName: simulasiState.modelName || 'Model Rambut'
+                })
+            });
+
+            statusEl.textContent = 'Menunggu response dari AI...';
+            progressEl.style.width = '50%';
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`HTTP ${response.status}: ${errorText.substring(0, 100)}`);
+            }
+
+            const data = await response.json();
+            console.log('📥 FULL RESPONSE:', JSON.stringify(data, null, 2));
+
+            if (debugEl) {
+                debugEl.textContent = `📥 Response diterima (${JSON.stringify(data).length} karakter)`;
+            }
+
+            statusEl.textContent = 'Memproses hasil AI...';
+            progressEl.style.width = '80%';
+
+            // Ekstrak gambar
+            let imageBase64 = null;
+
+            const parts = data.candidates?.[0]?.content?.parts;
+            if (parts) {
+                for (const part of parts) {
+                    if (part.inlineData && part.inlineData.data) {
+                        imageBase64 = part.inlineData.data;
+                        console.log('✅ Gambar ditemukan di inlineData!');
+                        break;
+                    }
+                }
+            }
+
+            if (!imageBase64 && data.image) {
+                imageBase64 = data.image;
+            }
+
+            if (!imageBase64) {
+                const textResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || 
+                                    JSON.stringify(data, null, 2);
+                showTextResult(textResponse);
+                return;
+            }
+
+            progressEl.style.width = '100%';
+            statusEl.textContent = 'Selesai!';
+
+            simulasiState.resultImageBase64 = imageBase64;
+            showSimulasiResult(imageBase64);
+
+        } catch (error) {
+            console.error('❌ Error:', error);
+            if (debugEl) {
+                debugEl.textContent += `\n\n❌ Error: ${error.message}`;
+            }
+            alert('Gagal generate: ' + error.message);
+            showSimulasiStep('selfie');
         }
-        alert('Gagal generate: ' + error.message);
-        showSimulasiStep('selfie');
-    }
-});
+    });
+    // ============================================================
+}
+// ← INI PENUTUP initSimulasiEvents() YANG BENAR
 
 // ============================================================
 // TAMPILKAN HASIL (GAMBAR)
@@ -579,9 +553,7 @@ function showTextResult(text) {
     showSimulasiStep('result');
 
     const img = document.getElementById('simulasiResultImg');
-    if (img) {
-        img.style.display = 'none';
-    }
+    if (img) img.style.display = 'none';
 
     const infoEl = document.getElementById('simulasiResultInfo') || document.createElement('div');
     infoEl.id = 'simulasiResultInfo';
