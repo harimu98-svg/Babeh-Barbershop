@@ -22,12 +22,16 @@ function getKatalogSupabaseClient() {
 function renderKatalog(container) {
   container.innerHTML = `
     <div class="max-w-7xl mx-auto">
-      <!-- Header Katalog -->
+       <!-- Header Katalog -->
       <div class="text-center mb-8">
         <h2 class="text-3xl md:text-4xl font-bold text-purple-800 mb-2">
           <i class="fas fa-cut text-purple-600 mr-2"></i> Katalog Model Rambut
         </h2>
         <p class="text-gray-500">Inspirasi gaya rambut terbaru untuk Anda</p>
+        <p class="text-purple-600 mt-2 text-sm md:text-base inline-flex items-center gap-2 bg-purple-50 px-4 py-2 rounded-full">
+          <i class="fas fa-wand-magic-sparkles"></i>
+          Gunakan Fitur Simulasi AI untuk memprediksi Model Rambut Pilihan Anda
+        </p>
       </div>
 
       <!-- Menu Kategori dengan Gambar (seperti index.html) -->
