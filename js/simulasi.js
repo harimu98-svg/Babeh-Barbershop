@@ -149,11 +149,7 @@ function renderSimulasiView() {
                 <span id="simulasiProviderBadge" class="ml-2 text-xs bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full"></span>
             </p>
 
-            <p class="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4 text-left leading-relaxed">
-                <i class="fas fa-exclamation-triangle mr-1"></i>
-                <strong>Disclaimer:</strong> Simulasi AI hanya prediksi untuk memberikan gambaran model rambut, hasil potongan bisa berbeda tergantung jenis dan kondisi rambut, bentuk wajah, dan faktor lainnya.
-            </p>
-
+        
             <!-- Before/After Slider -->
             <div class="ba-wrap" id="simulasiBaWrap">
                 <img id="simulasiImgBefore" class="ba-before" alt="Sebelum">
@@ -175,6 +171,10 @@ function renderSimulasiView() {
                     <i class="fas fa-check mr-2"></i>Selesai
                 </button>
             </div>
+             <p class="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4 text-left leading-relaxed">
+                <i class="fas fa-exclamation-triangle mr-1"></i>
+                <strong>Disclaimer:</strong> Simulasi AI hanya prediksi untuk memberikan gambaran model rambut, hasil potongan bisa berbeda tergantung jenis dan kondisi rambut, bentuk wajah, dan faktor lainnya.
+            </p>
         </div>
     `;
 
