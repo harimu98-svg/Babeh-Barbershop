@@ -1,6 +1,5 @@
 // ============================================================
-// NETLIFY FUNCTION - SENSENOVA U1.5 LITE
-// TANPA DEPENDENCIES (pakai fetch native)
+// NETLIFY FUNCTION - SENSENOVA U1.5 LITE (1 SUDUT: DEPAN)
 // ============================================================
 
 exports.handler = async (event) => {
@@ -39,7 +38,7 @@ exports.handler = async (event) => {
                 statusCode: 500,
                 headers,
                 body: JSON.stringify({
-                    error: 'SENSENOVA_API_KEY tidak ditemukan. Set di Netlify Environment Variables.'
+                    error: 'SENSENOVA_API_KEY tidak ditemukan.'
                 })
             };
         }
@@ -47,13 +46,18 @@ exports.handler = async (event) => {
         const prompt = `
         Ubah rambut pada foto pertama (selfie) dengan gaya rambut dari foto kedua (model ${modelName || 'rambut'}).
 
-        BUATKAN 3 SUDUT PANDANG DALAM 1 GAMBAR:
-        - Kiri: Tampak DEPAN
-        - Tengah: Tampak SAMPING KANAN
-        - Kanan: Tampak BELAKANG
+        PENTING:
+        - Tampilkan HANYA TAMPAK DEPAN (front view, wajah menghadap kamera langsung)
+        - JANGAN buat multi-panel, JANGAN buat kolase, JANGAN buat sudut samping atau belakang
+        - Hanya SATU gambar tunggal
 
-        Setiap sudut harus menunjukkan orang yang SAMA dengan RAMBUT BARU.
-        Pertahankan ekspresi wajah, warna kulit, dan gaya foto yang natural.
+        PERTAHANKAN dengan sangat ketat:
+        - Wajah, ekspresi, bentuk wajah, warna kulit yang SAMA PERSIS
+        - Ukuran wajah dan posisi kepala SAMA PERSIS seperti foto asli
+        - Zoom, framing, dan komposisi SAMA PERSIS
+        - Background dan pencahayaan SAMA PERSIS
+
+        HANYA ubah rambutnya saja sesuai model dari foto kedua.
         Hasil harus NATURAL dan REALISTIS seperti foto asli.
         `;
 
@@ -72,9 +76,8 @@ exports.handler = async (event) => {
             n: 1
         };
 
-        console.log('📤 Mengirim ke SenseNova U1.5 Lite...');
+        console.log('📤 Mengirim ke SenseNova (1 sudut depan)...');
 
-        // Timeout 50s (di bawah batas 60s Netlify)
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 50000);
 
