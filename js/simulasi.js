@@ -144,9 +144,14 @@ function renderSimulasiView() {
             <h3 class="text-xl font-bold text-slate-800 mb-2 text-center">
                 <i class="fas fa-check-circle text-green-500 mr-2"></i>Hasil Simulasi
             </h3>
-            <p class="text-center text-sm text-gray-500 mb-4">
+             <p class="text-center text-sm text-gray-500 mb-4">
                 Geser untuk membandingkan sebelum &amp; sesudah
                 <span id="simulasiProviderBadge" class="ml-2 text-xs bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full"></span>
+            </p>
+
+            <p class="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4 text-left leading-relaxed">
+                <i class="fas fa-exclamation-triangle mr-1"></i>
+                <strong>Disclaimer:</strong> Simulasi AI hanya prediksi untuk memberikan gambaran model rambut, hasil potongan bisa berbeda tergantung jenis dan kondisi rambut, bentuk wajah, dan faktor lainnya.
             </p>
 
             <!-- Before/After Slider -->
