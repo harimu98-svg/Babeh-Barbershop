@@ -1,6 +1,8 @@
 // ============================================================
 // SIMULASI.JS - BABEH BARBERSHOP
-// Fitur Simulasi Model Rambut dengan Nano Banana 2 Lite
+// Fitur Simulasi Model Rambut dengan Fallback:
+//   1. SenseNova U1.5 Lite (gratis, dicoba dulu)
+//   2. Nano Banana 2 Lite (berbayar, fallback)
 // ============================================================
 
 // ============================================================
@@ -15,6 +17,7 @@ const simulasiState = {
     modelName: null,
     modelNomor: null,
     resultImageBase64: null,
+    usedProvider: null,
     step: 'select'
 };
 
@@ -120,6 +123,7 @@ function renderSimulasiView() {
             </div>
             <div class="text-center text-sm text-gray-500 mt-3">
                 <i class="fas fa-info-circle mr-1"></i> 3 sudut pandang: Depan · Samping · Belakang
+                <span id="simulasiProviderBadge" class="ml-2 text-xs bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full"></span>
             </div>
             <div class="flex flex-wrap gap-3 mt-4 justify-center">
                 <button id="simulasiDownloadBtn" class="px-6 py-2 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 transition active:scale-95">
@@ -237,14 +241,12 @@ function renderSimulasiKatalog(images) {
 // BUKA SIMULASI (DIPANGGIL DARI TOMBOL KATALOG)
 // ============================================================
 function openSimulasi(selectedModel = null) {
-    // Sembunyikan menu dan gallery katalog
     const menuContainer = document.getElementById('katalogMenuContainer');
     const galleryView = document.getElementById('katalogGalleryView');
 
     if (menuContainer) menuContainer.classList.add('hidden');
     if (galleryView) galleryView.classList.add('hidden');
 
-    // Cari atau buat container simulasiView
     let simulasiView = document.getElementById('simulasiView');
     if (!simulasiView) {
         const parent = document.querySelector('.max-w-7xl.mx-auto') || document.body;
@@ -256,18 +258,16 @@ function openSimulasi(selectedModel = null) {
         simulasiView = div;
     }
 
-    // Tampilkan view simulasi
     simulasiView.classList.remove('hidden');
 
-    // Render view
     renderSimulasiView();
 
-    // Reset state
     simulasiState.step = 'select';
     simulasiState.selfieBase64 = null;
     simulasiState.selfieDataUrl = null;
+    simulasiState.resultImageBase64 = null;
+    simulasiState.usedProvider = null;
 
-    // Set model jika ada
     if (selectedModel) {
         simulasiState.modelDataUrl = selectedModel.url;
         simulasiState.modelBase64 = selectedModel.base64 || null;
@@ -283,7 +283,6 @@ function openSimulasi(selectedModel = null) {
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    // Pasang event listener
     initSimulasiEvents();
 }
 
@@ -428,7 +427,7 @@ function initSimulasiEvents() {
         reader.readAsDataURL(file);
     });
 
-        // === TOMBOL GENERATE ===
+    // === TOMBOL GENERATE ===
     document.getElementById('simulasiGenerateBtn')?.addEventListener('click', async () => {
         if (!simulasiState.selfieBase64 || !simulasiState.modelDataUrl) {
             alert('Pastikan foto selfie dan model rambut sudah diupload!');
@@ -496,7 +495,6 @@ function initSimulasiEvents() {
                 if (data.data[0].b64_json) {
                     imageBase64 = data.data[0].b64_json;
                 } else if (data.data[0].url) {
-                    // Kalau URL, fetch dulu jadi base64
                     const imgRes = await fetch(data.data[0].url);
                     const imgBlob = await imgRes.blob();
                     const reader = new FileReader();
@@ -508,8 +506,8 @@ function initSimulasiEvents() {
             }
 
             if (imageBase64) {
-                usedProvider = 'SenseNova';
-                console.log('✅ Berhasil dengan SenseNova (gratis)');
+                usedProvider = 'SenseNova (gratis)';
+                console.log('✅ Berhasil dengan SenseNova');
             } else {
                 throw new Error('SenseNova tidak mengembalikan gambar');
             }
@@ -520,7 +518,7 @@ function initSimulasiEvents() {
         }
 
         // ============================================================
-        // PERCOBAAN 2: NANO BANANA (BERBAYAR) - FALLBACK
+        // PERCOBAAN 2: NANO BANANA (FALLBACK, BERBAYAR)
         // ============================================================
         if (!imageBase64) {
             try {
@@ -558,8 +556,8 @@ function initSimulasiEvents() {
                 }
 
                 if (imageBase64) {
-                    usedProvider = 'Nano Banana';
-                    console.log('✅ Berhasil dengan Nano Banana (fallback)');
+                    usedProvider = 'Nano Banana (fallback)';
+                    console.log('✅ Berhasil dengan Nano Banana');
                 } else {
                     throw new Error('Nano Banana tidak mengembalikan gambar');
                 }
@@ -588,6 +586,8 @@ function initSimulasiEvents() {
         simulasiState.usedProvider = usedProvider;
         showSimulasiResult(imageBase64);
     });
+}
+
 // ============================================================
 // TAMPILKAN HASIL (GAMBAR)
 // ============================================================
@@ -595,7 +595,16 @@ function showSimulasiResult(imageBase64) {
     showSimulasiStep('result');
 
     const img = document.getElementById('simulasiResultImg');
-    if (img) img.src = `data:image/jpeg;base64,${imageBase64}`;
+    if (img) {
+        img.style.display = '';
+        img.src = `data:image/jpeg;base64,${imageBase64}`;
+    }
+
+    // Tampilkan badge provider
+    const badge = document.getElementById('simulasiProviderBadge');
+    if (badge && simulasiState.usedProvider) {
+        badge.textContent = simulasiState.usedProvider;
+    }
 
     // Download
     document.getElementById('simulasiDownloadBtn')?.addEventListener('click', function() {
@@ -685,4 +694,4 @@ function showTextResult(text) {
 // ============================================================
 window.openSimulasi = openSimulasi;
 
-console.log('📁 Modul Simulasi Model Rambut siap digunakan!');
+console.log('📁 Modul Simulasi Model Rambut siap digunakan! (dengan fallback SenseNova → Nano Banana)');
