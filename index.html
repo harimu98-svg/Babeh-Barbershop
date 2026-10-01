@@ -510,5 +510,40 @@
       console.log('📋 Menu tersedia:', Array.from(desktopMenuBtns).map(b => b.dataset.menu));
     })();
   </script>
+  
+  <!-- Hash Routing untuk direct URL -->
+<script>
+  // Fungsi untuk load konten dari hash URL
+  function loadContentFromHash() {
+    const hash = window.location.hash.replace('#', '');
+    if (hash) {
+      // Cari tombol menu dengan data-menu yang sesuai
+      const menuBtn = document.querySelector(`.menu-btn[data-menu="${hash}"]`);
+      if (menuBtn) {
+        menuBtn.click();
+      } else {
+        // Coba cari di mobile menu
+        const mobileBtn = document.querySelector(`.mobile-menu-btn[data-menu="${hash}"]`);
+        if (mobileBtn) {
+          mobileBtn.click();
+        }
+      }
+    }
+  }
+
+  // Jalankan saat halaman pertama kali load
+  document.addEventListener('DOMContentLoaded', function() {
+    if (window.location.hash) {
+      setTimeout(loadContentFromHash, 100);
+    }
+  });
+
+  // Jalankan saat hash berubah
+  window.addEventListener('hashchange', function() {
+    loadContentFromHash();
+  });
+
+  console.log('✅ URL Hash Routing siap digunakan!');
+</script>
 </body>
 </html>
