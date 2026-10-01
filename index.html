@@ -399,7 +399,7 @@
   <script src="js/membercard.js"></script>
   <script src="js/simulasi.js"></script>
 
-  <script>
+ <script>
     // Main Controller
     (function() {
       // State
@@ -415,8 +415,13 @@
       const overlay = document.getElementById('overlay');
 
       // Fungsi untuk load konten dari module yang sudah di-load
-      function loadContent(menu) {
+      function loadContent(menu, skipHashUpdate = false) {
         currentMenu = menu;
+        
+        // Update hash URL (hanya jika tidak skip)
+        if (!skipHashUpdate && window.location.hash !== `#${menu}`) {
+          window.location.hash = menu;
+        }
 
         // Update active class di desktop menu
         desktopMenuBtns.forEach(btn => {
@@ -503,47 +508,31 @@
       closeMobileMenu.addEventListener('click', closeMobileMenuPanel);
       overlay.addEventListener('click', closeMobileMenuPanel);
 
-      // Load default menu
-      loadContent('tentang-kami');
+      // ========== HASH ROUTING ==========
+      // Cek hash saat pertama kali load
+      const initialHash = window.location.hash.replace('#', '');
+      if (initialHash) {
+        // Load dari hash
+        setTimeout(() => {
+          loadContent(initialHash, true);
+        }, 100);
+      } else {
+        // Load default menu
+        loadContent('tentang-kami', true);
+      }
+
+      // Handle hash change (back/forward browser)
+      window.addEventListener('hashchange', function() {
+        const hash = window.location.hash.replace('#', '');
+        if (hash && hash !== currentMenu) {
+          loadContent(hash, true);
+        }
+      });
 
       console.log('🚀 Babeh Barbershop App Ready!');
       console.log('📋 Menu tersedia:', Array.from(desktopMenuBtns).map(b => b.dataset.menu));
     })();
-  </script>
-  
-  <!-- Hash Routing untuk direct URL -->
-<script>
-  // Fungsi untuk load konten dari hash URL
-  function loadContentFromHash() {
-    const hash = window.location.hash.replace('#', '');
-    if (hash) {
-      // Cari tombol menu dengan data-menu yang sesuai
-      const menuBtn = document.querySelector(`.menu-btn[data-menu="${hash}"]`);
-      if (menuBtn) {
-        menuBtn.click();
-      } else {
-        // Coba cari di mobile menu
-        const mobileBtn = document.querySelector(`.mobile-menu-btn[data-menu="${hash}"]`);
-        if (mobileBtn) {
-          mobileBtn.click();
-        }
-      }
-    }
-  }
-
-  // Jalankan saat halaman pertama kali load
-  document.addEventListener('DOMContentLoaded', function() {
-    if (window.location.hash) {
-      setTimeout(loadContentFromHash, 100);
-    }
-  });
-
-  // Jalankan saat hash berubah
-  window.addEventListener('hashchange', function() {
-    loadContentFromHash();
-  });
-
-  console.log('✅ URL Hash Routing siap digunakan!');
 </script>
+  
 </body>
 </html>
